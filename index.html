@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TVD Herren 3 · Spielplan 2026/27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0E1726;
+    --surface:#16233A;
+    --surface-2:#1D2E49;
+    --line:rgba(255,255,255,.10);
+    --line-strong:rgba(255,255,255,.18);
+    --home:#3E7BFA;      /* Heim */
+    --away:#F5A524;      /* Auswärts (Leder-Amber) */
+    --text:#EAF0F8;
+    --muted:#93A4BE;
+    --muted-2:#6C7E9B;
+    --disp:'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+    --body:'Inter', system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -200px, rgba(62,123,250,.10), transparent 60%),
+      var(--ink);
+    color:var(--text);
+    font-family:var(--body);
+    line-height:1.4;
+    min-height:100vh;
+    padding-bottom:48px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+
+  /* ---- Header ---- */
+  header{
+    position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg, rgba(14,23,38,.96), rgba(14,23,38,.86));
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .head-inner{max-width:760px;margin:0 auto;padding:14px 16px 0}
+  .eyebrow{font-family:var(--disp);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-size:12px}
+  .title{font-family:var(--disp);font-weight:700;font-size:30px;letter-spacing:.01em;line-height:1;margin-top:2px}
+  .title span{color:var(--away)}
+  .sub{color:var(--muted);font-size:13px;margin-top:4px}
+
+  /* Tabs */
+  .tabs{display:flex;gap:4px;margin-top:14px}
+  .tab{
+    flex:1;appearance:none;border:0;cursor:pointer;
+    background:transparent;color:var(--muted);
+    font-family:var(--disp);font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    font-size:15px;padding:12px 8px 13px;
+    border-bottom:2px solid transparent;transition:color .18s, border-color .18s;
+  }
+  .tab[aria-selected="true"]{color:var(--text);border-bottom-color:var(--away)}
+  .tab:focus-visible{outline:2px solid var(--home);outline-offset:-2px;border-radius:6px}
+
+  /* ---- Summary strip ---- */
+  .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0 10px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .n{font-family:var(--disp);font-weight:700;font-size:24px;line-height:1}
+  .stat .l{font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:.02em}
+  .stat.home .n{color:var(--home)}
+  .stat.away .n{color:var(--away)}
+  @media(max-width:520px){.strip{grid-template-columns:repeat(2,1fr)}}
+
+  /* ---- Next game ---- */
+  .next{
+    background:linear-gradient(120deg, rgba(62,123,250,.16), rgba(245,165,36,.10));
+    border:1px solid var(--line-strong);border-radius:16px;
+    padding:14px 16px;margin:6px 0 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap
+  }
+  .next .lbl{font-family:var(--disp);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:12px;color:var(--away)}
+  .next .mu{font-family:var(--disp);font-weight:700;font-size:20px;line-height:1.05}
+  .next .meta{color:var(--muted);font-size:13px;margin-top:2px}
+  .next .when{margin-left:auto;text-align:right}
+  .next .when .d{font-family:var(--disp);font-weight:700;font-size:26px;line-height:1}
+  .next .when .t{color:var(--muted);font-size:13px}
+
+  /* ---- Panels ---- */
+  .panel{display:none;animation:fade .25s ease both}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---- Month + games ---- */
+  .month{font-family:var(--disp);font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);font-size:13px;margin:22px 2px 10px;display:flex;align-items:center;gap:10px}
+  .month::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .game{
+    display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;
+    background:var(--surface);border:1px solid var(--line);
+    border-left:3px solid var(--home);border-radius:14px;
+    padding:12px 14px;margin-bottom:8px;transition:transform .16s, border-color .16s, background .16s
+  }
+  .game.away{border-left-color:var(--away)}
+  .game:hover{transform:translateY(-2px);background:var(--surface-2);border-color:var(--line-strong)}
+  .game.isnext{box-shadow:0 0 0 1px var(--away) inset, 0 8px 30px -12px rgba(245,165,36,.5)}
+
+  .date{ text-align:center }
+  .date .dow{font-family:var(--disp);font-weight:600;text-transform:uppercase;font-size:12px;color:var(--muted);letter-spacing:.06em}
+  .date .dm{font-family:var(--disp);font-weight:700;font-size:22px;line-height:1;margin-top:1px}
+
+  .match .opp{font-weight:600;font-size:16px}
+  .match .venue{color:var(--muted);font-size:13px;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .pin{width:6px;height:6px;border-radius:50%;background:var(--muted-2);display:inline-block;flex:none}
+  .km{color:var(--muted-2)}
+  .hall{color:var(--muted-2);font-size:12px;margin-top:2px}
+
+  .side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+  .chip{font-family:var(--disp);font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    font-size:12px;padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .chip.h{background:var(--home);color:#04122e}
+  .chip.a{background:transparent;color:var(--away);border:1.5px solid var(--away)}
+  .time{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--text)}
+  .time.open{color:var(--muted-2);font-style:italic;font-weight:500;font-size:13px}
+
+  @media(max-width:460px){
+    .game{grid-template-columns:48px 1fr auto;gap:10px;padding:11px 12px}
+    .match .opp{font-size:15px}
+  }
+
+  /* ---- Map ---- */
+  .maphead{color:var(--muted);font-size:13px;margin:16px 2px 12px;max-width:60ch}
+  .mapcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px 8px 4px;overflow:hidden}
+  svg{display:block;width:100%;height:auto}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:14px 2px 4px;font-size:13px;color:var(--muted)}
+  .legend .k{display:inline-flex;align-items:center;gap:7px}
+  .dotk{width:11px;height:11px;border-radius:50%;flex:none}
+  .dotk.h{background:var(--home)}
+  .dotk.a{background:var(--away)}
+
+  .dist{margin-top:20px}
+  .dist h3{font-family:var(--disp);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-size:13px;margin:0 2px 10px}
+  .drow{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--away);border-radius:12px;margin-bottom:7px}
+  .drow .t{font-weight:600;flex:1}
+  .drow .t small{display:block;color:var(--muted);font-weight:400;font-size:12px;margin-top:2px}
+  .drow .bar{flex:1.4;height:6px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;max-width:220px}
+  .drow .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--away),#ffcf6b);border-radius:999px}
+  .drow .val{font-family:var(--disp);font-weight:700;font-size:18px;min-width:64px;text-align:right}
+  .drow .val small{font-weight:500;font-size:12px;color:var(--muted)}
+  @media(max-width:520px){.drow .bar{display:none}}
+
+  footer{color:var(--muted-2);font-size:12px;text-align:center;margin-top:30px;line-height:1.6}
+  footer b{color:var(--muted);font-weight:600}
+
+  /* ---- Tischdienst ---- */
+  .dutystatus{color:var(--muted);font-size:14px;padding:20px 2px}
+  .dutystatus.err{color:#ffb4a2}
+  .dcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:16px 0}
+  .dcard-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .dcard-h h3{font-family:var(--disp);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text);font-size:14px}
+  .fairmeta{font-size:12px;color:var(--muted)}
+
+  .overview{display:flex;flex-direction:column;gap:8px}
+  .ovrow{display:grid;grid-template-columns:1fr 130px 34px;align-items:center;gap:10px}
+  .ovrow .nm{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ovrow .nm.zero{color:var(--muted-2)}
+  .ovbar{height:8px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}
+  .ovbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--home),#7fb0ff)}
+  .ovrow.over .ovbar i{background:linear-gradient(90deg,#ff8a5c,var(--away))}
+  .ovcount{font-family:var(--disp);font-weight:700;font-size:18px;text-align:right}
+  .ovcount.zero{color:var(--muted-2)}
+  .emptyroster{color:var(--muted);font-size:14px;padding:6px 0}
+
+  .dutygame{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+  .dutygame.full{border-color:rgba(62,123,250,.5)}
+  .dg-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .dg-date{font-family:var(--disp);font-weight:700;font-size:17px}
+  .dg-sub{color:var(--muted);font-size:12px}
+  .dg-badge{margin-left:auto;font-family:var(--disp);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:11px;padding:3px 9px;border-radius:999px}
+  .dg-badge.open{background:rgba(245,165,36,.16);color:var(--away)}
+  .dg-badge.full{background:rgba(62,123,250,.18);color:#9cc0ff}
+
+  .roles{display:grid;gap:7px}
+  .role{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .ract{display:flex;gap:8px;margin-left:auto}
+  .role .rl{font-family:var(--disp);font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:12px;color:var(--muted);width:78px;flex:none}
+  .role .who{flex:1;font-size:14px;font-weight:500}
+  .role.empty .who{color:var(--muted-2);font-weight:400;font-style:italic}
+  .role .act{appearance:none;border:0;cursor:pointer;font-family:var(--body);font-weight:600;font-size:13px;border-radius:8px;padding:6px 12px;white-space:nowrap}
+  .role .act.add{background:var(--home);color:#04122e}
+  .role .act.swap{background:transparent;color:#9cc0ff;border:1px solid rgba(62,123,250,.5)}
+  .role .act.rm{background:transparent;color:var(--muted);border:1px solid var(--line-strong)}
+  .role .act:focus-visible{outline:2px solid var(--away);outline-offset:1px}
+
+  .picker{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding:8px;background:var(--ink);border:1px dashed var(--line-strong);border-radius:10px}
+  .picker .pklbl{flex-basis:100%;font-size:12px;color:var(--muted);margin-bottom:2px}
+  .picker .pklbl b{color:var(--text);font-weight:600}
+  .picker .pk{appearance:none;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--text);cursor:pointer;font-family:var(--body);font-size:13px;border-radius:999px;padding:6px 12px}
+  .picker .pk:hover{border-color:var(--home);color:#cfe0ff}
+  .picker .pk.dis{opacity:.35;cursor:not-allowed}
+  .picker .pkclose{margin-left:auto;background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:13px}
+
+  .rostermgr{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .rostermgr summary{cursor:pointer;padding:13px 16px;font-family:var(--disp);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:var(--muted);list-style:none}
+  .rostermgr summary::-webkit-details-marker{display:none}
+  .rostermgr summary::after{content:"＋";float:right;color:var(--muted-2)}
+  .rostermgr[open] summary::after{content:"－"}
+  .rosterbox{padding:0 16px 16px}
+  .hint{color:var(--muted);font-size:12.5px;margin-bottom:10px;line-height:1.5}
+  .addrow{display:flex;gap:8px;margin-bottom:12px}
+  .addrow input{flex:1;background:var(--ink);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:var(--body);font-size:14px;padding:9px 12px}
+  .addrow input:focus{outline:2px solid var(--home);outline-offset:0}
+  .btn{appearance:none;border:0;cursor:pointer;background:var(--home);color:#04122e;font-family:var(--body);font-weight:600;font-size:14px;border-radius:10px;padding:9px 14px;white-space:nowrap}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line-strong)}
+  .btn.refresh{display:block;margin:16px auto 0}
+  .rosterchips{display:flex;flex-wrap:wrap;gap:7px}
+  .rchip{display:inline-flex;align-items:center;gap:7px;background:var(--ink);border:1px solid var(--line);border-radius:999px;padding:5px 6px 5px 12px;font-size:13px}
+  .rchip .c{font-family:var(--disp);font-weight:700;min-width:16px;text-align:center;color:var(--home)}
+  .rchip .x{appearance:none;border:0;background:rgba(255,255,255,.06);color:var(--muted);cursor:pointer;width:20px;height:20px;border-radius:50%;font-size:13px;line-height:1}
+  .rchip .x:hover{background:rgba(255,120,90,.25);color:#ffb4a2}
+  .rchip.exempt{border-color:rgba(62,123,250,.25)}
+  .rchip.plain{padding-right:12px}
+  .rchip.exempt .c{color:var(--muted-2)}
+  .rchip .tg{appearance:none;border:1px solid var(--line-strong);background:transparent;color:var(--muted);cursor:pointer;font-family:var(--body);font-size:11px;border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .rchip .tg:hover{color:#cfe0ff;border-color:var(--home)}
+  .ovrow.exempt{opacity:.8}
+  .ovrow.exempt .nm{color:var(--muted)}
+  .extag{grid-column:2 / 4;justify-self:end;font-family:var(--disp);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:11px;color:#9cc0ff;background:rgba(62,123,250,.14);padding:3px 9px;border-radius:999px}
+  .savestat{font-size:12.5px;min-height:18px;margin:-6px 2px 14px;transition:color .2s}
+  .savestat.saving{color:var(--muted-2)}
+  .savestat.ok{color:#7fcf9b}
+  .savestat.err{color:#ffb4a2}
+  .linkbtn{appearance:none;background:transparent;border:0;color:#ffd591;text-decoration:underline;cursor:pointer;font-family:var(--body);font-size:12.5px;padding:0}
+  .modenote{background:rgba(245,165,36,.12);border:1px solid rgba(245,165,36,.3);color:#ffd591;border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.5;margin:-6px 2px 14px}
+  .modenote b{color:#ffe6b8;font-weight:700}
+  .modenote.ok{background:rgba(80,200,140,.12);border-color:rgba(80,200,140,.35);color:#9be3bd}
+  .modenote.ok b{color:#c9f2dc}
+  .rostermgr.sync summary{color:#ffd591}
+  .synctext{width:100%;min-height:66px;background:var(--ink);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;padding:9px 11px;margin:8px 0;resize:vertical;word-break:break-all}
+  .synctext:focus{outline:2px solid var(--home);outline-offset:0}
+  .synhr{height:1px;background:var(--line);margin:14px 0}
+
+  .deadline{display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 14px;margin-bottom:16px;font-size:13.5px;border:1px solid var(--line-strong)}
+  .deadline .dl-ic{font-family:var(--disp);font-weight:700;font-size:20px;line-height:1}
+  .deadline.open{background:rgba(245,165,36,.12);color:#ffd591}
+  .deadline.open .dl-ic{color:var(--away)}
+  .deadline.closed{background:rgba(62,123,250,.12);color:#bcd4ff}
+  .deadline.closed .dl-ic{color:var(--home)}
+  .deadline b{font-weight:700}
+  .rostermgr.admin summary{color:#9cc0ff}
+  .rostermgr.admin{border-color:rgba(62,123,250,.28)}
+  #adminOpen b{color:var(--text)}
+
+  @media(max-width:460px){
+    .ovrow{grid-template-columns:1fr 84px 30px}
+    .role .rl{width:64px}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <div class="eyebrow">BBW4 Kreisliga Mitte · Alb/Bodensee</div>
+    <div class="title">TVD Herren <span>3</span> · Saison 26/27</div>
+    <div class="sub">Spielplan &amp; Anfahrten — TV Derendingen 3</div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-tab="plan">Spielplan</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="map">Karte</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="duty">Tischdienst</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- SPIELPLAN -->
+  <section class="panel active" id="plan" role="tabpanel">
+    <div class="strip">
+      <div class="stat"><div class="n">14</div><div class="l">Spiele</div></div>
+      <div class="stat home"><div class="n">7</div><div class="l">Heim</div></div>
+      <div class="stat away"><div class="n">7</div><div class="l">Auswärts</div></div>
+      <div class="stat"><div class="n">127<small style="font-size:13px"> km</small></div><div class="l">Auswärts einfach</div></div>
+    </div>
+    <div class="next" id="nextGame"></div>
+    <div id="schedule"></div>
+  </section>
+
+  <!-- KARTE -->
+  <section class="panel" id="map" role="tabpanel">
+    <p class="maphead">Alle Spielorte relativ zu Derendingen (Heimbasis). Ringe = Luftlinie 10 / 20 / 30 km, Zahlen = <b style="color:var(--muted)">ca. Fahrstrecke</b> ab der Kreissporthalle. Norden ist oben.</p>
+    <div class="mapcard"><div id="svgHost"></div></div>
+    <div class="legend">
+      <span class="k"><span class="dotk h"></span> Heim · Derendingen (7 Spiele)</span>
+      <span class="k"><span class="dotk a"></span> Auswärts (7 Orte)</span>
+    </div>
+    <div class="dist">
+      <h3>Anfahrt ab Derendingen · ca.</h3>
+      <div id="distList"></div>
+    </div>
+  </section>
+
+  <!-- TISCHDIENST -->
+  <section class="panel" id="duty" role="tabpanel">
+    <p class="maphead">
+      Tischdienst für <b style="color:var(--muted)">Herren 2</b> im Anschluss an unsere 7 Heimspiele — je <b style="color:var(--muted)">3 Personen</b> (Anschreiber · Zeit · 24&nbsp;Sek.).
+      Eintragungen sind für alle mit dem Link sichtbar und werden live geteilt.
+    </p>
+
+    <div id="dutyStatus" class="dutystatus">Lade Eintragungen…</div>
+
+    <div id="dutyApp" style="display:none">
+      <div id="dutyDeadline" class="deadline"></div>
+      <div id="saveStatus" class="savestat"></div>
+      <div id="modeNote" class="modenote" style="display:none"></div>
+
+      <!-- Fairness overview -->
+      <div class="dcard">
+        <div class="dcard-h">
+          <h3>Übersicht · Dienste pro Person</h3>
+          <span id="fairMeta" class="fairmeta"></span>
+        </div>
+        <div id="overview" class="overview"></div>
+      </div>
+
+      <!-- Duty games -->
+      <div class="month">Dienste eintragen</div>
+      <div id="dutyList"></div>
+
+      <!-- Roster management -->
+      <details class="rostermgr">
+        <summary>Kader verwalten (<span id="rosterCount">0</span>)</summary>
+        <div class="rosterbox">
+          <p class="hint">Namen einmal anlegen — danach tragen sich alle per Auswahl ein. Mehrere auf einmal: mit Komma oder Zeilenumbruch einfügen.</p>
+          <div class="addrow">
+            <input id="newPlayer" type="text" placeholder="Name(n) hinzufügen…" autocomplete="off" />
+            <button id="addPlayerBtn" class="btn">Hinzufügen</button>
+          </div>
+          <div id="rosterChips" class="rosterchips"></div>
+          <p id="rosterAdminHint" class="hint" style="margin:12px 0 0;display:none">Namen entfernen und „– Dienst / + Dienst" sind nur mit Admin-Code möglich — unten im <b style="color:var(--muted)">Admin</b>-Bereich freischalten.</p>
+        </div>
+      </details>
+
+      <!-- Admin -->
+      <details class="rostermgr admin">
+        <summary>Admin · Dienste verteilen</summary>
+        <div class="rosterbox">
+          <div id="adminLocked">
+            <p class="hint">Geschützter Bereich für dich als Organisator. Code eingeben, um <b style="color:var(--muted)">Verteilen, Namen entfernen und Befreiungen</b> freizuschalten (leichte Sperre, kein echtes Login). Spieler können ohne Code jederzeit Namen hinzufügen und sich ein-/austragen.</p>
+            <div class="addrow">
+              <input id="adminCode" type="password" placeholder="Admin-Code…" autocomplete="off" />
+              <button id="adminUnlock" class="btn">Freischalten</button>
+            </div>
+            <div id="adminMsg" class="hint" style="margin:8px 0 0"></div>
+          </div>
+          <div id="adminPanel" style="display:none">
+            <p class="hint">Nach dem Stichtag (Ende Oktober): füllt <b style="color:var(--muted)">alle noch offenen Slots</b> automatisch — so ausgeglichen wie möglich (wenigste Dienste zuerst, niemand doppelt am selben Spieltag). Bereits eingetragene Personen bleiben unangetastet.</p>
+            <div id="adminOpen" class="hint" style="margin-bottom:12px"></div>
+            <button id="distribute" class="btn">Offene fair verteilen</button>
+            <button id="adminReset" class="btn ghost" style="margin-left:8px">Alle Zuteilungen leeren</button>
+            <div class="synhr"></div>
+            <h4 class="synch">Live-Sync (Server)</h4>
+            <p class="hint">Echtes Teilen über einen JSON-Endpunkt (GET/PUT), z.B. ein Blob von <b style="color:var(--muted)">jsonblob.com</b>. URL einfügen und „Verbinden" — alle Geräte mit derselben URL sehen live denselben Stand. Ob die App-Umgebung externe Verbindungen zulässt, zeigt sich sofort beim Verbinden.</p>
+            <div class="addrow"><input id="syncUrlInput" type="text" placeholder="https://jsonblob.com/api/jsonBlob/…" autocomplete="off" /><button id="syncUrlSet" class="btn">Verbinden</button></div>
+            <button id="syncUrlClear" class="btn ghost">Trennen</button>
+            <div id="syncUrlMsg" class="hint" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Sichern & Teilen -->
+      <details class="rostermgr sync">
+        <summary>Sichern &amp; Teilen (Code)</summary>
+        <div class="rosterbox">
+          <p class="hint">Server-unabhängige Sicherung: erzeugt einen Code des aktuellen Stands (Kader, Eintragungen, Befreiungen). Poste ihn z.B. im Team-Chat. Zum Übernehmen Code einfügen und laden (nur Admin).</p>
+          <button id="syncExport" class="btn">Aktuellen Stand als Code</button>
+          <textarea id="syncOut" class="synctext" readonly placeholder="Hier erscheint der Code…"></textarea>
+          <button id="syncCopy" class="btn ghost">Markieren / kopieren</button>
+          <div class="synhr"></div>
+          <textarea id="syncIn" class="synctext" placeholder="Code hier einfügen…"></textarea>
+          <button id="syncImport" class="btn">Stand aus Code laden</button>
+          <div id="syncMsg" class="hint" style="margin-top:8px"></div>
+        </div>
+      </details>
+
+      <button id="dutyRefresh" class="btn ghost refresh">Aktualisieren</button>
+    </div>
+  </section>
+
+  <footer>
+    Datenquelle: basketball-bund.net (TeamSL), Liga&nbsp;55489 · Fahrstrecken gerundet (ca.), Luftlinien geokodiert.<br>
+    Anwurfzeiten mit <b>„Zeit offen"</b> sind im Verband noch nicht angesetzt.
+  </footer>
+</main>
+
+<script>
+const HOME = {name:"Derendingen", lat:48.500802, lon:9.056901};
+
+const games = [
+  {date:"2026-10-10", time:"12:45", opp:"TB Kirchentellinsfurt 2", home:false, town:"Kirchentellinsfurt", km:11, lat:48.531019, lon:9.149446, hall:"Neue Sporthalle"},
+  {date:"2026-10-18", time:"10:00", opp:"TuS Metzingen 2",        home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2026-11-07", time:"16:00", opp:"SV Pfrondorf",            home:false, town:"Pfrondorf", km:9,  lat:48.549056, lon:9.109442, hall:"Schönbuchhalle"},
+  {date:"2026-11-15", time:"12:00", opp:"SV Böblingen Panthers 2", home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2026-11-21", time:"13:45", opp:"VfL Sindelfingen 3",      home:false, town:"Sindelfingen", km:34, lat:48.707456, lon:9.004405, hall:"Gemeindeschule Eichholz"},
+  {date:"2026-11-29", time:"12:00", opp:"SV 03 Tigers Tübingen 3", home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2026-12-06", time:"14:30", opp:"SpVgg Mössingen 2",       home:false, town:"Mössingen", km:13, lat:48.407165, lon:9.056302, hall:"Jahnhalle beim Schulzentrum"},
+  {date:"2026-12-12", time:"17:15", opp:"SV 03 Tigers Tübingen 3", home:false, town:"Tübingen", km:4,  lat:48.521636, lon:9.057645, hall:"Ballspielhalle"},
+  {date:"2026-12-20", time:"14:00", opp:"SpVgg Mössingen 2",       home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2027-01-31", time:"12:00", opp:"TB Kirchentellinsfurt 2", home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2027-02-21", time:"14:30", opp:"TuS Metzingen 2",         home:false, town:"Metzingen", km:23, lat:48.539900, lon:9.286406, hall:"Neue Öschhalle"},
+  {date:"2027-02-28", time:"12:00", opp:"SV Pfrondorf",            home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2027-03-06", time:"16:45", opp:"SV Böblingen Panthers 2", home:false, town:"Böblingen", km:33, lat:48.684549, lon:9.007351, hall:"Hermann-Raiser-Halle 1"},
+  {date:"2027-03-14", time:"14:00", opp:"VfL Sindelfingen 3",      home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+];
+
+const DOW = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const MON = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+function d(s){const [y,m,dd]=s.split("-").map(Number);return new Date(y,m-1,dd);}
+
+// next upcoming game
+const today = new Date(); today.setHours(0,0,0,0);
+let nextIdx = games.findIndex(g => d(g.date) >= today);
+
+// ---- NEXT GAME CARD ----
+(function(){
+  const host = document.getElementById("nextGame");
+  if(nextIdx === -1){ host.innerHTML = '<div class="mu">Saison beendet</div>'; return; }
+  const g = games[nextIdx], dt = d(g.date);
+  const timeTxt = g.time ? g.time+" Uhr" : "Zeit offen";
+  const place = g.home ? "Heim · Derendingen" : "Auswärts · "+g.town+(g.km?" · ca. "+g.km+" km":"");
+  host.innerHTML =
+    '<div><div class="lbl">Nächstes Spiel</div>'+
+    '<div class="mu">TVD 3 '+(g.home?'vs':'@')+' '+g.opp+'</div>'+
+    '<div class="meta">'+place+'</div></div>'+
+    '<div class="when"><div class="d">'+DOW[dt.getDay()]+' '+dt.getDate()+'.'+(dt.getMonth()+1)+'.</div>'+
+    '<div class="t">'+timeTxt+'</div></div>';
+})();
+
+// ---- SCHEDULE ----
+(function(){
+  const host = document.getElementById("schedule");
+  let curKey = "";
+  games.forEach((g,i)=>{
+    const dt = d(g.date);
+    const key = MON[dt.getMonth()]+" "+dt.getFullYear();
+    if(key !== curKey){ curKey = key;
+      const h = document.createElement("div"); h.className="month"; h.textContent=key; host.appendChild(h);
+    }
+    const row = document.createElement("div");
+    row.className = "game "+(g.home?"home":"away")+(i===nextIdx?" isnext":"");
+    const timeHtml = g.time ? '<div class="time">'+g.time+'</div>' : '<div class="time open">Zeit offen</div>';
+    const venue = g.home
+      ? '<span class="pin" style="background:var(--home)"></span> Derendingen (Heim)'
+      : '<span class="pin" style="background:var(--away)"></span> '+g.town+' <span class="km">· ca. '+g.km+' km</span>';
+    const hallLine = g.hall ? '<div class="hall">'+g.hall+'</div>' : '';
+    row.innerHTML =
+      '<div class="date"><div class="dow">'+DOW[dt.getDay()]+'</div><div class="dm">'+dt.getDate()+'.'+(dt.getMonth()+1)+'.</div></div>'+
+      '<div class="match"><div class="opp">'+(g.home?'vs ':'@ ')+g.opp+'</div>'+
+      '<div class="venue">'+venue+'</div>'+hallLine+'</div>'+
+      '<div class="side"><span class="chip '+(g.home?'h':'a')+'">'+(g.home?'Heim':'Ausw.')+'</span>'+timeHtml+'</div>';
+    host.appendChild(row);
+  });
+})();
+
+// ---- DISTANCE LIST ----
+(function(){
+  const host = document.getElementById("distList");
+  const away = games.filter(g=>!g.home).sort((a,b)=>b.km-a.km);
+  const max = Math.max(...away.map(g=>g.km));
+  away.forEach(g=>{
+    const dt = d(g.date);
+    const r = document.createElement("div"); r.className="drow";
+    r.innerHTML =
+      '<div class="t">'+g.town+'<small>@ '+g.opp+' · '+DOW[dt.getDay()]+' '+dt.getDate()+'.'+(dt.getMonth()+1)+'.</small></div>'+
+      '<div class="bar"><i style="width:'+(g.km/max*100)+'%"></i></div>'+
+      '<div class="val">'+g.km+'<small> km</small></div>';
+    host.appendChild(r);
+  });
+})();
+
+// ---- MAP (self-contained SVG, geo-accurate, uniform scale) ----
+(function(){
+  const kmLat = 111.19, kmLon = 111.32*Math.cos(HOME.lat*Math.PI/180);
+  const away = games.filter(g=>!g.home);
+  // project to km east/north relative to home
+  const pts = away.map(g=>({
+    ...g,
+    e:(g.lon-HOME.lon)*kmLon,
+    n:(g.lat-HOME.lat)*kmLat
+  }));
+  const all = [{e:0,n:0}, ...pts];
+  const pad = 6.5;
+  let minE=Math.min(...all.map(p=>p.e))-pad, maxE=Math.max(...all.map(p=>p.e))+pad;
+  let minN=Math.min(...all.map(p=>p.n))-pad, maxN=Math.max(...all.map(p=>p.n))+pad;
+  const spanE=maxE-minE, spanN=maxN-minN;
+  const PX = 620/spanE;                 // uniform px per km
+  const W = spanE*PX, H = spanN*PX;
+  const X = e => (e-minE)*PX;
+  const Y = n => (maxN-n)*PX;           // north up
+  const hx=X(0), hy=Y(0);
+
+  let s = '<svg viewBox="0 0 '+W.toFixed(0)+' '+H.toFixed(0)+'" role="img" aria-label="Karte der Spielorte um Derendingen">';
+  // subtle background
+  s += '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="none"/>';
+  // distance rings
+  [10,20,30].forEach(km=>{
+    const r=km*PX;
+    s += '<circle cx="'+hx+'" cy="'+hy+'" r="'+r+'" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="1" stroke-dasharray="3 5"/>';
+    s += '<text x="'+hx+'" y="'+(hy-r+16)+'" fill="#5a6c88" font-family="Barlow Condensed,sans-serif" font-size="13" text-anchor="middle">'+km+' km</text>';
+  });
+  // north arrow
+  s += '<g opacity=".55"><line x1="'+(W-26)+'" y1="26" x2="'+(W-26)+'" y2="52" stroke="#8093ad" stroke-width="1.5"/>'+
+       '<path d="M'+(W-26)+' 20 l5 10 h-10 z" fill="#8093ad"/>'+
+       '<text x="'+(W-26)+'" y="66" fill="#8093ad" font-family="Barlow Condensed,sans-serif" font-size="12" text-anchor="middle">N</text></g>';
+  // spokes
+  pts.forEach(p=>{
+    s += '<line x1="'+hx+'" y1="'+hy+'" x2="'+X(p.e)+'" y2="'+Y(p.n)+'" stroke="rgba(245,165,36,.28)" stroke-width="1.4"/>';
+  });
+  // away pins + labels (radial outward)
+  pts.forEach(p=>{
+    const px=X(p.e), py=Y(p.n);
+    const dist=Math.hypot(p.e,p.n)||1;
+    const ux=p.e/dist, uy=p.n/dist;
+    const off=15;
+    const lx=px+ux*off, ly=py-uy*off;      // svg y inverted
+    const anchor = ux>0.35?"start":(ux<-0.35?"end":"middle");
+    const dt=d(p.date);
+    const dmy=dt.getDate()+'.'+(dt.getMonth()+1)+'.';
+    s += '<circle cx="'+px+'" cy="'+py+'" r="6.5" fill="#F5A524" stroke="#0E1726" stroke-width="2"/>';
+    s += '<text x="'+lx+'" y="'+ly+'" text-anchor="'+anchor+'" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="16" fill="#EAF0F8">'+p.town+'</text>';
+    s += '<text x="'+lx+'" y="'+(ly+15)+'" text-anchor="'+anchor+'" font-family="Inter,sans-serif" font-size="12" fill="#93A4BE">'+dmy+' · ca. '+p.km+' km</text>';
+  });
+  // home hub on top
+  s += '<circle cx="'+hx+'" cy="'+hy+'" r="10" fill="#3E7BFA" stroke="#0E1726" stroke-width="2.5"/>';
+  s += '<circle cx="'+hx+'" cy="'+hy+'" r="18" fill="none" stroke="rgba(62,123,250,.4)" stroke-width="1.5"/>';
+  s += '<text x="'+(hx)+'" y="'+(hy+34)+'" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="17" fill="#3E7BFA">Derendingen</text>';
+  s += '<text x="'+(hx)+'" y="'+(hy+50)+'" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" fill="#93A4BE">Heimbasis · 7 Heimspiele</text>';
+  s += '</svg>';
+  document.getElementById("svgHost").innerHTML = s;
+})();
+
+// ---- TISCHDIENST (geteilt & persistent) ----
+const DutyApp = (function(){
+  const KEY = "tischdienst:v1";
+  const ROLES = [["anschreiber","Anschreiber"],["zeitnehmer","Zeit"],["sekunden","24 Sek."]];
+  const DEFAULT_ROSTER = ["Alex","Benno","Colin","Daniel","Dom","Fabi","Jan","Jannick","Jonas","Matze","Robert","Roman","Roy","Sadik","Simon","Stijn","Til","Gerhard"];
+  const DEFAULT_EXEMPT = ["Gerhard"];
+  const ADMIN_CODE = "120895";
+  const SYNC_URL = "https://script.google.com/macros/s/AKfycbycN6Q0a86wwK399_8AhLquCExag6NGUAMgVAZLKPiOR-Uqr_Zb4b7aFmktAL0CWRAZjA/exec";   // feste Live-Sync-URL (Google Apps Script Web-App)
+  const dutyGames = games.filter(g=>g.home);               // 7 Heimtermine
+  const SLOTS = dutyGames.length * ROLES.length;           // 21
+  const SIGNUP_DEADLINE = new Date(2026,9,31,23,59,59);     // Ende Oktober 2026
+  const hasStorage = typeof window!=="undefined" && window.storage && typeof window.storage.get==="function";
+  let state=null, pollTimer=null, openPicker=null, started=false, adminUnlocked=false, resetArm=false, dirty=false, storageMode=null, runtimeSyncUrl="";
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const syncUrl=()=>runtimeSyncUrl||SYNC_URL||"";
+
+  function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+  function blank(){const duties={};dutyGames.forEach(g=>duties[g.date]={anschreiber:"",zeitnehmer:"",sekunden:""});return {roster:[],exempt:[],duties,adminCode:""};}
+  function normalize(st){
+    if(!st||typeof st!=="object") st=blank();
+    if(!Array.isArray(st.roster)) st.roster=[];
+    if(!Array.isArray(st.exempt)) st.exempt=[];
+    if(typeof st.adminCode!=="string") st.adminCode="";
+    if(!st.duties||typeof st.duties!=="object") st.duties={};
+    dutyGames.forEach(g=>{const dd=st.duties[g.date]||{};st.duties[g.date]={anschreiber:dd.anschreiber||"",zeitnehmer:dd.zeitnehmer||"",sekunden:dd.sekunden||""};});
+    return st;
+  }
+  const isEx=(st,n)=>st.exempt.includes(n);
+  const active=st=>st.roster.filter(n=>!isEx(st,n));
+  async function load(){
+    const url=syncUrl();
+    if(url){
+      try{const r=await fetch(url,{cache:"no-store"});if(r.ok){const j=await r.json();if(storageMode!=="server"){storageMode="server";renderModeNote();}return normalize(j&&Array.isArray(j.roster)?j:blank());}}
+      catch(e){console.warn("sync get",e);}
+      // Server nicht erreichbar → weiter zu window.storage / RAM
+    }
+    if(!hasStorage) return normalize(state||blank());
+    const shared = storageMode!=="local";   // bevorzugt geteilt, außer wir wissen dass nur lokal geht
+    try{const r=await window.storage.get(KEY,shared);return normalize(r?JSON.parse(r.value):blank());}
+    catch(e){return normalize(state||blank());}
+  }
+  function renderModeNote(){
+    const el=document.getElementById("modeNote"); if(!el) return;
+    el.className="modenote";
+    if(storageMode==="server"){el.classList.add("ok");el.style.display="block";el.innerHTML='🟢 <b>Live-Sync aktiv</b> — alle Geräte mit derselben Sync-URL teilen denselben Stand.';}
+    else if(storageMode==="serverfail"){el.style.display="block";el.innerHTML='⚠ Sync-Server nicht erreichbar (evtl. von der App-Umgebung blockiert). Änderungen bleiben lokal — notfalls „Sichern &amp; Teilen (Code)" nutzen.';}
+    else if(storageMode==="local"){el.style.display="block";el.innerHTML='⚠ Geteilter Speicher ist hier nicht erreichbar — Einträge werden nur auf <b>diesem Gerät</b> gespeichert und <b>nicht</b> mit anderen geteilt.';}
+    else if(storageMode==="none"){el.style.display="block";el.innerHTML='⚠ Automatisches Speichern ist hier nicht möglich — Änderungen gehen beim Neuladen verloren. Sichere den Stand über <b>„Sichern &amp; Teilen (Code)"</b> unten und teile ihn im Team.';}
+    else{el.style.display="none";}
+  }
+  let okTimer=null;
+  function setSaveStatus(s){
+    const el=document.getElementById("saveStatus"); if(!el) return;
+    if(okTimer){clearTimeout(okTimer);okTimer=null;}
+    if(s==="saving"){el.className="savestat saving";el.textContent="Speichere…";}
+    else if(s==="ok"){el.className="savestat ok";el.textContent=storageMode==="local"?"Gespeichert – nur auf diesem Gerät ⚠":"Alles gespeichert ✓";okTimer=setTimeout(()=>{const e2=document.getElementById("saveStatus");if(e2&&!dirty){e2.className="savestat";e2.textContent="";}},2500);}
+    else if(s==="err"){el.className="savestat err";el.innerHTML='Speichern fehlgeschlagen — <button id="saveRetry" class="linkbtn">erneut versuchen</button>';}
+    else {el.className="savestat";el.textContent="";}
+  }
+  async function persist(st){
+    state=st; dirty=true;
+    const url=syncUrl();
+    let serverTried=false;
+    if(url){
+      serverTried=true;
+      setSaveStatus("saving");
+      const gs=/script\.google\.com/.test(url);   // Google Apps Script Web-App → POST + text/plain (kein CORS-Preflight)
+      const opts=gs
+        ? {method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(st)}
+        : {method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(st)};
+      for(let a=0;a<3;a++){
+        try{
+          const r=await fetch(url,opts);
+          if(r.ok){storageMode="server";dirty=false;setSaveStatus("ok");renderModeNote();return true;}
+          console.warn("sync write status",r.status);
+        }catch(e){console.warn("sync write",e);}
+        await sleep(400);
+      }
+      // Server nicht erreichbar → weiter zu window.storage als Notnagel
+    }
+    if(!hasStorage){setSaveStatus("err");storageMode=serverTried?"serverfail":"none";renderModeNote();return false;}
+    setSaveStatus("saving");
+    const json=JSON.stringify(st);
+    const order = storageMode==="local" ? [false,true] : [true,false];   // erst geteilt, dann lokal (oder umgekehrt, wenn schon lokal)
+    for(const shared of order){
+      for(let a=0;a<2;a++){
+        try{
+          await window.storage.set(KEY,json,shared);
+          const m=shared?"shared":"local";
+          if(storageMode!==m){storageMode=m;renderModeNote();}
+          dirty=false; setSaveStatus("ok"); return true;
+        }catch(e){ console.warn("storage set shared="+shared+" versuch "+(a+1),e); await sleep(250); }
+      }
+    }
+    setSaveStatus("err"); storageMode=serverTried?"serverfail":"none"; renderModeNote(); return false;   // bleibt lokal im RAM sichtbar, wird beim nächsten Versuch geflusht
+  }
+  async function mutate(fn){const fresh=await load();fn(fresh);await persist(fresh);render();}
+  function exportCode(){try{return btoa(unescape(encodeURIComponent(JSON.stringify(state))));}catch(e){return "";}}
+  async function importCode(raw){
+    let obj; try{obj=JSON.parse(decodeURIComponent(escape(atob(raw.trim()))));}catch(e){return false;}
+    if(!obj||typeof obj!=="object"||!Array.isArray(obj.roster)||!obj.duties) return false;
+    const st=normalize(obj); await persist(st); render(); return true;
+  }
+
+  function counts(st){const c={};st.roster.forEach(n=>c[n]=0);Object.values(st.duties).forEach(sl=>Object.values(sl).forEach(n=>{if(n)c[n]=(c[n]||0)+1;}));return c;}
+  function fmtDate(s){const dt=d(s);return DOW[dt.getDay()]+" "+dt.getDate()+"."+(dt.getMonth()+1)+".";}
+
+  function render(){
+    if(!state) return;
+    document.getElementById("dutyStatus").style.display="none";
+    document.getElementById("dutyApp").style.display="block";
+    const c=counts(state);
+    renderDeadline(); renderOverview(state,c); renderGames(state,c); renderRoster(state,c); renderAdmin(state,c); renderModeNote();
+  }
+  function openSlots(st){const o=[];dutyGames.forEach(g=>ROLES.forEach(([k])=>{if(!st.duties[g.date][k])o.push({date:g.date,role:k});}));return o;}
+  function renderDeadline(){
+    const el=document.getElementById("dutyDeadline");
+    const now=new Date();
+    if(now<=SIGNUP_DEADLINE){
+      const days=Math.ceil((SIGNUP_DEADLINE-now)/86400000);
+      el.className="deadline open";
+      el.innerHTML='<span class="dl-ic">‼</span><span>Selbst eintragen bis <b>So 31.10.2026</b> · noch <b>'+days+' Tag'+(days===1?'':'e')+'</b>. Danach verteilt der Admin die offenen Dienste fair.</span>';
+    }else{
+      const open=openSlots(state).length;
+      el.className="deadline closed";
+      el.innerHTML='<span class="dl-ic">✓</span><span>Eintragefrist vorbei — Austragen gesperrt. Bei Verhinderung bitte <b>tauschen (Wechseln)</b>. '+(open?'<b>'+open+'</b> offene Slots: Restverteilung über den Admin-Bereich.':'Alle Dienste besetzt.')+'</span>';
+    }
+  }
+  function renderOverview(st,c){
+    const host=document.getElementById("overview");
+    const act=active(st);
+    const assigned=Object.values(c).reduce((a,b)=>a+b,0);
+    document.getElementById("fairMeta").textContent=assigned+" / "+SLOTS+" Slots vergeben"+(act.length?" · Ziel ≈ "+(SLOTS/act.length).toFixed(1)+" pro Person":"");
+    if(!st.roster.length){host.innerHTML='<div class="emptyroster">Noch keine Namen im Kader — unten unter „Kader verwalten" anlegen.</div>';return;}
+    const max=Math.max(1,...act.map(n=>c[n]||0)), target=SLOTS/Math.max(act.length,1);
+    let html=[...act].sort((a,b)=>(c[b]||0)-(c[a]||0)||a.localeCompare(b)).map(n=>{
+      const v=c[n]||0, over=v>Math.ceil(target);
+      return '<div class="ovrow'+(over?' over':'')+'"><span class="nm'+(v===0?' zero':'')+'">'+esc(n)+'</span>'+
+        '<span class="ovbar"><i style="width:'+(v/max*100)+'%"></i></span>'+
+        '<span class="ovcount'+(v===0?' zero':'')+'">'+v+'</span></div>';
+    }).join("");
+    const ex=st.roster.filter(n=>isEx(st,n));
+    if(ex.length) html+=ex.sort((a,b)=>a.localeCompare(b)).map(n=>
+      '<div class="ovrow exempt"><span class="nm">'+esc(n)+'</span><span class="extag">kein Dienst</span></div>').join("");
+    host.innerHTML=html;
+  }
+  function renderGames(st,c){
+    const canSignOff = new Date() <= SIGNUP_DEADLINE;
+    document.getElementById("dutyList").innerHTML=dutyGames.map(g=>{
+      const slot=st.duties[g.date], filled=ROLES.filter(([k])=>slot[k]).length, full=filled===ROLES.length;
+      const roles=ROLES.map(([k,label])=>{
+        const who=slot[k];
+        const isOpen=openPicker&&openPicker.date===g.date&&openPicker.role===k;
+        if(who) return '<div class="role"><span class="rl">'+label+'</span><span class="who">'+esc(who)+'</span>'+
+          '<div class="ract"><button class="act swap" data-add="'+g.date+'|'+k+'">Wechseln</button>'+
+          (canSignOff?'<button class="act rm" data-rm="'+g.date+'|'+k+'">Austragen</button>':'')+'</div></div>'+(isOpen?picker(st,c,g.date,k):"");
+        return '<div class="role empty"><span class="rl">'+label+'</span><span class="who">frei</span>'+
+          '<button class="act add" data-add="'+g.date+'|'+k+'">Eintragen</button></div>'+(isOpen?picker(st,c,g.date,k):"");
+      }).join("");
+      return '<div class="dutygame'+(full?' full':'')+'"><div class="dg-h">'+
+        '<span class="dg-date">'+fmtDate(g.date)+'</span><span class="dg-sub">Herren 2 · nach unserem Heimspiel</span>'+
+        '<span class="dg-badge '+(full?'full':'open')+'">'+(full?'komplett':(ROLES.length-filled)+' frei')+'</span></div>'+
+        '<div class="roles">'+roles+'</div></div>';
+    }).join("");
+  }
+  function picker(st,c,date,role){
+    if(!st.roster.length) return '<div class="picker"><span style="color:var(--muted);font-size:13px">Erst Namen im Kader anlegen.</span></div>';
+    const current=st.duties[date][role];
+    const taken=new Set(Object.values(st.duties[date]).filter(Boolean));
+    const btns=active(st).sort((a,b)=>(c[a]||0)-(c[b]||0)||a.localeCompare(b)).map(n=>{
+      const dis=taken.has(n);
+      return '<button class="pk'+(dis?' dis':'')+'"'+(dis?' disabled':' data-pick="'+date+'|'+role+'|'+encodeURIComponent(n)+'"')+'>'+esc(n)+' ('+(c[n]||0)+')</button>';
+    }).join("");
+    const lbl='<span class="pklbl">'+(current?'Ersatz für <b>'+esc(current)+'</b> (vorab geklärt) wählen:':'Eintragen:')+'</span>';
+    return '<div class="picker">'+lbl+btns+'<button class="pkclose" data-close="1">abbrechen</button></div>';
+  }
+  function renderRoster(st,c){
+    document.getElementById("rosterCount").textContent=st.roster.length;
+    const admin=adminUnlocked;
+    document.getElementById("rosterChips").innerHTML=[...st.roster].sort((a,b)=>a.localeCompare(b)).map(n=>{
+      const ex=isEx(st,n);
+      const btns=admin
+        ? '<button class="tg" data-exempt="'+encodeURIComponent(n)+'" title="Dienstpflicht umschalten">'+(ex?'+ Dienst':'– Dienst')+'</button>'+
+          '<button class="x" data-del="'+encodeURIComponent(n)+'" title="Entfernen">×</button>'
+        : '';
+      return '<span class="rchip'+(ex?' exempt':'')+(admin?'':' plain')+'"><span class="c">'+(ex?'∅':(c[n]||0))+'</span>'+esc(n)+btns+'</span>';
+    }).join("");
+    const hint=document.getElementById("rosterAdminHint");
+    if(hint) hint.style.display=admin?"none":"block";
+  }
+  function renderAdmin(st,c){
+    document.getElementById("adminLocked").style.display = adminUnlocked ? "none":"block";
+    document.getElementById("adminPanel").style.display  = adminUnlocked ? "block":"none";
+    if(adminUnlocked){
+      const open=openSlots(st).length;
+      document.getElementById("adminOpen").innerHTML = open
+        ? 'Aktuell <b>'+open+'</b> offene Slots.'
+        : 'Alle Slots sind besetzt.';
+      document.getElementById("distribute").disabled = !open || !active(st).length;
+      const sui=document.getElementById("syncUrlInput"); if(sui && document.activeElement!==sui) sui.value=syncUrl();
+    }
+  }
+  // faire Auto-Verteilung: füllt nur offene Slots, wenigste Dienste zuerst, niemand doppelt pro Spieltag
+  function fairAssign(st){
+    const c=counts(st);
+    const open=openSlots(st);
+    // stabil-zufällige Reihenfolge der offenen Slots, damit keine systematische Bevorzugung
+    for(let i=open.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[open[i],open[j]]=[open[j],open[i]];}
+    open.forEach(sl=>{
+      const inGame=new Set(Object.values(st.duties[sl.date]).filter(Boolean));
+      const elig=st.roster.filter(n=>!inGame.has(n)&&!isEx(st,n));
+      if(!elig.length) return;
+      elig.sort((a,b)=>(c[a]-c[b])||(Math.random()-0.5));
+      const pick=elig[0];
+      st.duties[sl.date][sl.role]=pick;
+      c[pick]=(c[pick]||0)+1;
+    });
+  }
+  async function addPlayers(){
+    const inp=document.getElementById("newPlayer");
+    const raw=inp.value.split(/[,\n;]/).map(s=>s.trim()).filter(Boolean);
+    if(!raw.length) return; inp.value="";
+    await mutate(st=>{raw.forEach(n=>{if(!st.roster.some(x=>x.toLowerCase()===n.toLowerCase()))st.roster.push(n);});});
+  }
+  function wire(){
+    document.getElementById("duty").addEventListener("click", async e=>{
+      const t=e.target.closest("button"); if(!t) return;
+      if(t.dataset.add){const [date,role]=t.dataset.add.split("|");openPicker={date,role};render();}
+      else if(t.dataset.close){openPicker=null;render();}
+      else if(t.dataset.pick){const [date,role,nm]=t.dataset.pick.split("|");openPicker=null;await mutate(st=>{st.duties[date][role]=decodeURIComponent(nm);});}
+      else if(t.dataset.rm){if(new Date()>SIGNUP_DEADLINE)return;const [date,role]=t.dataset.rm.split("|");await mutate(st=>{st.duties[date][role]="";});}
+      else if(t.id==="addPlayerBtn"){await addPlayers();}
+      else if(t.dataset.del){if(!adminUnlocked)return;const name=decodeURIComponent(t.dataset.del);await mutate(st=>{st.roster=st.roster.filter(x=>x!==name);st.exempt=st.exempt.filter(x=>x!==name);Object.values(st.duties).forEach(sl=>Object.keys(sl).forEach(k=>{if(sl[k]===name)sl[k]="";}));});}
+      else if(t.dataset.exempt){if(!adminUnlocked)return;const name=decodeURIComponent(t.dataset.exempt);await mutate(st=>{if(st.exempt.includes(name)){st.exempt=st.exempt.filter(x=>x!==name);}else{st.exempt.push(name);Object.values(st.duties).forEach(sl=>Object.keys(sl).forEach(k=>{if(sl[k]===name)sl[k]="";}));}});}
+      else if(t.id==="dutyRefresh"){t.textContent="Aktualisiere…";if(dirty){await persist(state);}else{state=await load();render();}t.textContent="Aktualisieren";}
+      else if(t.id==="saveRetry"){await persist(state);}
+      else if(t.id==="syncExport"){document.getElementById("syncOut").value=exportCode();document.getElementById("syncMsg").textContent="Code erzeugt — markieren, kopieren und teilen.";}
+      else if(t.id==="syncCopy"){const ta=document.getElementById("syncOut");const msg=document.getElementById("syncMsg");if(!ta.value){msg.textContent="Erst oben den Code erzeugen.";return;}ta.focus();ta.select();try{await navigator.clipboard.writeText(ta.value);msg.textContent="In die Zwischenablage kopiert ✓";}catch(e){msg.textContent="Text ist markiert — jetzt manuell kopieren (lange drücken → Kopieren).";}}
+      else if(t.id==="syncUrlSet"){
+        const url=document.getElementById("syncUrlInput").value.trim();
+        const msg=document.getElementById("syncUrlMsg");
+        if(!/^https:\/\/.+/.test(url)){msg.textContent="Bitte eine gültige https-URL einfügen.";return;}
+        runtimeSyncUrl=url; try{location.hash="sync="+encodeURIComponent(url);}catch(e){}
+        msg.textContent="Verbinde…";
+        const remote=await load();
+        if(remote&&Array.isArray(remote.roster)&&remote.roster.length){state=remote;render();msg.textContent="Verbunden — Stand vom Server geladen ✓";}
+        else{const ok=await persist(state);msg.textContent=ok?"Verbunden — aktueller Stand hochgeladen ✓":"Verbindung fehlgeschlagen — Umgebung blockiert evtl. externe Aufrufe.";render();}
+      }
+      else if(t.id==="syncUrlClear"){runtimeSyncUrl="";try{if(/[#&]sync=/.test(location.hash))location.hash="";}catch(e){}storageMode=null;document.getElementById("syncUrlMsg").textContent="Getrennt — zurück auf lokalen Speicher/Code.";renderModeNote();render();}
+      else if(t.id==="adminUnlock"){
+        const code=document.getElementById("adminCode").value.trim();
+        const msg=document.getElementById("adminMsg");
+        if(code===ADMIN_CODE){adminUnlocked=true;msg.textContent="";document.getElementById("adminCode").value="";render();}
+        else{msg.textContent="Falscher Code.";}
+      }
+      else if(t.id==="distribute"){t.textContent="Verteile…";await mutate(fairAssign);t.textContent="Offene fair verteilen";}
+      else if(t.id==="adminReset"){
+        if(!resetArm){resetArm=true;t.textContent="Sicher? Nochmal tippen";setTimeout(()=>{resetArm=false;t.textContent="Alle Zuteilungen leeren";},4000);}
+        else{resetArm=false;t.textContent="Alle Zuteilungen leeren";await mutate(st=>{dutyGames.forEach(g=>st.duties[g.date]={anschreiber:"",zeitnehmer:"",sekunden:""});});}
+      }
+    });
+    document.getElementById("newPlayer").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addPlayers();}});
+  }
+  function startPoll(){stopPoll();if(!hasStorage)return;pollTimer=setInterval(async()=>{
+    if(openPicker) return;
+    if(dirty){ await persist(state); return; }          // erst ausstehende Speicherung nachholen
+    const f=await load();
+    if(JSON.stringify(f)!==JSON.stringify(state)){state=f;render();}
+  },20000);}
+  function stopPoll(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}}
+  async function start(){
+    if(!started){started=true;wire();
+      try{const m=/[#&]sync=([^&]+)/.exec(location.hash||"");if(m)runtimeSyncUrl=decodeURIComponent(m[1]);}catch(e){}
+      if(!hasStorage && !syncUrl())document.getElementById("dutyStatus").innerHTML='<span class="err">Hinweis: automatischer Speicher ist hier nicht aktiv — Live-Sync im Admin-Bereich einrichten oder „Sichern &amp; Teilen (Code)" nutzen.</span>';
+    }
+    state=await load();
+    if(!state.roster.length){await mutate(st=>{st.roster=[...DEFAULT_ROSTER];st.exempt=[...DEFAULT_EXEMPT];});}
+    else{render();}
+    startPoll();
+  }
+  return {start,stopPoll};
+})();
+
+// ---- TABS ----
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", x===t));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    document.getElementById(t.dataset.tab).classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+    if(t.dataset.tab==="duty") DutyApp.start(); else DutyApp.stopPoll();
+  });
+});
+</script>
+</body>
+</html>
