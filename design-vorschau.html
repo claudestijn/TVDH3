@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<script>try{var t=new URLSearchParams(location.search).get("theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TVD Herren 3 · Spielplan 2026/27</title>
+<link rel="icon" type="image/svg+xml" href="https://www.tvderendingen.de/de-wGlobal/wGlobal/layout/images/Logo-TVD.svg" />
+<link rel="alternate icon" href="https://www.tvderendingen.de/favicon.ico" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0E1726;
+    --surface:#16233A;
+    --surface-2:#1D2E49;
+    --line:color-mix(in srgb,var(--text) 10%,transparent);
+    --line-strong:color-mix(in srgb,var(--text) 18%,transparent);
+    --home:#3E7BFA;      /* Heim */
+    --away:#F5A524;      /* Auswärts (Leder-Amber) */
+    --text:#EAF0F8;
+    --muted:#93A4BE;
+    --muted-2:#6C7E9B;
+    --disp:'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
+    --body:'Inter', system-ui, -apple-system, sans-serif;
+    --home-light:#9cc0ff;  /* helle Heim-Tönung für Text auf dunkel */
+    --away-light:#ffd591;
+    --on-home:#04122e;     /* Text auf Heim-Fläche */
+    --header-bg:linear-gradient(180deg, color-mix(in srgb,var(--ink) 96%,transparent), color-mix(in srgb,var(--ink) 86%,transparent));
+    --header-text:var(--text);
+    --header-muted:var(--muted);
+    --tab-active:var(--away);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -200px, color-mix(in srgb,var(--home) 10%,transparent), transparent 60%),
+      var(--ink);
+    color:var(--text);
+    font-family:var(--body);
+    line-height:1.4;
+    min-height:100vh;
+    padding-bottom:48px;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+
+  /* ---- Header ---- */
+  header{
+    position:sticky;top:0;z-index:20;
+    background:var(--header-bg);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .head-inner{max-width:760px;margin:0 auto;padding:14px 16px 0}
+  .eyebrow{font-family:var(--disp);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--header-muted);font-size:12px}
+  .title{font-family:var(--disp);font-weight:700;font-size:30px;color:var(--header-text);letter-spacing:.01em;line-height:1;margin-top:2px}
+  .title span{color:var(--away)}
+  .sub{color:var(--header-muted);font-size:13px;margin-top:4px}
+
+  /* Tabs */
+  .tabs{display:flex;gap:4px;margin-top:14px}
+  .tab{
+    flex:1;appearance:none;border:0;cursor:pointer;
+    background:transparent;color:var(--header-muted);
+    font-family:var(--disp);font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    font-size:15px;padding:12px 8px 13px;
+    border-bottom:2px solid transparent;transition:color .18s, border-color .18s;
+  }
+  .tab[aria-selected="true"]{color:var(--header-text);border-bottom-color:var(--tab-active)}
+  .tab:focus-visible{outline:2px solid var(--home);outline-offset:-2px;border-radius:6px}
+
+  /* ---- Summary strip ---- */
+  .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0 10px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat .n{font-family:var(--disp);font-weight:700;font-size:24px;line-height:1}
+  .stat .l{font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:.02em}
+  .stat.home .n{color:var(--home)}
+  .stat.away .n{color:var(--away)}
+  @media(max-width:520px){.strip{grid-template-columns:repeat(2,1fr)}}
+
+  /* ---- Next game ---- */
+  .next{
+    background:linear-gradient(120deg, color-mix(in srgb,var(--home) 16%,transparent), color-mix(in srgb,var(--away) 10%,transparent));
+    border:1px solid var(--line-strong);border-radius:16px;
+    padding:14px 16px;margin:6px 0 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap
+  }
+  .next .lbl{font-family:var(--disp);font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:12px;color:var(--away)}
+  .next .mu{font-family:var(--disp);font-weight:700;font-size:20px;line-height:1.05}
+  .next .meta{color:var(--muted);font-size:13px;margin-top:2px}
+  .next .when{margin-left:auto;text-align:right}
+  .next .when .d{font-family:var(--disp);font-weight:700;font-size:26px;line-height:1}
+  .next .when .t{color:var(--muted);font-size:13px}
+
+  /* ---- Panels ---- */
+  .panel{display:none;animation:fade .25s ease both}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---- Month + games ---- */
+  .month{font-family:var(--disp);font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);font-size:13px;margin:22px 2px 10px;display:flex;align-items:center;gap:10px}
+  .month::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .game{
+    display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;
+    background:var(--surface);border:1px solid var(--line);
+    border-left:3px solid var(--home);border-radius:14px;
+    padding:12px 14px;margin-bottom:8px;transition:transform .16s, border-color .16s, background .16s
+  }
+  .game.away{border-left-color:var(--away)}
+  .game:hover{transform:translateY(-2px);background:var(--surface-2);border-color:var(--line-strong)}
+  .game.isnext{box-shadow:0 0 0 1px var(--away) inset, 0 8px 30px -12px color-mix(in srgb,var(--away) 50%,transparent)}
+
+  .date{ text-align:center }
+  .date .dow{font-family:var(--disp);font-weight:600;text-transform:uppercase;font-size:12px;color:var(--muted);letter-spacing:.06em}
+  .date .dm{font-family:var(--disp);font-weight:700;font-size:22px;line-height:1;margin-top:1px}
+
+  .match .opp{font-weight:600;font-size:16px}
+  .match .venue{color:var(--muted);font-size:13px;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .pin{width:6px;height:6px;border-radius:50%;background:var(--muted-2);display:inline-block;flex:none}
+  .km{color:var(--muted-2)}
+  .hall{color:var(--muted-2);font-size:12px;margin-top:2px}
+
+  .side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+  .chip{font-family:var(--disp);font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    font-size:12px;padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .chip.h{background:var(--home);color:var(--on-home)}
+  .chip.a{background:transparent;color:var(--away);border:1.5px solid var(--away)}
+  .time{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--text)}
+  .time.open{color:var(--muted-2);font-style:italic;font-weight:500;font-size:13px}
+  .game.past{opacity:.6}
+  .game.past:hover{opacity:.85}
+  .score{font-family:var(--disp);font-weight:700;font-size:18px;line-height:1;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .res{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.04em;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+  .res.w{background:#2f9e5f;color:#fff}
+  .res.l{background:#c2413a;color:#fff}
+  .game.past .score{opacity:1}
+  .next .last{color:var(--muted);font-size:12.5px;margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .next .last b{color:var(--text);font-family:var(--disp);font-size:15px}
+  .resbar{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0 0;color:var(--muted-2);font-size:12px}
+
+  @media(max-width:460px){
+    .game{grid-template-columns:48px 1fr auto;gap:10px;padding:11px 12px}
+    .match .opp{font-size:15px}
+  }
+
+  /* ---- Map ---- */
+  .maphead{color:var(--muted);font-size:13px;margin:16px 2px 12px;max-width:60ch}
+  .mapcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px 8px 4px;overflow:hidden}
+  svg{display:block;width:100%;height:auto}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:14px 2px 4px;font-size:13px;color:var(--muted)}
+  .legend .k{display:inline-flex;align-items:center;gap:7px}
+  .dotk{width:11px;height:11px;border-radius:50%;flex:none}
+  .dotk.h{background:var(--home)}
+  .dotk.a{background:var(--away)}
+
+  .dist{margin-top:20px}
+  .dist h3{font-family:var(--disp);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-size:13px;margin:0 2px 10px}
+  .drow{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--away);border-radius:12px;margin-bottom:7px}
+  .drow .t{font-weight:600;flex:1}
+  .drow .t small{display:block;color:var(--muted);font-weight:400;font-size:12px;margin-top:2px}
+  .drow .bar{flex:1.4;height:6px;background:color-mix(in srgb,var(--text) 6%,transparent);border-radius:999px;overflow:hidden;max-width:220px}
+  .drow .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--away),var(--away-light));border-radius:999px}
+  .drow .val{font-family:var(--disp);font-weight:700;font-size:18px;min-width:64px;text-align:right}
+  .drow .val small{font-weight:500;font-size:12px;color:var(--muted)}
+  @media(max-width:520px){.drow .bar{display:none}}
+
+  footer{color:var(--muted-2);font-size:12px;text-align:center;margin-top:30px;line-height:1.6}
+  footer b{color:var(--muted);font-weight:600}
+
+  /* ---- Tischdienst ---- */
+  .dutystatus{color:var(--muted);font-size:14px;padding:20px 2px}
+  .dutystatus.err{color:#ffb4a2}
+  .dcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:16px 0}
+  .dcard-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .dcard-h h3{font-family:var(--disp);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text);font-size:14px}
+  .fairmeta{font-size:12px;color:var(--muted)}
+
+  .overview{display:flex;flex-direction:column;gap:8px}
+  .ovrow{display:grid;grid-template-columns:1fr 130px 34px;align-items:center;gap:10px}
+  .ovrow .nm{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ovrow .nm.zero{color:var(--muted-2)}
+  .ovbar{height:8px;background:color-mix(in srgb,var(--text) 6%,transparent);border-radius:999px;overflow:hidden}
+  .ovbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--home),var(--home-light))}
+  .ovrow.over .ovbar i{background:linear-gradient(90deg,#ff8a5c,var(--away))}
+  .ovcount{font-family:var(--disp);font-weight:700;font-size:18px;text-align:right}
+  .ovcount.zero{color:var(--muted-2)}
+  .emptyroster{color:var(--muted);font-size:14px;padding:6px 0}
+
+  .dutygame{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+  .dutygame.full{border-color:color-mix(in srgb,var(--home) 50%,transparent)}
+  .dg-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .dg-date{font-family:var(--disp);font-weight:700;font-size:17px}
+  .dg-sub{color:var(--muted);font-size:12px}
+  .dg-badge{margin-left:auto;font-family:var(--disp);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:11px;padding:3px 9px;border-radius:999px}
+  .dg-badge.open{background:color-mix(in srgb,var(--away) 16%,transparent);color:var(--away)}
+  .dg-badge.full{background:color-mix(in srgb,var(--home) 18%,transparent);color:var(--home-light)}
+  .dg-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .dg-time{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--muted);margin-left:6px}
+  .dg-tag{display:inline-block;font-family:var(--disp);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px dashed var(--muted-2);color:var(--muted);margin-left:6px;vertical-align:1px}
+  .dutygame.tentative{border-style:dashed}
+  .dg-note{color:var(--muted-2);font-size:12px;margin:-4px 0 10px}
+
+  .roles{display:grid;gap:7px}
+  .role{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  .ract{display:flex;gap:8px;margin-left:auto}
+  .role .rl{font-family:var(--disp);font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:12px;color:var(--muted);width:78px;flex:none}
+  .role .who{flex:1;font-size:14px;font-weight:500}
+  .role.empty .who{color:var(--muted-2);font-weight:400;font-style:italic}
+  .role .act{appearance:none;border:0;cursor:pointer;font-family:var(--body);font-weight:600;font-size:13px;border-radius:8px;padding:6px 12px;white-space:nowrap}
+  .role .act.add{background:var(--home);color:var(--on-home)}
+  .role .act.swap{background:transparent;color:var(--home-light);border:1px solid color-mix(in srgb,var(--home) 50%,transparent)}
+  .role .act.rm{background:transparent;color:var(--muted);border:1px solid var(--line-strong)}
+  .role .act:focus-visible{outline:2px solid var(--away);outline-offset:1px}
+
+  .picker{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding:8px;background:var(--ink);border:1px dashed var(--line-strong);border-radius:10px}
+  .picker .pklbl{flex-basis:100%;font-size:12px;color:var(--muted);margin-bottom:2px}
+  .picker .pklbl b{color:var(--text);font-weight:600}
+  .picker .pk{appearance:none;border:1px solid var(--line-strong);background:var(--surface-2);color:var(--text);cursor:pointer;font-family:var(--body);font-size:13px;border-radius:999px;padding:6px 12px}
+  .picker .pk:hover{border-color:var(--home);color:var(--home-light)}
+  .picker .pk.dis{opacity:.35;cursor:not-allowed}
+  .picker .pkclose{margin-left:auto;background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:13px}
+
+  .rostermgr{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .rostermgr summary{cursor:pointer;padding:13px 16px;font-family:var(--disp);font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:var(--muted);list-style:none}
+  .rostermgr summary::-webkit-details-marker{display:none}
+  .rostermgr summary::after{content:"＋";float:right;color:var(--muted-2)}
+  .rostermgr[open] summary::after{content:"－"}
+  .rosterbox{padding:0 16px 16px}
+  .hint{color:var(--muted);font-size:12.5px;margin-bottom:10px;line-height:1.5}
+  .addrow{display:flex;gap:8px;margin-bottom:12px}
+  .addrow input{flex:1;background:var(--ink);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:var(--body);font-size:14px;padding:9px 12px}
+  .addrow input:focus{outline:2px solid var(--home);outline-offset:0}
+  .btn{appearance:none;border:0;cursor:pointer;background:var(--home);color:var(--on-home);font-family:var(--body);font-weight:600;font-size:14px;border-radius:10px;padding:9px 14px;white-space:nowrap}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line-strong)}
+  .btn.refresh{display:block;margin:16px auto 0}
+  .rosterchips{display:flex;flex-wrap:wrap;gap:7px}
+  .rchip{display:inline-flex;align-items:center;gap:7px;background:var(--ink);border:1px solid var(--line);border-radius:999px;padding:5px 6px 5px 12px;font-size:13px}
+  .rchip .c{font-family:var(--disp);font-weight:700;min-width:16px;text-align:center;color:var(--home)}
+  .rchip .x{appearance:none;border:0;background:color-mix(in srgb,var(--text) 6%,transparent);color:var(--muted);cursor:pointer;width:20px;height:20px;border-radius:50%;font-size:13px;line-height:1}
+  .rchip .x:hover{background:rgba(255,120,90,.25);color:#ffb4a2}
+  .rchip.exempt{border-color:color-mix(in srgb,var(--home) 25%,transparent)}
+  .rchip.plain{padding-right:12px}
+  .rchip.exempt .c{color:var(--muted-2)}
+  .rchip .tg{appearance:none;border:1px solid var(--line-strong);background:transparent;color:var(--muted);cursor:pointer;font-family:var(--body);font-size:11px;border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .rchip .tg:hover{color:var(--home-light);border-color:var(--home)}
+  .ovrow.exempt{opacity:.8}
+  .ovrow.exempt .nm{color:var(--muted)}
+  .extag{grid-column:2 / 4;justify-self:end;font-family:var(--disp);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:11px;color:var(--home-light);background:color-mix(in srgb,var(--home) 14%,transparent);padding:3px 9px;border-radius:999px}
+  .savestat{font-size:12.5px;min-height:18px;margin:-6px 2px 14px;transition:color .2s}
+  .savestat.saving{color:var(--muted-2)}
+  .savestat.ok{color:#7fcf9b}
+  .savestat.err{color:#ffb4a2}
+  .linkbtn{appearance:none;background:transparent;border:0;color:var(--away-light);text-decoration:underline;cursor:pointer;font-family:var(--body);font-size:12.5px;padding:0}
+  .modenote{background:color-mix(in srgb,var(--away) 12%,transparent);border:1px solid color-mix(in srgb,var(--away) 30%,transparent);color:var(--away-light);border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.5;margin:-6px 2px 14px}
+  .modenote b{color:var(--away-light);font-weight:700}
+  .modenote.ok{background:rgba(80,200,140,.12);border-color:rgba(80,200,140,.35);color:#9be3bd}
+  .modenote.ok b{color:#c9f2dc}
+  .rostermgr.sync summary{color:var(--away-light)}
+  .synctext{width:100%;min-height:66px;background:var(--ink);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;padding:9px 11px;margin:8px 0;resize:vertical;word-break:break-all}
+  .synctext:focus{outline:2px solid var(--home);outline-offset:0}
+  .synhr{height:1px;background:var(--line);margin:14px 0}
+
+  .deadline{display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 14px;margin-bottom:16px;font-size:13.5px;border:1px solid var(--line-strong)}
+  .deadline .dl-ic{font-family:var(--disp);font-weight:700;font-size:20px;line-height:1}
+  .deadline.open{background:color-mix(in srgb,var(--away) 12%,transparent);color:var(--away-light)}
+  .deadline.open .dl-ic{color:var(--away)}
+  .deadline.closed{background:color-mix(in srgb,var(--home) 12%,transparent);color:var(--home-light)}
+  .deadline.closed .dl-ic{color:var(--home)}
+  .deadline b{font-weight:700}
+  .rostermgr.admin summary{color:var(--home-light)}
+  .rostermgr.admin{border-color:color-mix(in srgb,var(--home) 28%,transparent)}
+  #adminOpen b{color:var(--text)}
+
+  @media(max-width:460px){
+    .ovrow{grid-template-columns:1fr 84px 30px}
+    .role .rl{width:64px}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important}
+  }
+
+  /* ---- Karte (SVG) über Tokens ---- */
+  .m-ring{stroke:color-mix(in srgb,var(--text) 10%,transparent)}
+  .m-rt{fill:var(--muted-2)}
+  .m-north line{stroke:var(--muted-2)} .m-north path,.m-north text{fill:var(--muted-2)}
+  .m-spoke{stroke:color-mix(in srgb,var(--away) 30%,transparent)}
+  .m-pin{fill:var(--away);stroke:var(--surface)}
+  .m-town{fill:var(--text)} .m-sub{fill:var(--muted)}
+  .m-home{fill:var(--home);stroke:var(--surface)}
+  .m-homering{stroke:color-mix(in srgb,var(--home) 40%,transparent)}
+  .m-homelbl{fill:var(--home)}
+  /* =================== THEMES (Design-Vorschau) =================== */
+  /* A · Trikot — dunkel, Rot nur als Linie/Schrift, Weiß für Auswärts */
+  :root[data-theme="a"]{
+    --ink:#161618; --surface:#1F1F22; --surface-2:#29292D;
+    --text:#F5F5F3; --muted:#A3A3A8; --muted-2:#707076;
+    --home:#E0353B; --away:#F5F5F3;
+    --home-light:#FF9C9C; --away-light:#F5F5F3; --on-home:#FFFFFF;
+    --header-bg:#0E0E0F; --tab-active:#E0353B;
+  }
+  [data-theme="a"] header{border-bottom:3px solid #9D181D}
+  [data-theme="a"] .title span{color:var(--home)}
+  [data-theme="a"] .chip.h{background:transparent;color:var(--home);border:1.5px solid var(--home)}
+  [data-theme="a"] .chip.a{color:var(--text);border-color:color-mix(in srgb,var(--text) 55%,transparent)}
+  [data-theme="a"] .game.away{border-left-color:color-mix(in srgb,var(--text) 55%,transparent)}
+  [data-theme="a"] .game.isnext{box-shadow:0 0 0 1px var(--home) inset}
+  [data-theme="a"] .next{background:var(--surface);border-color:color-mix(in srgb,var(--home) 55%,transparent)}
+  [data-theme="a"] .next .lbl{color:var(--home)}
+  [data-theme="a"] .stat.home .n{color:var(--home)} [data-theme="a"] .stat.away .n{color:var(--text)}
+  [data-theme="a"] .role .act.add{background:transparent;color:var(--home);border:1.5px solid var(--home)}
+  [data-theme="a"] .btn{background:var(--text);color:#161618}
+  [data-theme="a"] .btn.ghost{background:transparent;color:var(--muted)}
+  [data-theme="a"] body{background:var(--ink)}
+
+  /* B · Halle — hell, Schwarz auf Weiß, Rot als Vereinsfarbe */
+  :root[data-theme="b"]{
+    --ink:#EDEDEB; --surface:#FFFFFF; --surface-2:#F7F7F5;
+    --text:#151515; --muted:#5A5A5A; --muted-2:#8A8A8A;
+    --home:#9D181D; --away:#151515;
+    --home-light:#9D181D; --away-light:#151515; --on-home:#FFFFFF;
+    --header-bg:#FFFFFF; --tab-active:#9D181D;
+  }
+  [data-theme="b"] body{background:var(--ink)}
+  [data-theme="b"] header{border-bottom:2px solid #151515;backdrop-filter:none}
+  [data-theme="b"] .title span{color:var(--home)}
+  [data-theme="b"] .chip.h{background:transparent;color:var(--home);border:1.5px solid var(--home)}
+  [data-theme="b"] .chip.a{color:var(--text);border-color:var(--text)}
+  [data-theme="b"] .game,[data-theme="b"] .stat,[data-theme="b"] .dcard,[data-theme="b"] .dutygame,[data-theme="b"] .drow,[data-theme="b"] .mapcard,[data-theme="b"] .rostermgr{border-color:#DADAD6}
+  [data-theme="b"] .game:hover{background:var(--surface)}
+  [data-theme="b"] .game.isnext{box-shadow:0 0 0 2px var(--home) inset}
+  [data-theme="b"] .next{background:#151515;border-color:#151515;color:#fff}
+  [data-theme="b"] .next .lbl{color:#FF8A8A} [data-theme="b"] .next .meta,[data-theme="b"] .next .when .t,[data-theme="b"] .next .last{color:#B5B5B5}
+  [data-theme="b"] .next .last b{color:#fff}
+  [data-theme="b"] .stat.home .n{color:var(--home)} [data-theme="b"] .stat.away .n{color:var(--text)}
+  [data-theme="b"] .role{background:var(--surface-2)}
+  [data-theme="b"] .role .act.add,[data-theme="b"] .btn{background:#151515;color:#fff}
+  [data-theme="b"] .btn.ghost{background:transparent;color:var(--muted)}
+  [data-theme="b"] .picker,[data-theme="b"] .addrow input,[data-theme="b"] .synctext,[data-theme="b"] .rchip{background:var(--surface-2)}
+  [data-theme="b"] .modenote.ok{color:#1d6b43} [data-theme="b"] .modenote.ok b{color:#14512f}
+  [data-theme="b"] .savestat.ok{color:#1d6b43}
+  [data-theme="b"] .drow .bar i{background:var(--home)}
+
+  /* C · Vollgas — rote Kopfzeile, schwarzer Körper, weiße Typo */
+  :root[data-theme="c"]{
+    --ink:#121212; --surface:#1C1C1C; --surface-2:#262626;
+    --text:#FFFFFF; --muted:#A6A6A6; --muted-2:#717171;
+    --home:#E0353B; --away:#FFFFFF;
+    --home-light:#FF9C9C; --away-light:#FFFFFF; --on-home:#FFFFFF;
+    --header-bg:#9D181D; --header-text:#FFFFFF; --header-muted:#F2C4C5; --tab-active:#FFFFFF;
+  }
+  [data-theme="c"] body{background:var(--ink)}
+  [data-theme="c"] header{border-bottom:0;backdrop-filter:none}
+  [data-theme="c"] .title{font-size:34px;text-transform:uppercase;letter-spacing:.01em}
+  [data-theme="c"] .title span{color:#fff;-webkit-text-stroke:0}
+  [data-theme="c"] .tab{color:#F2C4C5}
+  [data-theme="c"] .chip.h{background:var(--home);color:#fff}
+  [data-theme="c"] .chip.a{color:#fff;border-color:#fff}
+  [data-theme="c"] .game{border-left-width:4px}
+  [data-theme="c"] .game.away{border-left-color:#fff}
+  [data-theme="c"] .game.isnext{box-shadow:0 0 0 1px #fff inset}
+  [data-theme="c"] .next{background:var(--surface);border:0;border-top:4px solid var(--home);border-radius:4px}
+  [data-theme="c"] .next .lbl{color:var(--home)}
+  [data-theme="c"] .next .when .d{font-size:32px}
+  [data-theme="c"] .stat{border-radius:4px} [data-theme="c"] .game,[data-theme="c"] .dutygame,[data-theme="c"] .dcard,[data-theme="c"] .drow{border-radius:4px}
+  [data-theme="c"] .stat.home .n{color:var(--home)} [data-theme="c"] .stat.away .n{color:#fff}
+  [data-theme="c"] .role .act.add,[data-theme="c"] .btn{background:var(--home);color:#fff}
+  [data-theme="c"] .btn.ghost{background:transparent;color:var(--muted)}
+
+  /* Ergebnis "N" in den roten Themes neutral, damit Rot = Verein bleibt */
+  [data-theme="a"] .res.l,[data-theme="b"] .res.l,[data-theme="c"] .res.l{background:#5E5E5E}
+
+  /* Vorschau-Umschalter */
+  .themebar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:50;display:flex;gap:4px;padding:5px;border-radius:999px;background:rgba(20,20,20,.88);backdrop-filter:blur(8px);box-shadow:0 6px 24px rgba(0,0,0,.35)}
+  .themebar button{appearance:none;border:0;cursor:pointer;font:600 13px/1 var(--body);color:#ddd;background:transparent;padding:9px 13px;border-radius:999px;white-space:nowrap}
+  .themebar button[aria-pressed="true"]{background:#fff;color:#111}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <div class="eyebrow">BBW4 Kreisliga Mitte · Alb/Bodensee</div>
+    <div class="title">TVD Herren <span>3</span> · Saison 26/27</div>
+    <div class="sub">Spielplan &amp; Anfahrten — TV Derendingen 3</div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-tab="plan">Spielplan</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="map">Karte</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="duty">Tischdienst</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- SPIELPLAN -->
+  <section class="panel active" id="plan" role="tabpanel">
+    <div class="strip">
+      <div class="stat"><div class="n">14</div><div class="l">Spiele</div></div>
+      <div class="stat home"><div class="n">7</div><div class="l">Heim</div></div>
+      <div class="stat away"><div class="n">7</div><div class="l">Auswärts</div></div>
+      <div class="stat"><div class="n">127<small style="font-size:13px"> km</small></div><div class="l">Auswärts einfach</div></div>
+    </div>
+    <div class="next" id="nextGame"></div>
+    <div id="schedule"></div>
+    <div class="resbar"><button id="resRefresh" class="btn ghost">Ergebnisse aktualisieren</button><span id="resInfo"></span></div>
+  </section>
+
+  <!-- KARTE -->
+  <section class="panel" id="map" role="tabpanel">
+    <p class="maphead">Alle Spielorte relativ zu Derendingen (Heimbasis). Ringe = Luftlinie 10 / 20 / 30 km, Zahlen = <b style="color:var(--muted)">ca. Fahrstrecke</b> ab der Kreissporthalle. Norden ist oben.</p>
+    <div class="mapcard"><div id="svgHost"></div></div>
+    <div class="legend">
+      <span class="k"><span class="dotk h"></span> Heim · Derendingen (7 Spiele)</span>
+      <span class="k"><span class="dotk a"></span> Auswärts (7 Orte)</span>
+    </div>
+    <div class="dist">
+      <h3>Anfahrt ab Derendingen · ca.</h3>
+      <div id="distList"></div>
+    </div>
+  </section>
+
+  <!-- TISCHDIENST -->
+  <section class="panel" id="duty" role="tabpanel">
+    <p class="maphead">
+      Tischdienst an unseren 7 Heimspieltagen (6× Herren 2, 1× Damen) — je <b style="color:var(--muted)">3 Personen</b> (Anschreiber · Zeit · 24&nbsp;Sek.).
+      Bis Jahresende vom Verband zugeteilt, Termine ab Januar <b style="color:var(--muted)">vorläufig</b>.
+      Eintragungen sind für alle mit dem Link sichtbar und werden live geteilt.
+    </p>
+
+    <div id="dutyStatus" class="dutystatus">Lade Eintragungen…</div>
+
+    <div id="dutyApp" style="display:none">
+      <div id="dutyDeadline" class="deadline"></div>
+      <div id="saveStatus" class="savestat"></div>
+      <div id="modeNote" class="modenote" style="display:none"></div>
+
+      <!-- Fairness overview -->
+      <div class="dcard">
+        <div class="dcard-h">
+          <h3>Übersicht · Dienste pro Person</h3>
+          <span id="fairMeta" class="fairmeta"></span>
+        </div>
+        <div id="overview" class="overview"></div>
+      </div>
+
+      <!-- Duty games -->
+      <div class="month">Dienste eintragen</div>
+      <div id="dutyList"></div>
+
+      <!-- Roster management -->
+      <details class="rostermgr">
+        <summary>Kader verwalten (<span id="rosterCount">0</span>)</summary>
+        <div class="rosterbox">
+          <p class="hint">Namen einmal anlegen — danach tragen sich alle per Auswahl ein. Mehrere auf einmal: mit Komma oder Zeilenumbruch einfügen.</p>
+          <div class="addrow">
+            <input id="newPlayer" type="text" placeholder="Name(n) hinzufügen…" autocomplete="off" />
+            <button id="addPlayerBtn" class="btn">Hinzufügen</button>
+          </div>
+          <div id="rosterChips" class="rosterchips"></div>
+          <p id="rosterAdminHint" class="hint" style="margin:12px 0 0;display:none">Namen entfernen und „– Dienst / + Dienst" sind nur mit Admin-Code möglich — unten im <b style="color:var(--muted)">Admin</b>-Bereich freischalten.</p>
+        </div>
+      </details>
+
+      <!-- Admin -->
+      <details class="rostermgr admin">
+        <summary>Admin · Dienste verteilen</summary>
+        <div class="rosterbox">
+          <div id="adminLocked">
+            <p class="hint">Geschützter Bereich für dich als Organisator. Code eingeben, um <b style="color:var(--muted)">Verteilen, Namen entfernen und Befreiungen</b> freizuschalten (leichte Sperre, kein echtes Login). Spieler können ohne Code jederzeit Namen hinzufügen und sich ein-/austragen.</p>
+            <div class="addrow">
+              <input id="adminCode" type="password" placeholder="Admin-Code…" autocomplete="off" />
+              <button id="adminUnlock" class="btn">Freischalten</button>
+            </div>
+            <div id="adminMsg" class="hint" style="margin:8px 0 0"></div>
+          </div>
+          <div id="adminPanel" style="display:none">
+            <p class="hint">Nach dem Stichtag (Ende Oktober): füllt <b style="color:var(--muted)">alle noch offenen Slots</b> automatisch — so ausgeglichen wie möglich (wenigste Dienste zuerst, niemand doppelt am selben Spieltag). Bereits eingetragene Personen bleiben unangetastet.</p>
+            <div id="adminOpen" class="hint" style="margin-bottom:12px"></div>
+            <button id="distribute" class="btn">Offene fair verteilen</button>
+            <button id="adminReset" class="btn ghost" style="margin-left:8px">Alle Zuteilungen leeren</button>
+            <div class="synhr"></div>
+            <h4 class="synch">Live-Sync (Server)</h4>
+            <p class="hint">Echtes Teilen über einen JSON-Endpunkt (GET/PUT), z.B. ein Blob von <b style="color:var(--muted)">jsonblob.com</b>. URL einfügen und „Verbinden" — alle Geräte mit derselben URL sehen live denselben Stand. Ob die App-Umgebung externe Verbindungen zulässt, zeigt sich sofort beim Verbinden.</p>
+            <div class="addrow"><input id="syncUrlInput" type="text" placeholder="https://jsonblob.com/api/jsonBlob/…" autocomplete="off" /><button id="syncUrlSet" class="btn">Verbinden</button></div>
+            <button id="syncUrlClear" class="btn ghost">Trennen</button>
+            <div id="syncUrlMsg" class="hint" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Sichern & Teilen -->
+      <details class="rostermgr sync">
+        <summary>Sichern &amp; Teilen (Code)</summary>
+        <div class="rosterbox">
+          <p class="hint">Server-unabhängige Sicherung: erzeugt einen Code des aktuellen Stands (Kader, Eintragungen, Befreiungen). Poste ihn z.B. im Team-Chat. Zum Übernehmen Code einfügen und laden (nur Admin).</p>
+          <button id="syncExport" class="btn">Aktuellen Stand als Code</button>
+          <textarea id="syncOut" class="synctext" readonly placeholder="Hier erscheint der Code…"></textarea>
+          <button id="syncCopy" class="btn ghost">Markieren / kopieren</button>
+          <div class="synhr"></div>
+          <textarea id="syncIn" class="synctext" placeholder="Code hier einfügen…"></textarea>
+          <button id="syncImport" class="btn">Stand aus Code laden</button>
+          <div id="syncMsg" class="hint" style="margin-top:8px"></div>
+        </div>
+      </details>
+
+      <button id="dutyRefresh" class="btn ghost refresh">Aktualisieren</button>
+    </div>
+  </section>
+
+  <footer>
+    Datenquelle: basketball-bund.net (TeamSL), Liga&nbsp;55489 · Fahrstrecken gerundet (ca.), Luftlinien geokodiert.<br>
+    Anwurfzeiten mit <b>„Zeit offen"</b> sind im Verband noch nicht angesetzt.
+  </footer>
+</main>
+
+<script>
+const HOME = {name:"Derendingen", lat:48.500802, lon:9.056901};
+
+const games = [
+  {date:"2026-10-10", time:"12:45", opp:"TB Kirchentellinsfurt 2", home:false, town:"Kirchentellinsfurt", km:11, lat:48.531019, lon:9.149446, hall:"Neue Sporthalle"},
+  {date:"2026-10-18", time:"10:00", opp:"TuS Metzingen 2",        home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2026-11-08", time:"16:00", opp:"SV Pfrondorf",            home:false, town:"Pfrondorf", km:9,  lat:48.549056, lon:9.109442, hall:"Schönbuchhalle"},
+  {date:"2026-11-15", time:"12:00", opp:"SV Böblingen Panthers 2", home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2026-11-21", time:"13:45", opp:"VfL Sindelfingen 3",      home:false, town:"Sindelfingen", km:34, lat:48.707456, lon:9.004405, hall:"Gemeindeschule Eichholz"},
+  {date:"2026-11-29", time:"12:00", opp:"SV 03 Tigers Tübingen 3", home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2026-12-06", time:"14:30", opp:"SpVgg Mössingen 2",       home:false, town:"Mössingen", km:13, lat:48.407165, lon:9.056302, hall:"Jahnhalle beim Schulzentrum"},
+  {date:"2026-12-12", time:"17:15", opp:"SV 03 Tigers Tübingen 3", home:false, town:"Tübingen", km:4,  lat:48.521636, lon:9.057645, hall:"Ballspielhalle"},
+  {date:"2026-12-20", time:"14:00", opp:"SpVgg Mössingen 2",       home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2027-01-31", time:"12:00", opp:"TB Kirchentellinsfurt 2", home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2027-02-21", time:"14:30", opp:"TuS Metzingen 2",         home:false, town:"Metzingen", km:23, lat:48.539900, lon:9.286406, hall:"Neue Öschhalle"},
+  {date:"2027-02-28", time:"12:00", opp:"SV Pfrondorf",            home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+  {date:"2027-03-06", time:"16:45", opp:"SV Böblingen Panthers 2", home:false, town:"Böblingen", km:33, lat:48.684549, lon:9.007351, hall:"Hermann-Raiser-Halle 1"},
+  {date:"2027-03-14", time:"14:00", opp:"VfL Sindelfingen 3",      home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
+];
+
+const DOW = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const MON = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+function d(s){const [y,m,dd]=s.split("-").map(Number);return new Date(y,m-1,dd);}
+
+// next upcoming game
+// Spiel gilt als "aktuell" bis Anwurf + 2 Std. (Spieldauer), danach springt die Anzeige weiter
+const GAME_LEN_MS = 2*60*60*1000;
+function gameStart(g){const dt=d(g.date);const [h,m]=(g.time||"12:00").split(":").map(Number);dt.setHours(h,m,0,0);return dt;}
+function calcNext(now){return games.findIndex(g => gameStart(g).getTime()+GAME_LEN_MS > now.getTime());}
+let nextIdx = calcNext(new Date());
+const isPast = g => gameStart(g).getTime()+GAME_LEN_MS <= Date.now();
+
+// ---- ERGEBNISSE (aus Apps Script, Quelle basketball-bund.net) ----
+const API_URL = "https://script.google.com/macros/s/AKfycbz6wi1cBqOI4Pa7vONWNMX8hZhjNwPNLz3EcGdKYqUiRNvJZm5wfsooQdRhtcNUWJXEtw/exec";   // Apps Script Web-App (einzige Stelle für die URL)
+let RESULTS = {}, RES_UPDATED = "";
+function scoreHtml(r){return '<span class="res '+(r.win?'w':'l')+'">'+(r.win?'S':'N')+'</span>'+r.our+':'+r.opp;}
+async function loadResults(refresh){
+  for(let a=0;a<3;a++){                               // bis zu 3 Versuche (Apps Script Kaltstart)
+    try{
+      const r = await fetch(API_URL+"?action=results"+(refresh?"&refresh=1":"")+"&t="+Date.now(),{cache:"no-store"});
+      if(r.ok){
+        const j = JSON.parse(await r.text());
+        if(j && j.results && typeof j.results==="object"){
+          RESULTS = j.results; RES_UPDATED = j.updated || "";
+          renderSchedule(); renderNext(); renderResInfo();
+          return true;
+        }
+      }
+    }catch(e){ console.warn("results try "+(a+1),e); }
+    await new Promise(res=>setTimeout(res,800*(a+1)));
+  }
+  return false;
+}
+// Beim Start: gespeicherte Ergebnisse laden; fehlt für ein beendetes Spiel noch das Ergebnis -> live nachholen
+async function initResults(){
+  const info=document.getElementById("resInfo");
+  info.textContent="Lade Ergebnisse…";
+  const ok=await loadResults(false);
+  const missing=games.some(g=>isPast(g) && !RESULTS[g.date] && Date.now()-gameStart(g).getTime() < 3*86400000);
+  if(ok && missing) await loadResults(true);
+  if(!ok && !(await loadResults(true))) info.textContent="Ergebnisse nicht geladen – bitte „Aktualisieren“ tippen";
+  else renderResInfo();
+}
+function renderResInfo(){const el=document.getElementById("resInfo");if(el)el.textContent=RES_UPDATED?"Stand: "+RES_UPDATED:"";}
+
+// ---- NEXT GAME CARD ----
+function renderNext(){
+  const host = document.getElementById("nextGame");
+  if(nextIdx === -1){ host.innerHTML = '<div class="mu">Saison beendet</div>'; return; }
+  const g = games[nextIdx], dt = d(g.date), now = new Date(), st = gameStart(g);
+  const t0 = new Date(now); t0.setHours(0,0,0,0);
+  const dayDiff = Math.round((d(g.date)-t0)/86400000);
+  let lbl;
+  if(now >= st) lbl = "● Läuft gerade";
+  else if(dayDiff === 0){ const min=Math.round((st-now)/60000); lbl = "Heute · in "+(min>=60?Math.floor(min/60)+" Std. "+(min%60?min%60+" Min.":""):min+" Min."); }
+  else if(dayDiff === 1) lbl = "Morgen";
+  else lbl = "Nächstes Spiel · in "+dayDiff+" Tagen";
+  const timeTxt = g.time ? g.time+" Uhr" : "Zeit offen";
+  let lastHtml = "";
+  for(let i=nextIdx-1;i>=0;i--){ const lg=games[i], lr=RESULTS[lg.date];
+    if(lr){ lastHtml='<div class="last">Letztes Spiel: <b>'+scoreHtml(lr).replace('<span','<span style="vertical-align:1px"')+'</b> '+(lg.home?'vs ':'@ ')+lg.opp+'</div>'; break; } }
+  const place = g.home ? "Heim · Derendingen" : "Auswärts · "+g.town+(g.km?" · ca. "+g.km+" km":"");
+  host.innerHTML =
+    '<div><div class="lbl">'+lbl.trim()+'</div>'+
+    '<div class="mu">TVD 3 '+(g.home?'vs':'@')+' '+g.opp+'</div>'+
+    '<div class="meta">'+place+'</div>'+lastHtml+'</div>'+
+    '<div class="when"><div class="d">'+DOW[dt.getDay()]+' '+dt.getDate()+'.'+(dt.getMonth()+1)+'.</div>'+
+    '<div class="t">'+timeTxt+'</div></div>';
+}
+renderNext();
+
+// ---- SCHEDULE ----
+function renderSchedule(){
+  const host = document.getElementById("schedule");
+  host.innerHTML = "";
+  let curKey = "";
+  games.forEach((g,i)=>{
+    const dt = d(g.date);
+    const key = MON[dt.getMonth()]+" "+dt.getFullYear();
+    if(key !== curKey){ curKey = key;
+      const h = document.createElement("div"); h.className="month"; h.textContent=key; host.appendChild(h);
+    }
+    const row = document.createElement("div");
+    const past = isPast(g), res = RESULTS[g.date];
+    row.className = "game "+(g.home?"home":"away")+(i===nextIdx?" isnext":"")+(past?" past":"");
+    row.dataset.i = i;
+    const timeHtml = res ? '<div class="score">'+scoreHtml(res)+'</div>'
+      : past ? '<div class="time open">Ergebnis offen</div>'
+      : g.time ? '<div class="time">'+g.time+'</div>' : '<div class="time open">Zeit offen</div>';
+    const venue = g.home
+      ? '<span class="pin" style="background:var(--home)"></span> Derendingen (Heim)'
+      : '<span class="pin" style="background:var(--away)"></span> '+g.town+' <span class="km">· ca. '+g.km+' km</span>';
+    const hallLine = g.hall ? '<div class="hall">'+g.hall+'</div>' : '';
+    row.innerHTML =
+      '<div class="date"><div class="dow">'+DOW[dt.getDay()]+'</div><div class="dm">'+dt.getDate()+'.'+(dt.getMonth()+1)+'.</div></div>'+
+      '<div class="match"><div class="opp">'+(g.home?'vs ':'@ ')+g.opp+'</div>'+
+      '<div class="venue">'+venue+'</div>'+hallLine+'</div>'+
+      '<div class="side"><span class="chip '+(g.home?'h':'a')+'">'+(g.home?'Heim':'Ausw.')+'</span>'+timeHtml+'</div>';
+    host.appendChild(row);
+  });
+}
+renderSchedule();
+
+// ---- NÄCHSTES SPIEL LIVE AKTUALISIEREN (jede Minute + beim Zurückkehren in die App) ----
+function tickNext(){
+  nextIdx = calcNext(new Date());
+  renderSchedule();
+  renderNext();
+}
+setInterval(tickNext, 60000);
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ tickNext(); loadResults(false); } });
+initResults();
+document.getElementById("resRefresh").addEventListener("click", async e=>{
+  const b=e.currentTarget, info=document.getElementById("resInfo");
+  b.disabled=true; b.textContent="Lade von basketball-bund.net…";
+  const ok=await loadResults(true);
+  b.disabled=false; b.textContent="Ergebnisse aktualisieren";
+  if(!ok) info.textContent="Abruf fehlgeschlagen – Apps Script neu bereitgestellt?";
+});
+
+// ---- DISTANCE LIST ----
+(function(){
+  const host = document.getElementById("distList");
+  const away = games.filter(g=>!g.home).sort((a,b)=>b.km-a.km);
+  const max = Math.max(...away.map(g=>g.km));
+  away.forEach(g=>{
+    const dt = d(g.date);
+    const r = document.createElement("div"); r.className="drow";
+    r.innerHTML =
+      '<div class="t">'+g.town+'<small>@ '+g.opp+' · '+DOW[dt.getDay()]+' '+dt.getDate()+'.'+(dt.getMonth()+1)+'.</small></div>'+
+      '<div class="bar"><i style="width:'+(g.km/max*100)+'%"></i></div>'+
+      '<div class="val">'+g.km+'<small> km</small></div>';
+    host.appendChild(r);
+  });
+})();
+
+// ---- MAP (self-contained SVG, geo-accurate, uniform scale) ----
+(function(){
+  const kmLat = 111.19, kmLon = 111.32*Math.cos(HOME.lat*Math.PI/180);
+  const away = games.filter(g=>!g.home);
+  // project to km east/north relative to home
+  const pts = away.map(g=>({
+    ...g,
+    e:(g.lon-HOME.lon)*kmLon,
+    n:(g.lat-HOME.lat)*kmLat
+  }));
+  const all = [{e:0,n:0}, ...pts];
+  const pad = 6.5;
+  let minE=Math.min(...all.map(p=>p.e))-pad, maxE=Math.max(...all.map(p=>p.e))+pad;
+  let minN=Math.min(...all.map(p=>p.n))-pad, maxN=Math.max(...all.map(p=>p.n))+pad;
+  const spanE=maxE-minE, spanN=maxN-minN;
+  const PX = 620/spanE;                 // uniform px per km
+  const W = spanE*PX, H = spanN*PX;
+  const X = e => (e-minE)*PX;
+  const Y = n => (maxN-n)*PX;           // north up
+  const hx=X(0), hy=Y(0);
+
+  let s = '<svg viewBox="0 0 '+W.toFixed(0)+' '+H.toFixed(0)+'" role="img" aria-label="Karte der Spielorte um Derendingen">';
+  // subtle background
+  s += '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="none"/>';
+  // distance rings
+  [10,20,30].forEach(km=>{
+    const r=km*PX;
+    s += '<circle cx="'+hx+'" cy="'+hy+'" r="'+r+'" class="m-ring" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="1" stroke-dasharray="3 5"/>';
+    s += '<text x="'+hx+'" y="'+(hy-r+16)+'" class="m-rt" fill="#5a6c88" font-family="Barlow Condensed,sans-serif" font-size="13" text-anchor="middle">'+km+' km</text>';
+  });
+  // north arrow
+  s += '<g class="m-north" opacity=".55"><line x1="'+(W-26)+'" y1="26" x2="'+(W-26)+'" y2="52" stroke="#8093ad" stroke-width="1.5"/>'+
+       '<path d="M'+(W-26)+' 20 l5 10 h-10 z" fill="#8093ad"/>'+
+       '<text x="'+(W-26)+'" y="66" fill="#8093ad" font-family="Barlow Condensed,sans-serif" font-size="12" text-anchor="middle">N</text></g>';
+  // spokes
+  pts.forEach(p=>{
+    s += '<line x1="'+hx+'" y1="'+hy+'" x2="'+X(p.e)+'" y2="'+Y(p.n)+'" class="m-spoke" stroke="rgba(245,165,36,.28)" stroke-width="1.4"/>';
+  });
+  // away pins + labels (radial outward)
+  pts.forEach(p=>{
+    const px=X(p.e), py=Y(p.n);
+    const dist=Math.hypot(p.e,p.n)||1;
+    const ux=p.e/dist, uy=p.n/dist;
+    const off=15;
+    const lx=px+ux*off, ly=py-uy*off;      // svg y inverted
+    const anchor = ux>0.35?"start":(ux<-0.35?"end":"middle");
+    const dt=d(p.date);
+    const dmy=dt.getDate()+'.'+(dt.getMonth()+1)+'.';
+    s += '<circle cx="'+px+'" cy="'+py+'" r="6.5" class="m-pin" fill="#F5A524" stroke="#0E1726" stroke-width="2"/>';
+    s += '<text x="'+lx+'" y="'+ly+'" text-anchor="'+anchor+'" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="16" class="m-town" fill="#EAF0F8">'+p.town+'</text>';
+    s += '<text x="'+lx+'" y="'+(ly+15)+'" text-anchor="'+anchor+'" font-family="Inter,sans-serif" font-size="12" class="m-sub" fill="#93A4BE">'+dmy+' · ca. '+p.km+' km</text>';
+  });
+  // home hub on top
+  s += '<circle cx="'+hx+'" cy="'+hy+'" r="10" class="m-home" fill="#3E7BFA" stroke="#0E1726" stroke-width="2.5"/>';
+  s += '<circle cx="'+hx+'" cy="'+hy+'" r="18" fill="none" class="m-homering" stroke="rgba(62,123,250,.4)" stroke-width="1.5"/>';
+  s += '<text x="'+(hx)+'" y="'+(hy+34)+'" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="17" class="m-homelbl" fill="#3E7BFA">Derendingen</text>';
+  s += '<text x="'+(hx)+'" y="'+(hy+50)+'" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" class="m-sub" fill="#93A4BE">Heimbasis · 7 Heimspiele</text>';
+  s += '</svg>';
+  document.getElementById("svgHost").innerHTML = s;
+})();
+
+// ---- TISCHDIENST (geteilt & persistent) ----
+const DutyApp = (function(){
+  const KEY = "tischdienst:v1";
+  const ROLES = [["anschreiber","Anschreiber"],["zeitnehmer","Zeit"],["sekunden","24 Sek."]];
+  const DEFAULT_ROSTER = ["Alex","Benno","Colin","Daniel","Dom","Fabi","Jan","Jannick","Jonas","Matze","Robert","Roman","Roy","Sadik","Simon","Stijn","Til","Gerhard"];
+  const DEFAULT_EXEMPT = ["Gerhard"];
+  const ADMIN_CODE = "120895";
+  const SYNC_URL = API_URL;   // feste Live-Sync-URL (Google Apps Script Web-App)
+  // Zugeteilte Schreibdienste (Schlüssel = unser Heimspieltag). ok:false = noch nicht offiziell zugeteilt
+  const DUTY_INFO = {
+    "2026-10-18":{time:"14:00",team:"Herren 2",opp:"TSG Reutlingen Ravens 3",ok:true},
+    "2026-11-15":{time:"14:00",team:"Herren 2",opp:"TSV Lustnau",ok:true},
+    "2026-11-29":{time:"14:00",team:"Herren 2",opp:"VfL Kirchheim Knights 2",ok:true},
+    "2026-12-20":{time:"16:00",team:"Damen",opp:"SV 03 Tigers Tübingen 2",ok:true},
+    "2027-01-31":{time:"14:00",team:"Herren 2",opp:"SG Schramberg",ok:false},
+    "2027-02-28":{time:"14:00",team:"Herren 2",opp:"TuS Metzingen",ok:false},
+    "2027-03-14":{time:"16:00",team:"Herren 2",opp:"SV Böblingen Panthers",ok:false}
+  };
+  const dutyGames = games.filter(g=>g.home);               // 7 Heimtermine
+  const SLOTS = dutyGames.length * ROLES.length;           // 21
+  const SIGNUP_DEADLINE = new Date(2026,9,31,23,59,59);     // Ende Oktober 2026
+  const hasStorage = typeof window!=="undefined" && window.storage && typeof window.storage.get==="function";
+  let state=null, pollTimer=null, openPicker=null, started=false, adminUnlocked=false, resetArm=false, dirty=false, storageMode=null, runtimeSyncUrl="";
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  const syncUrl=()=>runtimeSyncUrl||SYNC_URL||"";
+
+  function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+  function blank(){const duties={};dutyGames.forEach(g=>duties[g.date]={anschreiber:"",zeitnehmer:"",sekunden:""});return {roster:[],exempt:[],duties,adminCode:""};}
+  function normalize(st){
+    if(!st||typeof st!=="object") st=blank();
+    if(!Array.isArray(st.roster)) st.roster=[];
+    if(!Array.isArray(st.exempt)) st.exempt=[];
+    if(typeof st.adminCode!=="string") st.adminCode="";
+    if(!st.duties||typeof st.duties!=="object") st.duties={};
+    dutyGames.forEach(g=>{const dd=st.duties[g.date]||{};st.duties[g.date]={anschreiber:dd.anschreiber||"",zeitnehmer:dd.zeitnehmer||"",sekunden:dd.sekunden||""};});
+    return st;
+  }
+  const isEx=(st,n)=>st.exempt.includes(n);
+  const active=st=>st.roster.filter(n=>!isEx(st,n));
+  async function load(){
+    const url=syncUrl();
+    if(url){
+      try{const r=await fetch(url,{cache:"no-store"});if(r.ok){const j=await r.json();if(storageMode!=="server"){storageMode="server";renderModeNote();}return normalize(j&&Array.isArray(j.roster)?j:blank());}}
+      catch(e){console.warn("sync get",e);}
+      // Server nicht erreichbar → weiter zu window.storage / RAM
+    }
+    if(!hasStorage) return normalize(state||blank());
+    const shared = storageMode!=="local";   // bevorzugt geteilt, außer wir wissen dass nur lokal geht
+    try{const r=await window.storage.get(KEY,shared);return normalize(r?JSON.parse(r.value):blank());}
+    catch(e){return normalize(state||blank());}
+  }
+  function renderModeNote(){
+    const el=document.getElementById("modeNote"); if(!el) return;
+    el.className="modenote";
+    if(storageMode==="server"){el.classList.add("ok");el.style.display="block";el.innerHTML='🟢 <b>Live-Sync aktiv</b> — alle Geräte mit derselben Sync-URL teilen denselben Stand.';}
+    else if(storageMode==="serverfail"){el.style.display="block";el.innerHTML='⚠ Sync-Server nicht erreichbar (evtl. von der App-Umgebung blockiert). Änderungen bleiben lokal — notfalls „Sichern &amp; Teilen (Code)" nutzen.';}
+    else if(storageMode==="local"){el.style.display="block";el.innerHTML='⚠ Geteilter Speicher ist hier nicht erreichbar — Einträge werden nur auf <b>diesem Gerät</b> gespeichert und <b>nicht</b> mit anderen geteilt.';}
+    else if(storageMode==="none"){el.style.display="block";el.innerHTML='⚠ Automatisches Speichern ist hier nicht möglich — Änderungen gehen beim Neuladen verloren. Sichere den Stand über <b>„Sichern &amp; Teilen (Code)"</b> unten und teile ihn im Team.';}
+    else{el.style.display="none";}
+  }
+  let okTimer=null;
+  function setSaveStatus(s){
+    const el=document.getElementById("saveStatus"); if(!el) return;
+    if(okTimer){clearTimeout(okTimer);okTimer=null;}
+    if(s==="saving"){el.className="savestat saving";el.textContent="Speichere…";}
+    else if(s==="ok"){el.className="savestat ok";el.textContent=storageMode==="local"?"Gespeichert – nur auf diesem Gerät ⚠":"Alles gespeichert ✓";okTimer=setTimeout(()=>{const e2=document.getElementById("saveStatus");if(e2&&!dirty){e2.className="savestat";e2.textContent="";}},2500);}
+    else if(s==="err"){el.className="savestat err";el.innerHTML='Speichern fehlgeschlagen — <button id="saveRetry" class="linkbtn">erneut versuchen</button>';}
+    else {el.className="savestat";el.textContent="";}
+  }
+  async function persist(st){
+    state=st; dirty=true;
+    const url=syncUrl();
+    let serverTried=false;
+    if(url){
+      serverTried=true;
+      setSaveStatus("saving");
+      const gs=/script\.google\.com/.test(url);   // Google Apps Script Web-App → POST + text/plain (kein CORS-Preflight)
+      const opts=gs
+        ? {method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(st)}
+        : {method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(st)};
+      for(let a=0;a<3;a++){
+        try{
+          const r=await fetch(url,opts);
+          if(r.ok){storageMode="server";dirty=false;setSaveStatus("ok");renderModeNote();return true;}
+          console.warn("sync write status",r.status);
+        }catch(e){console.warn("sync write",e);}
+        await sleep(400);
+      }
+      // Server nicht erreichbar → weiter zu window.storage als Notnagel
+    }
+    if(!hasStorage){setSaveStatus("err");storageMode=serverTried?"serverfail":"none";renderModeNote();return false;}
+    setSaveStatus("saving");
+    const json=JSON.stringify(st);
+    const order = storageMode==="local" ? [false,true] : [true,false];   // erst geteilt, dann lokal (oder umgekehrt, wenn schon lokal)
+    for(const shared of order){
+      for(let a=0;a<2;a++){
+        try{
+          await window.storage.set(KEY,json,shared);
+          const m=shared?"shared":"local";
+          if(storageMode!==m){storageMode=m;renderModeNote();}
+          dirty=false; setSaveStatus("ok"); return true;
+        }catch(e){ console.warn("storage set shared="+shared+" versuch "+(a+1),e); await sleep(250); }
+      }
+    }
+    setSaveStatus("err"); storageMode=serverTried?"serverfail":"none"; renderModeNote(); return false;   // bleibt lokal im RAM sichtbar, wird beim nächsten Versuch geflusht
+  }
+  async function mutate(fn){const fresh=await load();fn(fresh);await persist(fresh);render();}
+  function exportCode(){try{return btoa(unescape(encodeURIComponent(JSON.stringify(state))));}catch(e){return "";}}
+  async function importCode(raw){
+    let obj; try{obj=JSON.parse(decodeURIComponent(escape(atob(raw.trim()))));}catch(e){return false;}
+    if(!obj||typeof obj!=="object"||!Array.isArray(obj.roster)||!obj.duties) return false;
+    const st=normalize(obj); await persist(st); render(); return true;
+  }
+
+  function counts(st){const c={};st.roster.forEach(n=>c[n]=0);Object.values(st.duties).forEach(sl=>Object.values(sl).forEach(n=>{if(n)c[n]=(c[n]||0)+1;}));return c;}
+  function fmtDate(s){const dt=d(s);return DOW[dt.getDay()]+" "+dt.getDate()+"."+(dt.getMonth()+1)+".";}
+
+  function render(){
+    if(!state) return;
+    document.getElementById("dutyStatus").style.display="none";
+    document.getElementById("dutyApp").style.display="block";
+    const c=counts(state);
+    renderDeadline(); renderOverview(state,c); renderGames(state,c); renderRoster(state,c); renderAdmin(state,c); renderModeNote();
+  }
+  function openSlots(st){const o=[];dutyGames.forEach(g=>ROLES.forEach(([k])=>{if(!st.duties[g.date][k])o.push({date:g.date,role:k});}));return o;}
+  function renderDeadline(){
+    const el=document.getElementById("dutyDeadline");
+    const now=new Date();
+    if(now<=SIGNUP_DEADLINE){
+      const days=Math.ceil((SIGNUP_DEADLINE-now)/86400000);
+      el.className="deadline open";
+      el.innerHTML='<span class="dl-ic">‼</span><span>Selbst eintragen bis <b>So 31.10.2026</b> · noch <b>'+days+' Tag'+(days===1?'':'e')+'</b>. Danach verteilt der Admin die offenen Dienste fair.</span>';
+    }else{
+      const open=openSlots(state).length;
+      el.className="deadline closed";
+      el.innerHTML='<span class="dl-ic">✓</span><span>Eintragefrist vorbei — Austragen gesperrt. Bei Verhinderung bitte <b>tauschen (Wechseln)</b>. '+(open?'<b>'+open+'</b> offene Slots: Restverteilung über den Admin-Bereich.':'Alle Dienste besetzt.')+'</span>';
+    }
+  }
+  function renderOverview(st,c){
+    const host=document.getElementById("overview");
+    const act=active(st);
+    const assigned=Object.values(c).reduce((a,b)=>a+b,0);
+    document.getElementById("fairMeta").textContent=assigned+" / "+SLOTS+" Slots vergeben"+(act.length?" · Ziel ≈ "+(SLOTS/act.length).toFixed(1)+" pro Person":"");
+    if(!st.roster.length){host.innerHTML='<div class="emptyroster">Noch keine Namen im Kader — unten unter „Kader verwalten" anlegen.</div>';return;}
+    const max=Math.max(1,...act.map(n=>c[n]||0)), target=SLOTS/Math.max(act.length,1);
+    let html=[...act].sort((a,b)=>(c[b]||0)-(c[a]||0)||a.localeCompare(b)).map(n=>{
+      const v=c[n]||0, over=v>Math.ceil(target);
+      return '<div class="ovrow'+(over?' over':'')+'"><span class="nm'+(v===0?' zero':'')+'">'+esc(n)+'</span>'+
+        '<span class="ovbar"><i style="width:'+(v/max*100)+'%"></i></span>'+
+        '<span class="ovcount'+(v===0?' zero':'')+'">'+v+'</span></div>';
+    }).join("");
+    const ex=st.roster.filter(n=>isEx(st,n));
+    if(ex.length) html+=ex.sort((a,b)=>a.localeCompare(b)).map(n=>
+      '<div class="ovrow exempt"><span class="nm">'+esc(n)+'</span><span class="extag">kein Dienst</span></div>').join("");
+    host.innerHTML=html;
+  }
+  function renderGames(st,c){
+    const canSignOff = new Date() <= SIGNUP_DEADLINE;
+    document.getElementById("dutyList").innerHTML=dutyGames.map(g=>{
+      const slot=st.duties[g.date], filled=ROLES.filter(([k])=>slot[k]).length, full=filled===ROLES.length;
+      const roles=ROLES.map(([k,label])=>{
+        const who=slot[k];
+        const isOpen=openPicker&&openPicker.date===g.date&&openPicker.role===k;
+        if(who) return '<div class="role"><span class="rl">'+label+'</span><span class="who">'+esc(who)+'</span>'+
+          '<div class="ract"><button class="act swap" data-add="'+g.date+'|'+k+'">Wechseln</button>'+
+          (canSignOff?'<button class="act rm" data-rm="'+g.date+'|'+k+'">Austragen</button>':'')+'</div></div>'+(isOpen?picker(st,c,g.date,k):"");
+        return '<div class="role empty"><span class="rl">'+label+'</span><span class="who">frei</span>'+
+          '<button class="act add" data-add="'+g.date+'|'+k+'">Eintragen</button></div>'+(isOpen?picker(st,c,g.date,k):"");
+      }).join("");
+      const inf=DUTY_INFO[g.date]||{time:"",team:"Herren 2",opp:"",ok:false};
+      const tent=!inf.ok;
+      return '<div class="dutygame'+(full?' full':'')+(tent?' tentative':'')+'"><div class="dg-h">'+
+        '<div class="dg-main"><div><span class="dg-date">'+fmtDate(g.date)+'</span>'+(inf.time?'<span class="dg-time">'+inf.time+' Uhr</span>':'')+
+        (tent?'<span class="dg-tag">vorläufig</span>':'')+'</div>'+
+        '<span class="dg-sub">'+esc(inf.team)+(inf.opp?' vs '+esc(inf.opp):'')+'</span></div>'+
+        '<span class="dg-badge '+(full?'full':'open')+'">'+(full?'komplett':(ROLES.length-filled)+' frei')+'</span></div>'+
+        (tent?'<div class="dg-note">Noch nicht offiziell zugeteilt – Termin/Uhrzeit können sich ändern.</div>':'')+
+        '<div class="roles">'+roles+'</div></div>';
+    }).join("");
+  }
+  function picker(st,c,date,role){
+    if(!st.roster.length) return '<div class="picker"><span style="color:var(--muted);font-size:13px">Erst Namen im Kader anlegen.</span></div>';
+    const current=st.duties[date][role];
+    const taken=new Set(Object.values(st.duties[date]).filter(Boolean));
+    const btns=active(st).sort((a,b)=>(c[a]||0)-(c[b]||0)||a.localeCompare(b)).map(n=>{
+      const dis=taken.has(n);
+      return '<button class="pk'+(dis?' dis':'')+'"'+(dis?' disabled':' data-pick="'+date+'|'+role+'|'+encodeURIComponent(n)+'"')+'>'+esc(n)+' ('+(c[n]||0)+')</button>';
+    }).join("");
+    const lbl='<span class="pklbl">'+(current?'Ersatz für <b>'+esc(current)+'</b> (vorab geklärt) wählen:':'Eintragen:')+'</span>';
+    return '<div class="picker">'+lbl+btns+'<button class="pkclose" data-close="1">abbrechen</button></div>';
+  }
+  function renderRoster(st,c){
+    document.getElementById("rosterCount").textContent=st.roster.length;
+    const admin=adminUnlocked;
+    document.getElementById("rosterChips").innerHTML=[...st.roster].sort((a,b)=>a.localeCompare(b)).map(n=>{
+      const ex=isEx(st,n);
+      const btns=admin
+        ? '<button class="tg" data-exempt="'+encodeURIComponent(n)+'" title="Dienstpflicht umschalten">'+(ex?'+ Dienst':'– Dienst')+'</button>'+
+          '<button class="x" data-del="'+encodeURIComponent(n)+'" title="Entfernen">×</button>'
+        : '';
+      return '<span class="rchip'+(ex?' exempt':'')+(admin?'':' plain')+'"><span class="c">'+(ex?'∅':(c[n]||0))+'</span>'+esc(n)+btns+'</span>';
+    }).join("");
+    const hint=document.getElementById("rosterAdminHint");
+    if(hint) hint.style.display=admin?"none":"block";
+  }
+  function renderAdmin(st,c){
+    document.getElementById("adminLocked").style.display = adminUnlocked ? "none":"block";
+    document.getElementById("adminPanel").style.display  = adminUnlocked ? "block":"none";
+    if(adminUnlocked){
+      const open=openSlots(st).length;
+      document.getElementById("adminOpen").innerHTML = open
+        ? 'Aktuell <b>'+open+'</b> offene Slots.'
+        : 'Alle Slots sind besetzt.';
+      document.getElementById("distribute").disabled = !open || !active(st).length;
+      const sui=document.getElementById("syncUrlInput"); if(sui && document.activeElement!==sui) sui.value=syncUrl();
+    }
+  }
+  // faire Auto-Verteilung: füllt nur offene Slots, wenigste Dienste zuerst, niemand doppelt pro Spieltag
+  function fairAssign(st){
+    const c=counts(st);
+    const open=openSlots(st);
+    // stabil-zufällige Reihenfolge der offenen Slots, damit keine systematische Bevorzugung
+    for(let i=open.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[open[i],open[j]]=[open[j],open[i]];}
+    open.forEach(sl=>{
+      const inGame=new Set(Object.values(st.duties[sl.date]).filter(Boolean));
+      const elig=st.roster.filter(n=>!inGame.has(n)&&!isEx(st,n));
+      if(!elig.length) return;
+      elig.sort((a,b)=>(c[a]-c[b])||(Math.random()-0.5));
+      const pick=elig[0];
+      st.duties[sl.date][sl.role]=pick;
+      c[pick]=(c[pick]||0)+1;
+    });
+  }
+  async function addPlayers(){
+    const inp=document.getElementById("newPlayer");
+    const raw=inp.value.split(/[,\n;]/).map(s=>s.trim()).filter(Boolean);
+    if(!raw.length) return; inp.value="";
+    await mutate(st=>{raw.forEach(n=>{if(!st.roster.some(x=>x.toLowerCase()===n.toLowerCase()))st.roster.push(n);});});
+  }
+  function wire(){
+    document.getElementById("duty").addEventListener("click", async e=>{
+      const t=e.target.closest("button"); if(!t) return;
+      if(t.dataset.add){const [date,role]=t.dataset.add.split("|");openPicker={date,role};render();}
+      else if(t.dataset.close){openPicker=null;render();}
+      else if(t.dataset.pick){const [date,role,nm]=t.dataset.pick.split("|");openPicker=null;await mutate(st=>{st.duties[date][role]=decodeURIComponent(nm);});}
+      else if(t.dataset.rm){if(new Date()>SIGNUP_DEADLINE)return;const [date,role]=t.dataset.rm.split("|");await mutate(st=>{st.duties[date][role]="";});}
+      else if(t.id==="addPlayerBtn"){await addPlayers();}
+      else if(t.dataset.del){if(!adminUnlocked)return;const name=decodeURIComponent(t.dataset.del);await mutate(st=>{st.roster=st.roster.filter(x=>x!==name);st.exempt=st.exempt.filter(x=>x!==name);Object.values(st.duties).forEach(sl=>Object.keys(sl).forEach(k=>{if(sl[k]===name)sl[k]="";}));});}
+      else if(t.dataset.exempt){if(!adminUnlocked)return;const name=decodeURIComponent(t.dataset.exempt);await mutate(st=>{if(st.exempt.includes(name)){st.exempt=st.exempt.filter(x=>x!==name);}else{st.exempt.push(name);Object.values(st.duties).forEach(sl=>Object.keys(sl).forEach(k=>{if(sl[k]===name)sl[k]="";}));}});}
+      else if(t.id==="dutyRefresh"){t.textContent="Aktualisiere…";if(dirty){await persist(state);}else{state=await load();render();}t.textContent="Aktualisieren";}
+      else if(t.id==="saveRetry"){await persist(state);}
+      else if(t.id==="syncExport"){document.getElementById("syncOut").value=exportCode();document.getElementById("syncMsg").textContent="Code erzeugt — markieren, kopieren und teilen.";}
+      else if(t.id==="syncCopy"){const ta=document.getElementById("syncOut");const msg=document.getElementById("syncMsg");if(!ta.value){msg.textContent="Erst oben den Code erzeugen.";return;}ta.focus();ta.select();try{await navigator.clipboard.writeText(ta.value);msg.textContent="In die Zwischenablage kopiert ✓";}catch(e){msg.textContent="Text ist markiert — jetzt manuell kopieren (lange drücken → Kopieren).";}}
+      else if(t.id==="syncUrlSet"){
+        const url=document.getElementById("syncUrlInput").value.trim();
+        const msg=document.getElementById("syncUrlMsg");
+        if(!/^https:\/\/.+/.test(url)){msg.textContent="Bitte eine gültige https-URL einfügen.";return;}
+        runtimeSyncUrl=url; try{location.hash="sync="+encodeURIComponent(url);}catch(e){}
+        msg.textContent="Verbinde…";
+        const remote=await load();
+        if(remote&&Array.isArray(remote.roster)&&remote.roster.length){state=remote;render();msg.textContent="Verbunden — Stand vom Server geladen ✓";}
+        else{const ok=await persist(state);msg.textContent=ok?"Verbunden — aktueller Stand hochgeladen ✓":"Verbindung fehlgeschlagen — Umgebung blockiert evtl. externe Aufrufe.";render();}
+      }
+      else if(t.id==="syncUrlClear"){runtimeSyncUrl="";try{if(/[#&]sync=/.test(location.hash))location.hash="";}catch(e){}storageMode=null;document.getElementById("syncUrlMsg").textContent="Getrennt — zurück auf lokalen Speicher/Code.";renderModeNote();render();}
+      else if(t.id==="adminUnlock"){
+        const code=document.getElementById("adminCode").value.trim();
+        const msg=document.getElementById("adminMsg");
+        if(code===ADMIN_CODE){adminUnlocked=true;msg.textContent="";document.getElementById("adminCode").value="";render();}
+        else{msg.textContent="Falscher Code.";}
+      }
+      else if(t.id==="distribute"){t.textContent="Verteile…";await mutate(fairAssign);t.textContent="Offene fair verteilen";}
+      else if(t.id==="adminReset"){
+        if(!resetArm){resetArm=true;t.textContent="Sicher? Nochmal tippen";setTimeout(()=>{resetArm=false;t.textContent="Alle Zuteilungen leeren";},4000);}
+        else{resetArm=false;t.textContent="Alle Zuteilungen leeren";await mutate(st=>{dutyGames.forEach(g=>st.duties[g.date]={anschreiber:"",zeitnehmer:"",sekunden:""});});}
+      }
+    });
+    document.getElementById("newPlayer").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addPlayers();}});
+  }
+  function startPoll(){stopPoll();if(!hasStorage)return;pollTimer=setInterval(async()=>{
+    if(openPicker) return;
+    if(dirty){ await persist(state); return; }          // erst ausstehende Speicherung nachholen
+    const f=await load();
+    if(JSON.stringify(f)!==JSON.stringify(state)){state=f;render();}
+  },20000);}
+  function stopPoll(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}}
+  async function start(){
+    if(!started){started=true;wire();
+      try{const m=/[#&]sync=([^&]+)/.exec(location.hash||"");if(m)runtimeSyncUrl=decodeURIComponent(m[1]);}catch(e){}
+      if(!hasStorage && !syncUrl())document.getElementById("dutyStatus").innerHTML='<span class="err">Hinweis: automatischer Speicher ist hier nicht aktiv — Live-Sync im Admin-Bereich einrichten oder „Sichern &amp; Teilen (Code)" nutzen.</span>';
+    }
+    state=await load();
+    if(!state.roster.length){await mutate(st=>{st.roster=[...DEFAULT_ROSTER];st.exempt=[...DEFAULT_EXEMPT];});}
+    else{render();}
+    startPoll();
+  }
+  return {start,stopPoll};
+})();
+
+// ---- TABS ----
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", x===t));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    document.getElementById(t.dataset.tab).classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+    if(t.dataset.tab==="duty") DutyApp.start(); else DutyApp.stopPoll();
+  });
+});
+</script>
+<div class="themebar" role="group" aria-label="Design wählen">
+  <button data-th="">Aktuell</button><button data-th="a">A Trikot</button><button data-th="b">B Halle</button><button data-th="c">C Vollgas</button>
+</div>
+<script>
+(function(){
+  const bs=document.querySelectorAll(".themebar button");
+  function set(t){ if(t) document.documentElement.dataset.theme=t; else delete document.documentElement.dataset.theme;
+    bs.forEach(b=>b.setAttribute("aria-pressed", b.dataset.th===(t||"")));
+    try{const u=new URL(location.href); t?u.searchParams.set("theme",t):u.searchParams.delete("theme"); history.replaceState(null,"",u);}catch(e){}
+  }
+  bs.forEach(b=>b.addEventListener("click",()=>set(b.dataset.th)));
+  set(document.documentElement.dataset.theme||"");
+})();
+</script>
+</body>
+</html>
