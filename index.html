@@ -177,6 +177,11 @@
   .dg-badge{margin-left:auto;font-family:var(--disp);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:11px;padding:3px 9px;border-radius:999px}
   .dg-badge.open{background:rgba(245,165,36,.16);color:var(--away)}
   .dg-badge.full{background:rgba(62,123,250,.18);color:#9cc0ff}
+  .dg-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .dg-time{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--muted);margin-left:6px}
+  .dg-tag{display:inline-block;font-family:var(--disp);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px dashed var(--muted-2);color:var(--muted);margin-left:6px;vertical-align:1px}
+  .dutygame.tentative{border-style:dashed}
+  .dg-note{color:var(--muted-2);font-size:12px;margin:-4px 0 10px}
 
   .roles{display:grid;gap:7px}
   .role{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
@@ -303,7 +308,8 @@
   <!-- TISCHDIENST -->
   <section class="panel" id="duty" role="tabpanel">
     <p class="maphead">
-      Tischdienst für <b style="color:var(--muted)">Herren 2</b> im Anschluss an unsere 7 Heimspiele — je <b style="color:var(--muted)">3 Personen</b> (Anschreiber · Zeit · 24&nbsp;Sek.).
+      Tischdienst an unseren 7 Heimspieltagen (6× Herren 2, 1× Damen) — je <b style="color:var(--muted)">3 Personen</b> (Anschreiber · Zeit · 24&nbsp;Sek.).
+      Bis Jahresende vom Verband zugeteilt, Termine ab Januar <b style="color:var(--muted)">vorläufig</b>.
       Eintragungen sind für alle mit dem Link sichtbar und werden live geteilt.
     </p>
 
@@ -547,6 +553,16 @@ const DutyApp = (function(){
   const DEFAULT_EXEMPT = ["Gerhard"];
   const ADMIN_CODE = "120895";
   const SYNC_URL = "https://script.google.com/macros/s/AKfycbycN6Q0a86wwK399_8AhLquCExag6NGUAMgVAZLKPiOR-Uqr_Zb4b7aFmktAL0CWRAZjA/exec";   // feste Live-Sync-URL (Google Apps Script Web-App)
+  // Zugeteilte Schreibdienste (Schlüssel = unser Heimspieltag). ok:false = noch nicht offiziell zugeteilt
+  const DUTY_INFO = {
+    "2026-10-18":{time:"14:00",team:"Herren 2",opp:"TSG Reutlingen Ravens 3",ok:true},
+    "2026-11-15":{time:"14:00",team:"Herren 2",opp:"TSV Lustnau",ok:true},
+    "2026-11-29":{time:"14:00",team:"Herren 2",opp:"VfL Kirchheim Knights 2",ok:true},
+    "2026-12-20":{time:"16:00",team:"Damen",opp:"SV 03 Tigers Tübingen 2",ok:true},
+    "2027-01-31":{time:"14:00",team:"Herren 2",opp:"SG Schramberg",ok:false},
+    "2027-02-28":{time:"14:00",team:"Herren 2",opp:"TuS Metzingen",ok:false},
+    "2027-03-14":{time:"16:00",team:"Herren 2",opp:"SV Böblingen Panthers",ok:false}
+  };
   const dutyGames = games.filter(g=>g.home);               // 7 Heimtermine
   const SLOTS = dutyGames.length * ROLES.length;           // 21
   const SIGNUP_DEADLINE = new Date(2026,9,31,23,59,59);     // Ende Oktober 2026
@@ -698,9 +714,14 @@ const DutyApp = (function(){
         return '<div class="role empty"><span class="rl">'+label+'</span><span class="who">frei</span>'+
           '<button class="act add" data-add="'+g.date+'|'+k+'">Eintragen</button></div>'+(isOpen?picker(st,c,g.date,k):"");
       }).join("");
-      return '<div class="dutygame'+(full?' full':'')+'"><div class="dg-h">'+
-        '<span class="dg-date">'+fmtDate(g.date)+'</span><span class="dg-sub">Herren 2 · nach unserem Heimspiel</span>'+
+      const inf=DUTY_INFO[g.date]||{time:"",team:"Herren 2",opp:"",ok:false};
+      const tent=!inf.ok;
+      return '<div class="dutygame'+(full?' full':'')+(tent?' tentative':'')+'"><div class="dg-h">'+
+        '<div class="dg-main"><div><span class="dg-date">'+fmtDate(g.date)+'</span>'+(inf.time?'<span class="dg-time">'+inf.time+' Uhr</span>':'')+
+        (tent?'<span class="dg-tag">vorläufig</span>':'')+'</div>'+
+        '<span class="dg-sub">'+esc(inf.team)+(inf.opp?' vs '+esc(inf.opp):'')+'</span></div>'+
         '<span class="dg-badge '+(full?'full':'open')+'">'+(full?'komplett':(ROLES.length-filled)+' frei')+'</span></div>'+
+        (tent?'<div class="dg-note">Noch nicht offiziell zugeteilt – Termin/Uhrzeit können sich ändern.</div>':'')+
         '<div class="roles">'+roles+'</div></div>';
     }).join("");
   }
