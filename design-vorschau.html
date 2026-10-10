@@ -345,33 +345,53 @@
   [data-theme="b"] .drow .bar i{background:var(--home)}
 
   /* C · Vollgas — rote Kopfzeile, schwarzer Körper, weiße Typo */
-  :root[data-theme="c"]{
+  :root[data-theme^="c"]{
     --ink:#121212; --surface:#1C1C1C; --surface-2:#262626;
     --text:#FFFFFF; --muted:#A6A6A6; --muted-2:#717171;
     --home:#E0353B; --away:#FFFFFF;
     --home-light:#FF9C9C; --away-light:#FFFFFF; --on-home:#FFFFFF;
     --header-bg:#9D181D; --header-text:#FFFFFF; --header-muted:#F2C4C5; --tab-active:#FFFFFF;
   }
-  [data-theme="c"] body{background:var(--ink)}
-  [data-theme="c"] header{border-bottom:0;backdrop-filter:none}
-  [data-theme="c"] .title{font-size:34px;text-transform:uppercase;letter-spacing:.01em}
-  [data-theme="c"] .title span{color:#fff;-webkit-text-stroke:0}
-  [data-theme="c"] .tab{color:#F2C4C5}
-  [data-theme="c"] .chip.h{background:var(--home);color:#fff}
-  [data-theme="c"] .chip.a{color:#fff;border-color:#fff}
-  [data-theme="c"] .game{border-left-width:4px}
-  [data-theme="c"] .game.away{border-left-color:#fff}
-  [data-theme="c"] .game.isnext{box-shadow:0 0 0 1px #fff inset}
-  [data-theme="c"] .next{background:var(--surface);border:0;border-top:4px solid var(--home);border-radius:4px}
-  [data-theme="c"] .next .lbl{color:var(--home)}
-  [data-theme="c"] .next .when .d{font-size:32px}
-  [data-theme="c"] .stat{border-radius:4px} [data-theme="c"] .game,[data-theme="c"] .dutygame,[data-theme="c"] .dcard,[data-theme="c"] .drow{border-radius:4px}
-  [data-theme="c"] .stat.home .n{color:var(--home)} [data-theme="c"] .stat.away .n{color:#fff}
-  [data-theme="c"] .role .act.add,[data-theme="c"] .btn{background:var(--home);color:#fff}
-  [data-theme="c"] .btn.ghost{background:transparent;color:var(--muted)}
+  [data-theme^="c"] body{background:var(--ink)}
+  [data-theme^="c"] header{border-bottom:0;backdrop-filter:none}
+  [data-theme^="c"] .title{font-size:34px;text-transform:uppercase;letter-spacing:.01em}
+  [data-theme^="c"] .title span{color:#fff;-webkit-text-stroke:0}
+  [data-theme^="c"] .tab{color:#F2C4C5}
+  [data-theme^="c"] .chip.h{background:var(--home);color:#fff}
+  [data-theme^="c"] .chip.a{color:#fff;border-color:#fff}
+  [data-theme^="c"] .game{border-left-width:4px}
+  [data-theme^="c"] .game.away{border-left-color:#fff}
+  [data-theme^="c"] .game.isnext{box-shadow:0 0 0 1px #fff inset}
+  [data-theme^="c"] .next{background:var(--surface);border:0;border-top:4px solid var(--home);border-radius:4px}
+  [data-theme^="c"] .next .lbl{color:var(--home)}
+  [data-theme^="c"] .next .when .d{font-size:32px}
+  [data-theme^="c"] .stat{border-radius:4px} [data-theme^="c"] .game,[data-theme^="c"] .dutygame,[data-theme^="c"] .dcard,[data-theme^="c"] .drow{border-radius:4px}
+  [data-theme^="c"] .stat.home .n{color:var(--home)} [data-theme^="c"] .stat.away .n{color:#fff}
+  [data-theme^="c"] .role .act.add,[data-theme^="c"] .btn{background:var(--home);color:#fff}
+  [data-theme^="c"] .btn.ghost{background:transparent;color:var(--muted)}
 
   /* Ergebnis "N" in den roten Themes neutral, damit Rot = Verein bleibt */
-  [data-theme="a"] .res.l,[data-theme="b"] .res.l,[data-theme="c"] .res.l{background:#5E5E5E}
+  [data-theme="a"] .res.l,[data-theme="b"] .res.l,[data-theme^="c"] .res.l{background:#5E5E5E}
+
+  /* ---- C-Varianten: weniger Rot im Dauerblick ---- */
+  .head-inner .eyebrow,.head-inner .title,.head-inner .sub{transition:max-height .25s ease,opacity .2s ease,margin .25s ease;max-height:120px;overflow:hidden}
+  /* C1 · Einklappen: oben rot, beim Scrollen schmale schwarze Leiste */
+  [data-theme="c1"] header{transition:background .25s ease}
+  [data-theme="c1"].scrolled header{background:#121212;border-bottom:3px solid #9D181D}
+  [data-theme="c1"].scrolled .head-inner .eyebrow,[data-theme="c1"].scrolled .head-inner .title,[data-theme="c1"].scrolled .head-inner .sub{max-height:0;opacity:0;margin:0}
+  [data-theme="c1"].scrolled .tabs{margin-top:0}
+  [data-theme="c1"].scrolled .tab{color:var(--muted)} [data-theme="c1"].scrolled .tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--home)}
+  /* C2 · Tiefrot: dunkles Weinrot, das nach unten in Schwarz läuft */
+  :root[data-theme="c2"]{--header-bg:linear-gradient(180deg,#6E1216 0%,#2A0C0E 100%);--header-muted:#D3A3A5}
+  [data-theme="c2"] .title{font-size:30px}
+  [data-theme="c2"] .tab{color:#D3A3A5}
+  /* C3 · Kompakt: nur die Titelzeile rot, Tabs auf Schwarz */
+  [data-theme="c3"] .head-inner{padding-top:10px}
+  [data-theme="c3"] .head-inner .eyebrow,[data-theme="c3"] .head-inner .sub{display:none}
+  [data-theme="c3"] .title{font-size:clamp(19px,5.6vw,24px);white-space:nowrap;text-overflow:ellipsis;margin:0 0 10px}
+  [data-theme="c3"] .tabs{margin-top:0;background:#121212;box-shadow:0 0 0 100vmax #121212;clip-path:inset(0 -100vmax);border-bottom:1px solid var(--line)}
+  [data-theme="c3"] .tab{color:var(--muted)} [data-theme="c3"] .tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--home)}
+  .themebar{max-width:calc(100% - 16px);overflow-x:auto}
 
   /* Vorschau-Umschalter */
   .themebar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:50;display:flex;gap:4px;padding:5px;border-radius:999px;background:rgba(20,20,20,.88);backdrop-filter:blur(8px);box-shadow:0 6px 24px rgba(0,0,0,.35)}
@@ -1042,7 +1062,7 @@ document.querySelectorAll(".tab").forEach(t=>{
 });
 </script>
 <div class="themebar" role="group" aria-label="Design wählen">
-  <button data-th="">Aktuell</button><button data-th="a">A Trikot</button><button data-th="b">B Halle</button><button data-th="c">C Vollgas</button>
+  <button data-th="a">A</button><button data-th="c">C</button><button data-th="c1">C1 Scroll</button><button data-th="c2">C2 Tief</button><button data-th="c3">C3 Kompakt</button>
 </div>
 <script>
 (function(){
@@ -1052,7 +1072,9 @@ document.querySelectorAll(".tab").forEach(t=>{
     try{const u=new URL(location.href); t?u.searchParams.set("theme",t):u.searchParams.delete("theme"); history.replaceState(null,"",u);}catch(e){}
   }
   bs.forEach(b=>b.addEventListener("click",()=>set(b.dataset.th)));
-  set(document.documentElement.dataset.theme||"");
+  set(document.documentElement.dataset.theme||"c1");
+  const sc=()=>document.documentElement.classList.toggle("scrolled", window.scrollY>40);
+  window.addEventListener("scroll",sc,{passive:true}); sc();
 })();
 </script>
 </body>
