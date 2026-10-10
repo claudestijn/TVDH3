@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TVD Herren 3 · Spielplan 2026/27</title>
+<link rel="icon" type="image/svg+xml" href="https://www.tvderendingen.de/de-wGlobal/wGlobal/layout/images/Logo-TVD.svg" />
+<link rel="alternate icon" href="https://www.tvderendingen.de/favicon.ico" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -120,6 +122,16 @@
   .chip.a{background:transparent;color:var(--away);border:1.5px solid var(--away)}
   .time{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--text)}
   .time.open{color:var(--muted-2);font-style:italic;font-weight:500;font-size:13px}
+  .game.past{opacity:.6}
+  .game.past:hover{opacity:.85}
+  .score{font-family:var(--disp);font-weight:700;font-size:18px;line-height:1;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .res{font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.04em;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+  .res.w{background:#2f9e5f;color:#fff}
+  .res.l{background:#c2413a;color:#fff}
+  .game.past .score{opacity:1}
+  .next .last{color:var(--muted);font-size:12.5px;margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .next .last b{color:var(--text);font-family:var(--disp);font-size:15px}
+  .resbar{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px 0 0;color:var(--muted-2);font-size:12px}
 
   @media(max-width:460px){
     .game{grid-template-columns:48px 1fr auto;gap:10px;padding:11px 12px}
@@ -289,6 +301,7 @@
     </div>
     <div class="next" id="nextGame"></div>
     <div id="schedule"></div>
+    <div class="resbar"><button id="resRefresh" class="btn ghost">Ergebnisse aktualisieren</button><span id="resInfo"></span></div>
   </section>
 
   <!-- KARTE -->
@@ -424,27 +437,60 @@ const MON = ["Januar","Februar","März","April","Mai","Juni","Juli","August","Se
 function d(s){const [y,m,dd]=s.split("-").map(Number);return new Date(y,m-1,dd);}
 
 // next upcoming game
-const today = new Date(); today.setHours(0,0,0,0);
-let nextIdx = games.findIndex(g => d(g.date) >= today);
+// Spiel gilt als "aktuell" bis Anwurf + 2 Std. (Spieldauer), danach springt die Anzeige weiter
+const GAME_LEN_MS = 2*60*60*1000;
+function gameStart(g){const dt=d(g.date);const [h,m]=(g.time||"12:00").split(":").map(Number);dt.setHours(h,m,0,0);return dt;}
+function calcNext(now){return games.findIndex(g => gameStart(g).getTime()+GAME_LEN_MS > now.getTime());}
+let nextIdx = calcNext(new Date());
+const isPast = g => gameStart(g).getTime()+GAME_LEN_MS <= Date.now();
+
+// ---- ERGEBNISSE (aus Apps Script, Quelle basketball-bund.net) ----
+const API_URL = "https://script.google.com/macros/s/AKfycbycN6Q0a86wwK399_8AhLquCExag6NGUAMgVAZLKPiOR-Uqr_Zb4b7aFmktAL0CWRAZjA/exec";
+let RESULTS = {}, RES_UPDATED = "";
+function scoreHtml(r){return '<span class="res '+(r.win?'w':'l')+'">'+(r.win?'S':'N')+'</span>'+r.our+':'+r.opp;}
+async function loadResults(refresh){
+  try{
+    const r = await fetch(API_URL+"?action=results"+(refresh?"&refresh=1":""),{cache:"no-store"});
+    if(!r.ok) return false;
+    const j = await r.json();
+    if(!j || !j.results || typeof j.results!=="object") return false;   // alte Bereitstellung ohne Ergebnis-Endpunkt
+    RESULTS = j.results; RES_UPDATED = j.updated || "";
+    renderSchedule(); renderNext(); renderResInfo();
+    return true;
+  }catch(e){ console.warn("results",e); return false; }
+}
+function renderResInfo(){const el=document.getElementById("resInfo");if(el)el.textContent=RES_UPDATED?"Stand: "+RES_UPDATED:"";}
 
 // ---- NEXT GAME CARD ----
-(function(){
+function renderNext(){
   const host = document.getElementById("nextGame");
   if(nextIdx === -1){ host.innerHTML = '<div class="mu">Saison beendet</div>'; return; }
-  const g = games[nextIdx], dt = d(g.date);
+  const g = games[nextIdx], dt = d(g.date), now = new Date(), st = gameStart(g);
+  const t0 = new Date(now); t0.setHours(0,0,0,0);
+  const dayDiff = Math.round((d(g.date)-t0)/86400000);
+  let lbl;
+  if(now >= st) lbl = "● Läuft gerade";
+  else if(dayDiff === 0){ const min=Math.round((st-now)/60000); lbl = "Heute · in "+(min>=60?Math.floor(min/60)+" Std. "+(min%60?min%60+" Min.":""):min+" Min."); }
+  else if(dayDiff === 1) lbl = "Morgen";
+  else lbl = "Nächstes Spiel · in "+dayDiff+" Tagen";
   const timeTxt = g.time ? g.time+" Uhr" : "Zeit offen";
+  let lastHtml = "";
+  for(let i=nextIdx-1;i>=0;i--){ const lg=games[i], lr=RESULTS[lg.date];
+    if(lr){ lastHtml='<div class="last">Letztes Spiel: <b>'+scoreHtml(lr).replace('<span','<span style="vertical-align:1px"')+'</b> '+(lg.home?'vs ':'@ ')+lg.opp+'</div>'; break; } }
   const place = g.home ? "Heim · Derendingen" : "Auswärts · "+g.town+(g.km?" · ca. "+g.km+" km":"");
   host.innerHTML =
-    '<div><div class="lbl">Nächstes Spiel</div>'+
+    '<div><div class="lbl">'+lbl.trim()+'</div>'+
     '<div class="mu">TVD 3 '+(g.home?'vs':'@')+' '+g.opp+'</div>'+
-    '<div class="meta">'+place+'</div></div>'+
+    '<div class="meta">'+place+'</div>'+lastHtml+'</div>'+
     '<div class="when"><div class="d">'+DOW[dt.getDay()]+' '+dt.getDate()+'.'+(dt.getMonth()+1)+'.</div>'+
     '<div class="t">'+timeTxt+'</div></div>';
-})();
+}
+renderNext();
 
 // ---- SCHEDULE ----
-(function(){
+function renderSchedule(){
   const host = document.getElementById("schedule");
+  host.innerHTML = "";
   let curKey = "";
   games.forEach((g,i)=>{
     const dt = d(g.date);
@@ -453,8 +499,12 @@ let nextIdx = games.findIndex(g => d(g.date) >= today);
       const h = document.createElement("div"); h.className="month"; h.textContent=key; host.appendChild(h);
     }
     const row = document.createElement("div");
-    row.className = "game "+(g.home?"home":"away")+(i===nextIdx?" isnext":"");
-    const timeHtml = g.time ? '<div class="time">'+g.time+'</div>' : '<div class="time open">Zeit offen</div>';
+    const past = isPast(g), res = RESULTS[g.date];
+    row.className = "game "+(g.home?"home":"away")+(i===nextIdx?" isnext":"")+(past?" past":"");
+    row.dataset.i = i;
+    const timeHtml = res ? '<div class="score">'+scoreHtml(res)+'</div>'
+      : past ? '<div class="time open">Ergebnis offen</div>'
+      : g.time ? '<div class="time">'+g.time+'</div>' : '<div class="time open">Zeit offen</div>';
     const venue = g.home
       ? '<span class="pin" style="background:var(--home)"></span> Derendingen (Heim)'
       : '<span class="pin" style="background:var(--away)"></span> '+g.town+' <span class="km">· ca. '+g.km+' km</span>';
@@ -466,7 +516,25 @@ let nextIdx = games.findIndex(g => d(g.date) >= today);
       '<div class="side"><span class="chip '+(g.home?'h':'a')+'">'+(g.home?'Heim':'Ausw.')+'</span>'+timeHtml+'</div>';
     host.appendChild(row);
   });
-})();
+}
+renderSchedule();
+
+// ---- NÄCHSTES SPIEL LIVE AKTUALISIEREN (jede Minute + beim Zurückkehren in die App) ----
+function tickNext(){
+  nextIdx = calcNext(new Date());
+  renderSchedule();
+  renderNext();
+}
+setInterval(tickNext, 60000);
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ tickNext(); loadResults(false); } });
+loadResults(false);
+document.getElementById("resRefresh").addEventListener("click", async e=>{
+  const b=e.currentTarget, info=document.getElementById("resInfo");
+  b.disabled=true; b.textContent="Lade von basketball-bund.net…";
+  const ok=await loadResults(true);
+  b.disabled=false; b.textContent="Ergebnisse aktualisieren";
+  if(!ok) info.textContent="Abruf fehlgeschlagen – Apps Script neu bereitgestellt?";
+});
 
 // ---- DISTANCE LIST ----
 (function(){
