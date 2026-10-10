@@ -449,15 +449,31 @@ const API_URL = "https://script.google.com/macros/s/AKfycbz6wi1cBqOI4Pa7vONWNMX8
 let RESULTS = {}, RES_UPDATED = "";
 function scoreHtml(r){return '<span class="res '+(r.win?'w':'l')+'">'+(r.win?'S':'N')+'</span>'+r.our+':'+r.opp;}
 async function loadResults(refresh){
-  try{
-    const r = await fetch(API_URL+"?action=results"+(refresh?"&refresh=1":""),{cache:"no-store"});
-    if(!r.ok) return false;
-    const j = await r.json();
-    if(!j || !j.results || typeof j.results!=="object") return false;   // alte Bereitstellung ohne Ergebnis-Endpunkt
-    RESULTS = j.results; RES_UPDATED = j.updated || "";
-    renderSchedule(); renderNext(); renderResInfo();
-    return true;
-  }catch(e){ console.warn("results",e); return false; }
+  for(let a=0;a<3;a++){                               // bis zu 3 Versuche (Apps Script Kaltstart)
+    try{
+      const r = await fetch(API_URL+"?action=results"+(refresh?"&refresh=1":"")+"&t="+Date.now(),{cache:"no-store"});
+      if(r.ok){
+        const j = JSON.parse(await r.text());
+        if(j && j.results && typeof j.results==="object"){
+          RESULTS = j.results; RES_UPDATED = j.updated || "";
+          renderSchedule(); renderNext(); renderResInfo();
+          return true;
+        }
+      }
+    }catch(e){ console.warn("results try "+(a+1),e); }
+    await new Promise(res=>setTimeout(res,800*(a+1)));
+  }
+  return false;
+}
+// Beim Start: gespeicherte Ergebnisse laden; fehlt für ein beendetes Spiel noch das Ergebnis -> live nachholen
+async function initResults(){
+  const info=document.getElementById("resInfo");
+  info.textContent="Lade Ergebnisse…";
+  const ok=await loadResults(false);
+  const missing=games.some(g=>isPast(g) && !RESULTS[g.date] && Date.now()-gameStart(g).getTime() < 3*86400000);
+  if(ok && missing) await loadResults(true);
+  if(!ok && !(await loadResults(true))) info.textContent="Ergebnisse nicht geladen – bitte „Aktualisieren“ tippen";
+  else renderResInfo();
 }
 function renderResInfo(){const el=document.getElementById("resInfo");if(el)el.textContent=RES_UPDATED?"Stand: "+RES_UPDATED:"";}
 
@@ -527,7 +543,7 @@ function tickNext(){
 }
 setInterval(tickNext, 60000);
 document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ tickNext(); loadResults(false); } });
-loadResults(false);
+initResults();
 document.getElementById("resRefresh").addEventListener("click", async e=>{
   const b=e.currentTarget, info=document.getElementById("resInfo");
   b.disabled=true; b.textContent="Lade von basketball-bund.net…";
