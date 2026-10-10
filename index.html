@@ -418,7 +418,7 @@ const HOME = {name:"Derendingen", lat:48.500802, lon:9.056901};
 const games = [
   {date:"2026-10-10", time:"12:45", opp:"TB Kirchentellinsfurt 2", home:false, town:"Kirchentellinsfurt", km:11, lat:48.531019, lon:9.149446, hall:"Neue Sporthalle"},
   {date:"2026-10-18", time:"10:00", opp:"TuS Metzingen 2",        home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
-  {date:"2026-11-07", time:"16:00", opp:"SV Pfrondorf",            home:false, town:"Pfrondorf", km:9,  lat:48.549056, lon:9.109442, hall:"Schönbuchhalle"},
+  {date:"2026-11-08", time:"16:00", opp:"SV Pfrondorf",            home:false, town:"Pfrondorf", km:9,  lat:48.549056, lon:9.109442, hall:"Schönbuchhalle"},
   {date:"2026-11-15", time:"12:00", opp:"SV Böblingen Panthers 2", home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
   {date:"2026-11-21", time:"13:45", opp:"VfL Sindelfingen 3",      home:false, town:"Sindelfingen", km:34, lat:48.707456, lon:9.004405, hall:"Gemeindeschule Eichholz"},
   {date:"2026-11-29", time:"12:00", opp:"SV 03 Tigers Tübingen 3", home:true,  town:"Derendingen", km:0, hall:"Feuerhägle Derendingen"},
@@ -445,7 +445,7 @@ let nextIdx = calcNext(new Date());
 const isPast = g => gameStart(g).getTime()+GAME_LEN_MS <= Date.now();
 
 // ---- ERGEBNISSE (aus Apps Script, Quelle basketball-bund.net) ----
-const API_URL = "https://script.google.com/macros/s/AKfycbycN6Q0a86wwK399_8AhLquCExag6NGUAMgVAZLKPiOR-Uqr_Zb4b7aFmktAL0CWRAZjA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz6wi1cBqOI4Pa7vONWNMX8hZhjNwPNLz3EcGdKYqUiRNvJZm5wfsooQdRhtcNUWJXEtw/exec";   // Apps Script Web-App (einzige Stelle für die URL)
 let RESULTS = {}, RES_UPDATED = "";
 function scoreHtml(r){return '<span class="res '+(r.win?'w':'l')+'">'+(r.win?'S':'N')+'</span>'+r.our+':'+r.opp;}
 async function loadResults(refresh){
@@ -620,7 +620,7 @@ const DutyApp = (function(){
   const DEFAULT_ROSTER = ["Alex","Benno","Colin","Daniel","Dom","Fabi","Jan","Jannick","Jonas","Matze","Robert","Roman","Roy","Sadik","Simon","Stijn","Til","Gerhard"];
   const DEFAULT_EXEMPT = ["Gerhard"];
   const ADMIN_CODE = "120895";
-  const SYNC_URL = "https://script.google.com/macros/s/AKfycbycN6Q0a86wwK399_8AhLquCExag6NGUAMgVAZLKPiOR-Uqr_Zb4b7aFmktAL0CWRAZjA/exec";   // feste Live-Sync-URL (Google Apps Script Web-App)
+  const SYNC_URL = API_URL;   // feste Live-Sync-URL (Google Apps Script Web-App)
   // Zugeteilte Schreibdienste (Schlüssel = unser Heimspieltag). ok:false = noch nicht offiziell zugeteilt
   const DUTY_INFO = {
     "2026-10-18":{time:"14:00",team:"Herren 2",opp:"TSG Reutlingen Ravens 3",ok:true},
