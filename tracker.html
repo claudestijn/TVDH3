@@ -94,6 +94,10 @@
   .chip.G{box-shadow:inset 3px 0 0 #fff}
   .chip.arm{background:#5c1013;color:#fff}
   .chips .empty{font-size:13px;color:var(--muted2)}
+  .conflict{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px;background:#3a1416;border-bottom:1px solid #6b2a2a;color:#ffd0d0;font-size:14px;line-height:1.35}
+  .conflict[hidden]{display:none}
+  .conflict span{flex:1;min-width:220px}
+  .conflict button{font-family:var(--disp);font-weight:700;font-size:16px;border:1.5px solid #8a3a3a;border-radius:8px;padding:8px 12px;color:#fff;white-space:nowrap}
   .store{font-size:11px;color:var(--muted2);flex:none;text-align:right;max-width:190px;line-height:1.35;border:1px solid var(--line);border-radius:8px;padding:6px 9px}
   .store b{font-weight:600;color:var(--muted)}
   .store .ok{color:#7fcf9b}
@@ -146,6 +150,11 @@
   </div>
 </header>
 <div class="qline" id="qline"></div>
+<div class="conflict" id="conflict" hidden>
+  <span>The sheet has a different version of this game, from another device. Which one should count?</span>
+  <button id="cfLoad">Use sheet version</button>
+  <button id="cfPush">Keep this device's version</button>
+</div>
 
 <main class="court">
   <section class="side tvd" id="sideH"></section>
@@ -207,12 +216,13 @@ try{ const raw = localStorage.getItem(KEY); if(raw){ const o = JSON.parse(raw); 
 const pad = n => String(n).padStart(2,"0");
 const isoToday = () => { const t = new Date(); return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate()); };
 function meta(id){ const g = GAMES.find(x => x[0] === id); return g ? {opp:g[1], home:!!g[2]} : {opp:"Opponent", home:true}; }
-function cur(){ if(!S.games[S.current]) S.games[S.current] = {q:"1", ev:[], rev:0, sentRev:0}; return S.games[S.current]; }
+function cur(){ if(!S.games[S.current]) S.games[S.current] = {q:"1", ev:[], rev:0, sentRev:0, base:0}; return S.games[S.current]; }
 function defaultGame(){ const t = isoToday(); const g = GAMES.find(x => x[0] >= t); return g ? g[0] : "frei"; }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); storeOk = true; }catch(e){ storeOk = false; } renderStore(); }
 
 // alte Stände: Versionszähler ergänzen (rev = lokale Änderungen, sentRev = an Sheet gesendet)
 Object.values(S.games).forEach(g => { if(typeof g.rev !== "number"){ g.rev = g.ev.length ? 1 : 0; g.sentRev = 0; } });
+if(!S.device){ S.device = "d"+Date.now().toString(36)+Math.random().toString(36).slice(2,8); try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }   // Geräte-ID (einmalig)
 // Spielwahl: gespeichertes Spiel behalten, sonst heutiges/nächstes
 if(!S.current || !(S.games[S.current] && S.games[S.current].ev.length)) S.current = defaultGame();
 
@@ -363,6 +373,7 @@ function render(){
     el.textContent = b === s ? "● Possession" : free ? "Loose ball" : "Defense";
   });
   document.getElementById("swap").disabled = b === null;
+  document.getElementById("conflict").hidden = !g.conflict;
   renderLog();
   renderStore();
 }
@@ -386,7 +397,9 @@ function renderStore(){
   else if(syncing) sh = '<span class="wait">Sheet: sending…</span>';
   else{
     const n = pending().length;
-    if(syncErr) sh = '<span class="bad">Sheet: '+syncErr+' · tap to send</span>';
+    const nc = conflicts().length;
+    if(nc) sh = '<span class="bad">Sheet: conflict in '+nc+' game'+(nc>1?'s':'')+'</span>';
+    else if(syncErr) sh = '<span class="bad">Sheet: '+syncErr+' · tap to send</span>';
     else if(n) sh = '<span class="wait">Sheet: '+n+' game'+(n>1?'s':'')+' pending'+(navigator.onLine?'':' (offline)')+'</span>';
     else sh = '<span class="ok">Sheet ✓'+(lastSync?' '+lastSync:'')+'</span>';
   }
@@ -470,33 +483,41 @@ async function copy(text, okMsg){
 // ---- Sync ans Stat-Sheet (lokal zuerst, Sheet sobald Verbindung da) ----
 let syncing = false, syncTimer = null, syncErr = "", lastSync = "";
 function touch(){ const g = cur(); g.rev = (g.rev||0) + 1; save(); queueSync(); }
-function pending(){ return Object.keys(S.games).filter(id => (S.games[id].rev||0) !== (S.games[id].sentRev||0)); }
+function pending(){ return Object.keys(S.games).filter(id => !S.games[id].conflict && (S.games[id].rev||0) !== (S.games[id].sentRev||0)); }
+function conflicts(){ return Object.keys(S.games).filter(id => S.games[id].conflict); }
 function queueSync(){ if(!SHEET_URL || syncTimer) return; syncTimer = setTimeout(() => { syncTimer = null; syncNow(false); }, 5000); }
 function payload(id){
   const g = S.games[id], m = meta(id);
-  return {id:id, date:id === "frei" ? isoToday() : id, opp:m.opp, home:m.home, rev:g.rev,
+  return {id:id, date:id === "frei" ? isoToday() : id, opp:m.opp, home:m.home, rev:g.rev, device:S.device, base:g.base||0,
           events:g.ev.map(e => [e.q, e.s, e.t, e.m, e.ts||0])};   // kompakt: [Viertel, Seite, Aktion, Treffer, Zeitstempel]
 }
-async function syncNow(manual){
+async function syncNow(manual, forceIds){
   if(!SHEET_URL){ if(manual) document.getElementById("omsg").textContent = "No sheet URL set (SHEET_URL in the code)."; return false; }
   if(syncing) return false;
-  const ids = manual ? Object.keys(S.games).filter(id => S.games[id].ev.length || S.games[id].rev) : pending();
+  const ids = forceIds ? forceIds : manual ? Object.keys(S.games).filter(id => S.games[id].ev.length || S.games[id].rev) : pending();
   if(!ids.length){ if(manual) document.getElementById("omsg").textContent = "Nothing to send."; return true; }
   if(!manual && !navigator.onLine){ renderStore(); return false; }
   syncing = true; renderStore();
   const sent = {}; ids.forEach(id => sent[id] = S.games[id].rev||0);
-  let ok = false;
+  let ok = false, nConf = 0;
   try{
     const r = await fetch(SHEET_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
-                                      body:JSON.stringify({games:ids.map(payload)})});
+                                      body:JSON.stringify({games:ids.map(id => Object.assign(payload(id), forceIds ? {force:true} : {}))})});
     const j = JSON.parse(await r.text());
     if(!j.ok) throw new Error(j.error || "Fehler");
-    ids.forEach(id => { if(S.games[id]) S.games[id].sentRev = sent[id]; });   // spätere Taps bleiben ausstehend
+    (j.saved || []).forEach(x => {   // spätere Taps bleiben ausstehend
+      const sid = typeof x === "object" ? x.id : x, g = S.games[sid]; if(!g) return;
+      g.sentRev = sent[sid]; g.conflict = false; if(typeof x === "object" && x.ver != null) g.base = x.ver;
+    });
+    nConf = (j.conflicts || []).length;
+    (j.conflicts || []).forEach(x => { if(S.games[x.id]) S.games[x.id].conflict = true; });
     const t = new Date(); lastSync = pad(t.getHours())+":"+pad(t.getMinutes());
     syncErr = ""; ok = true; save();
   }catch(e){ console.warn("sync", e); syncErr = navigator.onLine ? "unreachable" : "offline"; }
-  syncing = false; renderStore();
-  if(manual) document.getElementById("omsg").textContent = ok ? "Sent to sheet ✓ ("+ids.length+" game"+(ids.length>1?"s":"")+")" : "Sending failed – check the connection, data stays on the device.";
+  syncing = false; render();
+  if(manual) document.getElementById("omsg").textContent = !ok ? "Sending failed – check the connection, data stays on the device."
+    : nConf ? "Not sent: "+nConf+" game"+(nConf>1?"s":"")+" has a newer version in the sheet from another device – see the red bar."
+    : "Sent to sheet ✓ ("+ids.length+" game"+(ids.length>1?"s":"")+")";
   if(ok && pending().length) queueSync();
   return ok;
 }
@@ -514,13 +535,13 @@ async function pullGame(id, force){
     if(!force && now && now.ev.length) return "local";   // inzwischen lokal getippt -> nichts überschreiben
     const ev = j.game.events.map((e,i) => ({id:"s"+i+"_"+(e[4]||0).toString(36), q:e[0], s:e[1], t:e[2], m:Number(e[3])||0, ts:e[4]||0}));
     const rev = j.game.rev || 1;
-    S.games[id] = {q: ev.length ? ev[ev.length-1].q : "1", ev, rev, sentRev: rev};
+    S.games[id] = {q: ev.length ? ev[ev.length-1].q : "1", ev, rev, sentRev: rev, base: j.game.ver || 0};
     save();
     if(id === S.current){ render(); if(!document.getElementById("ov").hidden) renderOv(); }
     return ev.length ? "loaded" : "none";
   }catch(e){ console.warn("pull", e); return "error"; }
 }
-let loadArm = false;
+let loadArm = false, cfArm = null;
 window.addEventListener("online", () => { syncErr = ""; syncNow(false); });
 window.addEventListener("offline", renderStore);
 setInterval(() => { if(pending().length && navigator.onLine && !syncing) syncNow(false); }, 30000);
@@ -564,6 +585,16 @@ document.addEventListener("click", e => {
   else if(b.id === "copyTxt"){ copy(summaryText(), "Summary copied ✓ — e.g. paste into the team chat."); }
   else if(b.id === "sendSheet"){ b.disabled = true; syncNow(true).then(() => { b.disabled = false; }); }
   else if(b.id === "store"){ syncNow(true); }
+  else if(b.id === "cfLoad" || b.id === "cfPush"){
+    const load = b.id === "cfLoad", lbl = load ? "Use sheet version" : "Keep this device's version";
+    if(cfArm !== b.id){
+      cfArm = b.id; b.textContent = load ? "Discard this device's taps?" : "Overwrite the sheet?";
+      setTimeout(() => { if(cfArm === b.id){ cfArm = null; b.textContent = lbl; } }, 3500);
+      return;
+    }
+    cfArm = null; b.textContent = lbl;
+    if(load) pullGame(S.current, true); else syncNow(false, [S.current]);
+  }
   else if(b.id === "loadSheet"){
     const msg = document.getElementById("omsg"), g = cur();
     if(g.ev.length && !loadArm){
