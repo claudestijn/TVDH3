@@ -722,6 +722,7 @@ const DutyApp = (function(){
     if(!Array.isArray(st.roster)) st.roster=[];
     if(!Array.isArray(st.exempt)) st.exempt=[];
     if(typeof st.adminCode!=="string") st.adminCode="";
+    st.rev=Number(st.rev)||0; delete st.base;
     if(!st.duties||typeof st.duties!=="object") st.duties={};
     dutyGames.forEach(g=>{const dd=st.duties[g.date]||{};st.duties[g.date]={anschreiber:dd.anschreiber||"",zeitnehmer:dd.zeitnehmer||"",sekunden:dd.sekunden||""};});
     return st;
@@ -731,9 +732,20 @@ const DutyApp = (function(){
   async function load(){
     const url=syncUrl();
     if(url){
-      try{const r=await fetch(url,{cache:"no-store"});if(r.ok){const j=await r.json();if(storageMode!=="server"){storageMode="server";renderModeNote();}return normalize(j&&Array.isArray(j.roster)?j:blank());}}
-      catch(e){console.warn("sync get",e);}
-      // Server nicht erreichbar → weiter zu window.storage / RAM
+      // Server ist die einzige Wahrheit: schlägt das Lesen fehl, wird ABGEBROCHEN (kein Rückfall auf leeren/alten Stand,
+      // sonst überschreibt der nächste Schreibvorgang den Server mit veralteten Daten)
+      let lastErr=null;
+      for(let a=0;a<3;a++){
+        try{
+          const r=await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now(),{cache:"no-store"});
+          if(r.ok){const j=JSON.parse(await r.text());
+            if(j&&typeof j==="object"){if(storageMode!=="server"){storageMode="server";renderModeNote();}return normalize(Array.isArray(j.roster)?j:blank());}}
+          lastErr=new Error("status "+r.status);
+        }catch(e){lastErr=e;console.warn("sync get "+(a+1),e);}
+        await sleep(600*(a+1));
+      }
+      storageMode="serverfail";renderModeNote();
+      throw lastErr||new Error("load failed");
     }
     if(!hasStorage) return normalize(state||blank());
     const shared = storageMode!=="local";   // bevorzugt geteilt, außer wir wissen dass nur lokal geht
@@ -758,49 +770,84 @@ const DutyApp = (function(){
     else if(s==="err"){el.className="savestat err";el.innerHTML='Speichern fehlgeschlagen — <button id="saveRetry" class="linkbtn">erneut versuchen</button>';}
     else {el.className="savestat";el.textContent="";}
   }
-  async function persist(st){
-    state=st; dirty=true;
-    const url=syncUrl();
-    let serverTried=false;
-    if(url){
-      serverTried=true;
-      setSaveStatus("saving");
-      const gs=/script\.google\.com/.test(url);   // Google Apps Script Web-App → POST + text/plain (kein CORS-Preflight)
-      const opts=gs
-        ? {method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(st)}
-        : {method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(st)};
-      for(let a=0;a<3;a++){
-        try{
-          const r=await fetch(url,opts);
-          if(r.ok){storageMode="server";dirty=false;setSaveStatus("ok");renderModeNote();return true;}
-          console.warn("sync write status",r.status);
-        }catch(e){console.warn("sync write",e);}
-        await sleep(400);
-      }
-      // Server nicht erreichbar → weiter zu window.storage als Notnagel
+  // Schreibt einen Stand. Server: mit Versionsprüfung (base = gelesene rev) -> "ok" | "conflict" | "err"
+  async function writeServer(url,st){
+    const gs=/script\.google\.com/.test(url);   // Google Apps Script Web-App → POST + text/plain (kein CORS-Preflight)
+    const body=JSON.stringify(Object.assign({},st,{base:st.rev||0}));
+    const opts=gs
+      ? {method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body}
+      : {method:"PUT",headers:{"Content-Type":"application/json"},body};
+    for(let a=0;a<3;a++){
+      try{
+        const r=await fetch(url,opts);
+        if(r.ok){
+          let j=null; try{j=JSON.parse(await r.text());}catch(e){}
+          if(j&&j.conflict) return "conflict";
+          if(!(j&&j.ok===false)){ if(j&&typeof j.rev==="number") st.rev=j.rev; return "ok"; }
+          console.warn("sync write abgelehnt",j);
+        }else console.warn("sync write status",r.status);
+      }catch(e){console.warn("sync write",e);}
+      await sleep(500*(a+1));
     }
-    if(!hasStorage){setSaveStatus("err");storageMode=serverTried?"serverfail":"none";renderModeNote();return false;}
-    setSaveStatus("saving");
+    return "err";
+  }
+  async function saveState(st){
+    const url=syncUrl();
+    if(url){
+      const res=await writeServer(url,st);
+      if(res==="ok"&&storageMode!=="server"){storageMode="server";renderModeNote();}
+      if(res==="err"){storageMode="serverfail";renderModeNote();}
+      return res;
+    }
+    if(!hasStorage){storageMode="none";renderModeNote();return "err";}
     const json=JSON.stringify(st);
-    const order = storageMode==="local" ? [false,true] : [true,false];   // erst geteilt, dann lokal (oder umgekehrt, wenn schon lokal)
+    const order = storageMode==="local" ? [false,true] : [true,false];
     for(const shared of order){
       for(let a=0;a<2;a++){
         try{
           await window.storage.set(KEY,json,shared);
           const m=shared?"shared":"local";
           if(storageMode!==m){storageMode=m;renderModeNote();}
-          dirty=false; setSaveStatus("ok"); return true;
+          return "ok";
         }catch(e){ console.warn("storage set shared="+shared+" versuch "+(a+1),e); await sleep(250); }
       }
     }
-    setSaveStatus("err"); storageMode=serverTried?"serverfail":"none"; renderModeNote(); return false;   // bleibt lokal im RAM sichtbar, wird beim nächsten Versuch geflusht
+    storageMode="none";renderModeNote();return "err";
   }
-  async function mutate(fn){const fresh=await load();fn(fresh);await persist(fresh);render();}
+  // Änderungen werden als Operationen gemerkt und immer auf den FRISCH geladenen Server-Stand angewendet.
+  // So überschreibt nie ein Gerät mit veraltetem Stand die Einträge anderer (Lucas/Tom-Bug).
+  let pending=[], flushing=false;
+  async function flush(){
+    if(flushing) return; flushing=true;
+    let conflicts=0;
+    try{
+      while(pending.length){
+        setSaveStatus("saving");
+        let fresh; try{fresh=await load();}catch(e){break;}
+        const ops=pending.slice(); ops.forEach(f=>f(fresh));
+        const res=await saveState(fresh);
+        if(res==="ok"){pending.splice(0,ops.length);state=fresh;continue;}
+        if(res==="conflict"&&++conflicts<=5){await sleep(300);continue;}   // jemand anderes hat gerade gespeichert → neu laden, erneut anwenden
+        break;
+      }
+    }finally{flushing=false;}
+    dirty=pending.length>0;
+    setSaveStatus(dirty?"err":"ok");
+    render();
+    return !dirty;
+  }
+  async function mutate(fn){
+    pending.push(fn);
+    if(state){try{fn(state);}catch(e){} render();}   // sofort anzeigen, gespeichert wird auf frischem Stand
+    return flush();
+  }
   function exportCode(){try{return btoa(unescape(encodeURIComponent(JSON.stringify(state))));}catch(e){return "";}}
   async function importCode(raw){
     let obj; try{obj=JSON.parse(decodeURIComponent(escape(atob(raw.trim()))));}catch(e){return false;}
     if(!obj||typeof obj!=="object"||!Array.isArray(obj.roster)||!obj.duties) return false;
-    const st=normalize(obj); await persist(st); render(); return true;
+    const st=normalize(obj);
+    await mutate(f=>{f.roster=st.roster.slice();f.exempt=st.exempt.slice();f.duties=JSON.parse(JSON.stringify(st.duties));});
+    return true;
   }
 
   function counts(st){const c={};st.roster.forEach(n=>c[n]=0);Object.values(st.duties).forEach(sl=>Object.values(sl).forEach(n=>{if(n)c[n]=(c[n]||0)+1;}));return c;}
@@ -937,9 +984,9 @@ const DutyApp = (function(){
       else if(t.dataset.rm){if(new Date()>SIGNUP_DEADLINE)return;const [date,role]=t.dataset.rm.split("|");await mutate(st=>{st.duties[date][role]="";});}
       else if(t.id==="addPlayerBtn"){await addPlayers();}
       else if(t.dataset.del){if(!adminUnlocked)return;const name=decodeURIComponent(t.dataset.del);await mutate(st=>{st.roster=st.roster.filter(x=>x!==name);st.exempt=st.exempt.filter(x=>x!==name);Object.values(st.duties).forEach(sl=>Object.keys(sl).forEach(k=>{if(sl[k]===name)sl[k]="";}));});}
-      else if(t.dataset.exempt){if(!adminUnlocked)return;const name=decodeURIComponent(t.dataset.exempt);await mutate(st=>{if(st.exempt.includes(name)){st.exempt=st.exempt.filter(x=>x!==name);}else{st.exempt.push(name);Object.values(st.duties).forEach(sl=>Object.keys(sl).forEach(k=>{if(sl[k]===name)sl[k]="";}));}});}
-      else if(t.id==="dutyRefresh"){t.textContent="Aktualisiere…";if(dirty){await persist(state);}else{state=await load();render();}t.textContent="Aktualisieren";}
-      else if(t.id==="saveRetry"){await persist(state);}
+      else if(t.dataset.exempt){if(!adminUnlocked)return;const name=decodeURIComponent(t.dataset.exempt);const makeEx=!state.exempt.includes(name);await mutate(st=>{if(!makeEx){st.exempt=st.exempt.filter(x=>x!==name);}else{if(!st.exempt.includes(name))st.exempt.push(name);Object.values(st.duties).forEach(sl=>Object.keys(sl).forEach(k=>{if(sl[k]===name)sl[k]="";}));}});}
+      else if(t.id==="dutyRefresh"){t.textContent="Aktualisiere…";if(pending.length){await flush();}else{try{state=await load();render();}catch(e){}}t.textContent="Aktualisieren";}
+      else if(t.id==="saveRetry"){await flush();}
       else if(t.id==="syncExport"){document.getElementById("syncOut").value=exportCode();document.getElementById("syncMsg").textContent="Code erzeugt — markieren, kopieren und teilen.";}
       else if(t.id==="syncCopy"){const ta=document.getElementById("syncOut");const msg=document.getElementById("syncMsg");if(!ta.value){msg.textContent="Erst oben den Code erzeugen.";return;}ta.focus();ta.select();try{await navigator.clipboard.writeText(ta.value);msg.textContent="In die Zwischenablage kopiert ✓";}catch(e){msg.textContent="Text ist markiert — jetzt manuell kopieren (lange drücken → Kopieren).";}}
       else if(t.id==="syncUrlSet"){
@@ -948,9 +995,10 @@ const DutyApp = (function(){
         if(!/^https:\/\/.+/.test(url)){msg.textContent="Bitte eine gültige https-URL einfügen.";return;}
         runtimeSyncUrl=url; try{location.hash="sync="+encodeURIComponent(url);}catch(e){}
         msg.textContent="Verbinde…";
-        const remote=await load();
-        if(remote&&Array.isArray(remote.roster)&&remote.roster.length){state=remote;render();msg.textContent="Verbunden — Stand vom Server geladen ✓";}
-        else{const ok=await persist(state);msg.textContent=ok?"Verbunden — aktueller Stand hochgeladen ✓":"Verbindung fehlgeschlagen — Umgebung blockiert evtl. externe Aufrufe.";render();}
+        let remote=null; try{remote=await load();}catch(e){}
+        if(!remote){msg.textContent="Verbindung fehlgeschlagen — Umgebung blockiert evtl. externe Aufrufe.";render();}
+        else if(remote.roster.length){state=remote;render();msg.textContent="Verbunden — Stand vom Server geladen ✓";}
+        else{const snap=JSON.parse(JSON.stringify(state));const ok=await mutate(f=>{if(!f.roster.length){f.roster=snap.roster;f.exempt=snap.exempt;f.duties=snap.duties;}});msg.textContent=ok?"Verbunden — aktueller Stand hochgeladen ✓":"Hochladen fehlgeschlagen.";}
       }
       else if(t.id==="syncUrlClear"){runtimeSyncUrl="";try{if(/[#&]sync=/.test(location.hash))location.hash="";}catch(e){}storageMode=null;document.getElementById("syncUrlMsg").textContent="Getrennt — zurück auf lokalen Speicher/Code.";renderModeNote();render();}
       else if(t.id==="adminUnlock"){
@@ -967,11 +1015,11 @@ const DutyApp = (function(){
     });
     document.getElementById("newPlayer").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addPlayers();}});
   }
-  function startPoll(){stopPoll();if(!hasStorage)return;pollTimer=setInterval(async()=>{
-    if(openPicker) return;
-    if(dirty){ await persist(state); return; }          // erst ausstehende Speicherung nachholen
-    const f=await load();
-    if(JSON.stringify(f)!==JSON.stringify(state)){state=f;render();}
+  function startPoll(){stopPoll();if(!hasStorage&&!syncUrl())return;pollTimer=setInterval(async()=>{
+    if(openPicker||flushing) return;
+    if(pending.length){ await flush(); return; }          // erst ausstehende Änderungen nachholen (auf frischem Stand)
+    let f; try{f=await load();}catch(e){return;}
+    if(!pending.length&&JSON.stringify(f)!==JSON.stringify(state)){state=f;render();}
   },20000);}
   function stopPoll(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}}
   async function start(){
@@ -979,8 +1027,16 @@ const DutyApp = (function(){
       try{const m=/[#&]sync=([^&]+)/.exec(location.hash||"");if(m)runtimeSyncUrl=decodeURIComponent(m[1]);}catch(e){}
       if(!hasStorage && !syncUrl())document.getElementById("dutyStatus").innerHTML='<span class="err">Hinweis: automatischer Speicher ist hier nicht aktiv — Live-Sync im Admin-Bereich einrichten oder „Sichern &amp; Teilen (Code)" nutzen.</span>';
     }
-    state=await load();
-    if(!state.roster.length){await mutate(st=>{st.roster=[...DEFAULT_ROSTER];st.exempt=[...DEFAULT_EXEMPT];});}
+    let loaded;
+    try{loaded=await load();}
+    catch(e){
+      if(!state){const ds=document.getElementById("dutyStatus");ds.style.display="block";ds.innerHTML='<span class="err">Eintragungen konnten nicht geladen werden — neuer Versuch läuft…</span>';}
+      setTimeout(()=>{if(document.getElementById("duty").classList.contains("active"))start();},5000);
+      return;
+    }
+    state=loaded;
+    // Standard-Kader nur anlegen, wenn der Server WIRKLICH leer ist (Prüfung auf dem frischen Stand)
+    if(!state.roster.length){await mutate(st=>{if(!st.roster.length){st.roster=[...DEFAULT_ROSTER];st.exempt=[...DEFAULT_EXEMPT];}});}
     else{render();}
     startPoll();
   }
