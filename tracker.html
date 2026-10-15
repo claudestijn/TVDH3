@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#9D181D" />
-<title>TVD Herren 3 · Stat-Tracker</title>
+<title>TVD Herren 3 · Stat tracker</title>
 <link rel="icon" type="image/svg+xml" href="https://www.tvderendingen.de/de-wGlobal/wGlobal/layout/images/Logo-TVD.svg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -53,15 +53,15 @@
   .side.opp{--acc:#fff;--hitbg:#EDEDED;--hittx:#121212}
   .shead{display:flex;align-items:center;gap:10px;min-width:0}
   .side h2{font-family:var(--disp);font-weight:700;font-size:22px;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
-  .ball{flex:none;font-family:var(--disp);font-weight:700;font-size:14px;padding:4px 11px;border-radius:999px;border:1.5px solid transparent;color:transparent;transition:background .15s,color .15s;pointer-events:none}
+  .ball{flex:none;min-width:132px;text-align:center;font-family:var(--disp);font-weight:700;font-size:16px;line-height:1.2;padding:7px 14px;border-radius:999px;border:1.5px solid transparent;color:transparent;transition:background .15s,color .15s,border-color .15s;pointer-events:none}
   .ball.on{background:var(--acc);color:var(--hittx);border-color:var(--acc)}
   .side.opp .ball.on{color:#121212}
-  .ball.def{border-color:var(--line);color:var(--muted2);font-weight:600}
-  .ball.reb{border-color:var(--muted2);color:var(--text);font-weight:600;font-size:16px;padding:7px 14px;pointer-events:auto;cursor:pointer}
+  .ball.def{border-color:var(--line);color:var(--muted2)}
+  .ball.reb{border-color:var(--muted2);color:var(--text);pointer-events:auto;cursor:pointer}
   #swap{font-family:var(--disp);font-weight:700;font-size:17px;border:1.5px solid #555;border-radius:8px;padding:10px 14px;flex:none}
   #swap:disabled{opacity:.35}
   .side h2::before{content:"";width:6px;height:22px;border-radius:2px;background:var(--acc);flex:none}
-  .shot{flex:1;display:grid;grid-template-columns:1.35fr 1fr 86px;gap:8px;min-height:74px}
+  .shot{flex:1;display:grid;grid-template-columns:1.35fr 1fr 104px;gap:8px;min-height:74px}
   .hit,.miss,.ex{border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .08s}
   .hit{background:var(--hitbg);color:var(--hittx)}
   .hit .big{font-family:var(--disp);font-weight:700;font-size:32px;line-height:1}
@@ -72,6 +72,8 @@
   .val{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;font-variant-numeric:tabular-nums}
   .val b{font-family:var(--disp);font-weight:700;font-size:27px;line-height:1;display:inline-block}
   .val small{color:var(--muted);font-size:12px;margin-top:4px}
+  .val small.tot,.ex .cnt small{color:var(--muted2);font-size:11px;margin-top:2px;white-space:nowrap}
+  .ex .cnt{display:flex;flex-direction:column;align-items:center}
   .extras{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;min-height:74px}
   .ex{background:var(--s1);border:1.5px solid var(--line);flex-direction:row;gap:8px;padding:0 8px}
   .ex .lbl{font-size:13px;font-weight:600;color:var(--muted);text-align:left;line-height:1.2}
@@ -126,7 +128,7 @@
   }
   @media(max-width:640px){
     .court{grid-template-columns:1fr}
-    .shot{grid-template-columns:1.3fr 1fr 74px}
+    .shot{grid-template-columns:1.3fr 1fr 96px}
     .extras{grid-template-columns:repeat(2,1fr)}
   }
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
@@ -134,13 +136,13 @@
 </head>
 <body>
 <header class="bar">
-  <select id="game" class="gamesel" aria-label="Spiel wählen"></select>
+  <select id="game" class="gamesel" aria-label="Choose game"></select>
   <div class="score" aria-live="polite">
-    <span class="tn">TVD 3</span><b id="scH">0</b><i>:</i><b id="scG">0</b><span class="tn" id="oppShort">Gegner</span>
+    <span class="tn">TVD 3</span><b id="scH">0</b><i>:</i><b id="scG">0</b><span class="tn" id="oppShort">Opponent</span>
   </div>
   <div class="barR">
-    <div class="qs" id="qs" role="group" aria-label="Viertel"></div>
-    <button class="btnTop" id="btnStats">Auswertung</button>
+    <div class="qs" id="qs" role="group" aria-label="Quarter"></div>
+    <button class="btnTop" id="btnStats">Stats</button>
   </div>
 </header>
 <div class="qline" id="qline"></div>
@@ -151,24 +153,24 @@
 </main>
 
 <footer class="log">
-  <button id="undo">Rückgängig</button>
-  <button id="swap" title="Ballbesitz an die andere Mannschaft">⇄ Ballbesitz</button>
+  <button id="undo">Undo</button>
+  <button id="swap" title="Give the ball to the other team">⇄ Possession</button>
   <div class="chips" id="log"></div>
-  <button class="store" id="store" title="An Sheet senden"></button>
+  <button class="store" id="store" title="Send to sheet"></button>
 </footer>
 
 <div class="ov" id="ov" hidden>
   <div class="ovh">
-    <h2 id="ovTitle">Auswertung</h2>
-    <button class="obtn pri" id="copyXls">Tabelle kopieren (Excel)</button>
-    <button class="obtn" id="copyTxt">Kurzbericht kopieren</button>
-    <button class="obtn" id="sendSheet">An Sheet senden</button>
-    <button class="obtn danger" id="resetGame">Spiel leeren</button>
-    <button class="obtn" id="ovClose">Zurück</button>
+    <h2 id="ovTitle">Stats</h2>
+    <button class="obtn pri" id="copyXls">Copy table (Excel)</button>
+    <button class="obtn" id="copyTxt">Copy summary</button>
+    <button class="obtn" id="sendSheet">Send to sheet</button>
+    <button class="obtn danger" id="resetGame">Clear game</button>
+    <button class="obtn" id="ovClose">Back</button>
   </div>
   <div class="omsg" id="omsg"></div>
   <div class="tbls" id="tbls"></div>
-  <p class="note">Ballbesitze (gezählt) ergeben sich aus der Reihenfolge der Aktionen: ein Besitz endet mit Treffer, letztem getroffenem Freiwurf oder Ballverlust; nach einem Fehlwurf entscheidet der Rebound. Ballbesitze (Formel) = Würfe aus dem Feld + 0,44 × Freiwürfe − Off. Rebounds + Ballverluste, zum Vergleich. eFG % = (2er-Treffer + 1,5 × 3er-Treffer) / Würfe aus dem Feld. True Shooting % = Punkte / (2 × (Würfe aus dem Feld + 0,44 × Freiwürfe)).</p>
+  <p class="note">Possessions (counted) follow from the order of actions: a possession ends with a made shot, a made last free throw, a turnover or an offensive foul; after a miss the rebound decides. Possessions (formula) = field goal attempts + 0.44 × free throw attempts − off. rebounds + turnovers, for comparison. eFG% = (2PT made + 1.5 × 3PT made) / field goal attempts. True shooting % = points / (2 × (field goal attempts + 0.44 × free throw attempts)).</p>
 </div>
 
 <script>
@@ -192,18 +194,18 @@ const GAMES = [   // [Datum, Gegner, Heim?]
   ["2027-03-14","VfL Sindelfingen 3",1]
 ];
 const QS = ["1","2","3","4","OT"];
-const QLBL = {"1":"1.","2":"2.","3":"3.","4":"4.","OT":"OT"};
-const SHOTS = [["2P",2,"Zweier"],["3P",3,"Dreier"],["FT",1,"Freiwurf"]];
-const EXTRAS = [["OR","Off.<br>Rebound"],["DR","Def.<br>Rebound"],["TO","Ball&shy;verlust"],["PF","Foul<br><small>im Viertel</small>"]];
-const TLBL = {"2P":"2er","3P":"3er","FT":"FW","OR":"Off. Reb.","DR":"Def. Reb.","BX":"⇄ Ballbesitz","TO":"Ballverl.","PF":"Foul"};
-const DOW = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const QLBL = {"1":"Q1","2":"Q2","3":"Q3","4":"Q4","OT":"OT"};
+const SHOTS = [["2P",2,"2PT"],["3P",3,"3PT"],["FT",1,"Free throw"]];
+const EXTRAS = [["OR","Off.<br>Rebound"],["DR","Def.<br>Rebound"],["TO","Turn&shy;over"],["PF","Foul"]];
+const TLBL = {"2P":"2PT","3P":"3PT","FT":"FT","OR":"Off. reb.","DR":"Def. reb.","BX":"⇄ Possession","TO":"Turnover","PF":"Foul"};
+const DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
 let S = {current:"", games:{}}, storeOk = true, armId = null, armTimer = null, resetArm = false;
 try{ const raw = localStorage.getItem(KEY); if(raw){ const o = JSON.parse(raw); if(o && o.games) S = o; } }catch(e){ storeOk = false; }
 
 const pad = n => String(n).padStart(2,"0");
 const isoToday = () => { const t = new Date(); return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate()); };
-function meta(id){ const g = GAMES.find(x => x[0] === id); return g ? {opp:g[1], home:!!g[2]} : {opp:"Gegner", home:true}; }
+function meta(id){ const g = GAMES.find(x => x[0] === id); return g ? {opp:g[1], home:!!g[2]} : {opp:"Opponent", home:true}; }
 function cur(){ if(!S.games[S.current]) S.games[S.current] = {q:"1", ev:[], rev:0, sentRev:0}; return S.games[S.current]; }
 function defaultGame(){ const t = isoToday(); const g = GAMES.find(x => x[0] >= t); return g ? g[0] : "frei"; }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); storeOk = true; }catch(e){ storeOk = false; } renderStore(); }
@@ -291,9 +293,9 @@ function ballNow(){   // wer hat gerade den Ball: "H" | "G" | "reb" | null
   if(P.loose) return "reb";
   return P.ended ? OTHER(P.owner) : P.owner;
 }
-const pct = (m,a) => a ? Math.round(m/a*100)+" %" : "–";
-const pctV = x => isFinite(x) ? Math.round(x*100)+" %" : "–";
-const dec = (x,n) => isFinite(x) ? x.toFixed(n).replace(".",",") : "–";
+const pct = (m,a) => a ? Math.round(m/a*100)+"%" : "–";
+const pctV = x => isFinite(x) ? Math.round(x*100)+"%" : "–";
+const dec = (x,n) => isFinite(x) ? x.toFixed(n) : "–";
 function usedQs(){
   const g = cur();
   let idx = Math.max(3, QS.indexOf(g.q));
@@ -311,19 +313,19 @@ function buildSelect(){
   sel.innerHTML = GAMES.map(([id,opp,h]) => {
     const [y,m,d] = id.split("-").map(Number), dt = new Date(y,m-1,d);
     return '<option value="'+id+'">'+DOW[dt.getDay()]+' '+d+'.'+m+'. · '+(h?'vs ':'@ ')+opp+'</option>';
-  }).join("") + '<option value="frei">Anderes Spiel / Training</option>';
+  }).join("") + '<option value="frei">Other game / practice</option>';
 }
 function buildSide(side){
   const host = document.getElementById("side"+side);
   host.innerHTML = '<div class="shead"><h2 id="name'+side+'"></h2><button class="ball" id="ball'+side+'" data-ball="'+side+'" aria-live="polite"></button></div>' +
     SHOTS.map(([t,p,l]) =>
       '<div class="shot">'+
-        '<button class="hit" data-act="'+side+'|'+t+'|1"><span class="big">+'+p+'</span><span class="sm">'+l+' Treffer</span></button>'+
-        '<button class="miss" data-act="'+side+'|'+t+'|0"><span class="big">'+l+'</span><span class="sm">daneben</span></button>'+
-        '<div class="val"><b id="v'+side+t+'">0/0</b><small id="p'+side+t+'">–</small></div>'+
+        '<button class="hit" data-act="'+side+'|'+t+'|1"><span class="big">+'+p+'</span><span class="sm">'+l+' made</span></button>'+
+        '<button class="miss" data-act="'+side+'|'+t+'|0"><span class="big">'+l+'</span><span class="sm">missed</span></button>'+
+        '<div class="val"><b id="v'+side+t+'">0/0</b><small class="tot" id="t'+side+t+'"></small></div>'+
       '</div>').join("") +
     '<div class="extras">'+EXTRAS.map(([t,l]) =>
-      '<button class="ex" id="x'+side+t+'" data-act="'+side+'|'+t+'|0"><span class="lbl">'+l+'</span><b id="v'+side+t+'">0</b></button>').join("")+'</div>';
+      '<button class="ex" id="x'+side+t+'" data-act="'+side+'|'+t+'|0"><span class="lbl">'+l+'</span><span class="cnt"><b id="v'+side+t+'">0</b><small id="t'+side+t+'"></small></span></button>').join("")+'</div>';
 }
 
 // ---- Anzeige ----
@@ -340,15 +342,16 @@ function render(){
     '<button data-q="'+q+'" aria-pressed="'+(g.q===q)+'">'+(q==="OT"?"OT":"Q"+q)+'</button>').join("");
   document.getElementById("qline").innerHTML = usedQs().map(q => {
     const h = agg(g.ev,"H",q).pts, o = agg(g.ev,"G",q).pts;
-    return '<span class="'+(q===g.q?'now':'')+'">'+QLBL[q]+(q==="OT"?'':' V')+' <b>'+h+':'+o+'</b></span>';
+    return '<span class="'+(q===g.q?'now':'')+'">'+QLBL[q]+' <b>'+h+':'+o+'</b></span>';
   }).join("");
-  [["H",H],["G",G]].forEach(([s,a]) => {
-    setTxt("v"+s+"2P", a.p2m+"/"+a.p2a); setTxt("p"+s+"2P", pct(a.p2m,a.p2a));
-    setTxt("v"+s+"3P", a.p3m+"/"+a.p3a); setTxt("p"+s+"3P", pct(a.p3m,a.p3a));
-    setTxt("v"+s+"FT", a.ftm+"/"+a.fta); setTxt("p"+s+"FT", pct(a.ftm,a.fta));
-    setTxt("v"+s+"OR", a.or); setTxt("v"+s+"DR", a.dr); setTxt("v"+s+"TO", a.to);
+  [["H",H],["G",G]].forEach(([s,a]) => {   // groß: aktuelles Viertel · klein: ganzes Spiel
+    const v = agg(g.ev, s, g.q);
+    [["2P","p2m","p2a"],["3P","p3m","p3a"],["FT","ftm","fta"]].forEach(([t,m,n]) => {
+      setTxt("v"+s+t, v[m]+"/"+v[n]); setTxt("t"+s+t, "Game "+a[m]+"/"+a[n]);
+    });
+    [["OR","or"],["DR","dr"],["TO","to"]].forEach(([t,k]) => { setTxt("v"+s+t, v[k]); setTxt("t"+s+t, "Game "+a[k]); });
     const f = foulsNow(s);
-    setTxt("v"+s+"PF", f);
+    setTxt("v"+s+"PF", f); setTxt("t"+s+"PF", "Game "+a.pf);
     document.getElementById("x"+s+"PF").classList.toggle("bonus", f >= 4);   // ab 4 Teamfouls: nächstes Foul = Freiwürfe
   });
   const b = ballNow();
@@ -356,7 +359,7 @@ function render(){
     const el = document.getElementById("ball"+s);
     const free = b === "reb" || b === null;
     el.className = "ball"+(b === s ? " on" : free ? " reb" : " def");
-    el.textContent = b === s ? "● Ballbesitz" : free ? "Ball frei" : "Verteidigung";
+    el.textContent = b === s ? "● Possession" : free ? "Loose ball" : "Defense";
   });
   document.getElementById("swap").disabled = b === null;
   renderLog();
@@ -366,24 +369,24 @@ function setTxt(id, v){ const el = document.getElementById(id); if(el) el.textCo
 function renderLog(){
   const g = cur(), host = document.getElementById("log");
   document.getElementById("undo").disabled = !g.ev.length;
-  if(!g.ev.length){ host.innerHTML = '<span class="empty">Noch keine Aktionen — einfach lostippen.</span>'; return; }
+  if(!g.ev.length){ host.innerHTML = '<span class="empty">No actions yet — just start tapping.</span>'; return; }
   host.innerHTML = g.ev.slice(-10).reverse().map(e => {
     const armed = e.id === armId;
     const mark = (e.t==="2P"||e.t==="3P"||e.t==="FT") ? (e.m ? " ✓" : " ✗") : "";
-    const who = e.s === "H" ? "TVD" : "Geg.";
-    return '<button class="chip '+e.s+(armed?' arm':'')+'" data-id="'+e.id+'">'+(armed ? 'Löschen?' : QLBL[e.q]+' '+who+' '+TLBL[e.t]+mark)+'</button>';
+    const who = e.s === "H" ? "TVD" : "Opp.";
+    return '<button class="chip '+e.s+(armed?' arm':'')+'" data-id="'+e.id+'">'+(armed ? 'Delete?' : QLBL[e.q]+' '+who+' '+TLBL[e.t]+mark)+'</button>';
   }).join("");
 }
 function renderStore(){
   const el = document.getElementById("store");
-  const dev = storeOk ? '<b>Gerät ✓</b>' : '<span class="bad">Gerät: Speichern nicht möglich – Seite nicht neu laden!</span>';
+  const dev = storeOk ? '<b>Device ✓</b>' : '<span class="bad">Device: saving failed – do not reload the page!</span>';
   let sh;
-  if(!SHEET_URL) sh = '<span>Sheet nicht verbunden</span>';
-  else if(syncing) sh = '<span class="wait">Sheet: sende…</span>';
+  if(!SHEET_URL) sh = '<span>Sheet not connected</span>';
+  else if(syncing) sh = '<span class="wait">Sheet: sending…</span>';
   else{
     const n = pending().length;
-    if(syncErr) sh = '<span class="bad">Sheet: '+syncErr+' · tippen zum Senden</span>';
-    else if(n) sh = '<span class="wait">Sheet: '+n+' Spiel'+(n>1?'e':'')+' ausstehend'+(navigator.onLine?'':' (offline)')+'</span>';
+    if(syncErr) sh = '<span class="bad">Sheet: '+syncErr+' · tap to send</span>';
+    else if(n) sh = '<span class="wait">Sheet: '+n+' game'+(n>1?'s':'')+' pending'+(navigator.onLine?'':' (offline)')+'</span>';
     else sh = '<span class="ok">Sheet ✓'+(lastSync?' '+lastSync:'')+'</span>';
   }
   el.innerHTML = dev+'<br>'+sh;
@@ -405,19 +408,19 @@ function tableFor(side){
   const g = cur(), qs = usedQs();
   const cols = qs.map(q => aggP(g.ev,side,q)).concat([aggP(g.ev,side)]);
   const R = [
-    ["Punkte", a => a.pts],
-    ["Ballbesitze (gezählt)", a => a.possC],
-    ["Punkte / Ballbesitz", a => dec(a.ppp,2)],
-    ["Ballbesitze (Formel)", a => Math.round(a.poss)],
+    ["Points", a => a.pts],
+    ["Possessions (counted)", a => a.possC],
+    ["Points / possession", a => dec(a.ppp,2)],
+    ["Possessions (formula)", a => Math.round(a.poss)],
     null,
-    ["2er", a => a.p2m+"/"+a.p2a], ["2er %", a => pct(a.p2m,a.p2a)],
-    ["3er", a => a.p3m+"/"+a.p3a], ["3er %", a => pct(a.p3m,a.p3a)],
-    ["Freiwürfe", a => a.ftm+"/"+a.fta], ["Freiwurf %", a => pct(a.ftm,a.fta)],
+    ["2PT", a => a.p2m+"/"+a.p2a], ["2PT %", a => pct(a.p2m,a.p2a)],
+    ["3PT", a => a.p3m+"/"+a.p3a], ["3PT %", a => pct(a.p3m,a.p3a)],
+    ["Free throws", a => a.ftm+"/"+a.fta], ["FT %", a => pct(a.ftm,a.fta)],
     null,
-    ["eFG %", a => pctV(a.efg)], ["True Shooting %", a => pctV(a.ts)],
-    ["Punkte aus 2/3/FW", a => (2*a.p2m)+"/"+(3*a.p3m)+"/"+a.ftm],
+    ["eFG%", a => pctV(a.efg)], ["True shooting %", a => pctV(a.ts)],
+    ["Points from 2/3/FT", a => (2*a.p2m)+"/"+(3*a.p3m)+"/"+a.ftm],
     null,
-    ["Off. Rebounds", a => a.or], ["Def. Rebounds", a => a.dr], ["Ballverluste", a => a.to], ["Fouls", a => a.pf]
+    ["Off. rebounds", a => a.or], ["Def. rebounds", a => a.dr], ["Turnovers", a => a.to], ["Fouls", a => a.pf]
   ];
   const name = side === "H" ? "TVD 3" : meta(S.current).opp;
   return '<div class="tw"><table><caption>'+name+'</caption><thead><tr><th></th>'+
@@ -434,9 +437,9 @@ function renderOv(){
 // Zeilen wie in der bestehenden Excel-Auswertung (TVD links, Gegner rechts)
 function excelText(){
   const g = cur(), qs = usedQs();
-  const rows = [["Possessions", a => a.possC], ["Offensivrebounds", a => a.or], ["Turnovers", a => a.to], null,
-    ["Punkte", a => a.pts], ["2er Attempts", a => a.p2a], ["2er Makes", a => a.p2m], ["3er Attempts", a => a.p3a],
-    ["3er Makes", a => a.p3m], ["Freiwürfe", a => a.fta], ["Freiwürfe Makes", a => a.ftm]];
+  const rows = [["Possessions", a => a.possC], ["Offensive rebounds", a => a.or], ["Turnovers", a => a.to], null,
+    ["Points", a => a.pts], ["2PT attempts", a => a.p2a], ["2PT made", a => a.p2m], ["3PT attempts", a => a.p3a],
+    ["3PT made", a => a.p3m], ["FT attempts", a => a.fta], ["FT made", a => a.ftm]];
   const colsH = qs.map(q => aggP(g.ev,"H",q)).concat([aggP(g.ev,"H")]);
   const colsG = qs.map(q => aggP(g.ev,"G",q)).concat([aggP(g.ev,"G")]);
   const head = ["Quarter"].concat(qs.map(q => q==="OT"?"OT":q), ["Gesamt",""], qs.map(q => q==="OT"?"OT":q), ["Gesamt"]);
@@ -450,8 +453,8 @@ function excelText(){
 function summaryText(){
   const g = cur(), m = meta(S.current), H = aggP(g.ev,"H"), G = aggP(g.ev,"G");
   const qs = usedQs().map(q => agg(g.ev,"H",q).pts+":"+agg(g.ev,"G",q).pts).join(", ");
-  const line = (n,a) => n+": 2er "+a.p2m+"/"+a.p2a+" ("+pct(a.p2m,a.p2a)+"), 3er "+a.p3m+"/"+a.p3a+" ("+pct(a.p3m,a.p3a)+"), FW "+a.ftm+"/"+a.fta+" ("+pct(a.ftm,a.fta)+"), Off. Reb. "+a.or+", Ballverluste "+a.to+", Ballbesitze "+a.possC+", Pkt/Ballbesitz "+dec(a.ppp,2);
-  return "🏀 TVD 3 "+(m.home?"vs":"@")+" "+m.opp+" "+H.pts+":"+G.pts+"\nViertel: "+qs+"\n"+line("TVD",H)+"\n"+line("Gegner",G);
+  const line = (n,a) => n+": 2PT "+a.p2m+"/"+a.p2a+" ("+pct(a.p2m,a.p2a)+"), 3PT "+a.p3m+"/"+a.p3a+" ("+pct(a.p3m,a.p3a)+"), FT "+a.ftm+"/"+a.fta+" ("+pct(a.ftm,a.fta)+"), off. reb. "+a.or+", def. reb. "+a.dr+", turnovers "+a.to+", possessions "+a.possC+", pts/poss "+dec(a.ppp,2);
+  return "🏀 TVD 3 "+(m.home?"vs":"@")+" "+m.opp+" "+H.pts+":"+G.pts+"\nQuarters: "+qs+"\n"+line("TVD",H)+"\n"+line("Opponent",G);
 }
 async function copy(text, okMsg){
   const msg = document.getElementById("omsg");
@@ -459,8 +462,8 @@ async function copy(text, okMsg){
   try{
     const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
     document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove();
-    msg.textContent = ok ? okMsg : "Kopieren nicht möglich – Browser blockiert die Zwischenablage.";
-  }catch(e){ msg.textContent = "Kopieren nicht möglich – Browser blockiert die Zwischenablage."; }
+    msg.textContent = ok ? okMsg : "Copy failed – the browser blocked the clipboard.";
+  }catch(e){ msg.textContent = "Copy failed – the browser blocked the clipboard."; }
 }
 
 // ---- Sync ans Stat-Sheet (lokal zuerst, Sheet sobald Verbindung da) ----
@@ -474,10 +477,10 @@ function payload(id){
           events:g.ev.map(e => [e.q, e.s, e.t, e.m, e.ts||0])};   // kompakt: [Viertel, Seite, Aktion, Treffer, Zeitstempel]
 }
 async function syncNow(manual){
-  if(!SHEET_URL){ if(manual) document.getElementById("omsg").textContent = "Keine Sheet-URL hinterlegt (SHEET_URL im Code)."; return false; }
+  if(!SHEET_URL){ if(manual) document.getElementById("omsg").textContent = "No sheet URL set (SHEET_URL in the code)."; return false; }
   if(syncing) return false;
   const ids = manual ? Object.keys(S.games).filter(id => S.games[id].ev.length || S.games[id].rev) : pending();
-  if(!ids.length){ if(manual) document.getElementById("omsg").textContent = "Nichts zu senden."; return true; }
+  if(!ids.length){ if(manual) document.getElementById("omsg").textContent = "Nothing to send."; return true; }
   if(!manual && !navigator.onLine){ renderStore(); return false; }
   syncing = true; renderStore();
   const sent = {}; ids.forEach(id => sent[id] = S.games[id].rev||0);
@@ -490,9 +493,9 @@ async function syncNow(manual){
     ids.forEach(id => { if(S.games[id]) S.games[id].sentRev = sent[id]; });   // spätere Taps bleiben ausstehend
     const t = new Date(); lastSync = pad(t.getHours())+":"+pad(t.getMinutes());
     syncErr = ""; ok = true; save();
-  }catch(e){ console.warn("sync", e); syncErr = navigator.onLine ? "nicht erreichbar" : "offline"; }
+  }catch(e){ console.warn("sync", e); syncErr = navigator.onLine ? "unreachable" : "offline"; }
   syncing = false; renderStore();
-  if(manual) document.getElementById("omsg").textContent = ok ? "An Sheet gesendet ✓ ("+ids.length+" Spiel"+(ids.length>1?"e":"")+")" : "Senden fehlgeschlagen – Verbindung prüfen, Daten bleiben auf dem Gerät.";
+  if(manual) document.getElementById("omsg").textContent = ok ? "Sent to sheet ✓ ("+ids.length+" game"+(ids.length>1?"s":"")+")" : "Sending failed – check the connection, data stays on the device.";
   if(ok && pending().length) queueSync();
   return ok;
 }
@@ -535,13 +538,13 @@ document.addEventListener("click", e => {
   }
   else if(b.id === "btnStats"){ document.getElementById("omsg").textContent = ""; renderOv(); document.getElementById("ov").hidden = false; }
   else if(b.id === "ovClose"){ document.getElementById("ov").hidden = true; }
-  else if(b.id === "copyXls"){ copy(excelText(), "Tabelle kopiert ✓ — in Excel in die erste Zelle einfügen."); }
-  else if(b.id === "copyTxt"){ copy(summaryText(), "Kurzbericht kopiert ✓ — z. B. in den Team-Chat einfügen."); }
+  else if(b.id === "copyXls"){ copy(excelText(), "Table copied ✓ — paste into the first cell in Excel."); }
+  else if(b.id === "copyTxt"){ copy(summaryText(), "Summary copied ✓ — e.g. paste into the team chat."); }
   else if(b.id === "sendSheet"){ b.disabled = true; syncNow(true).then(() => { b.disabled = false; }); }
   else if(b.id === "store"){ syncNow(true); }
   else if(b.id === "resetGame"){
-    if(!resetArm){ resetArm = true; b.textContent = "Wirklich leeren?"; setTimeout(() => { resetArm = false; b.textContent = "Spiel leeren"; }, 3500); }
-    else{ resetArm = false; b.textContent = "Spiel leeren"; const g = cur(); g.ev = []; g.q = "1"; touch(); render(); renderOv(); }
+    if(!resetArm){ resetArm = true; b.textContent = "Really clear?"; setTimeout(() => { resetArm = false; b.textContent = "Clear game"; }, 3500); }
+    else{ resetArm = false; b.textContent = "Clear game"; const g = cur(); g.ev = []; g.q = "1"; touch(); render(); renderOv(); }
   }
 });
 document.getElementById("game").addEventListener("change", e => { disarm(); S.current = e.target.value; cur(); save(); render(); });
