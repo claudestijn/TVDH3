@@ -84,8 +84,11 @@
   .chip.G{box-shadow:inset 3px 0 0 #fff}
   .chip.arm{background:#5c1013;color:#fff}
   .chips .empty{font-size:13px;color:var(--muted2)}
-  .store{font-size:11px;color:var(--muted2);flex:none;text-align:right;max-width:150px}
-  .store.err{color:#ffb4a2}
+  .store{font-size:11px;color:var(--muted2);flex:none;text-align:right;max-width:190px;line-height:1.35;border:1px solid var(--line);border-radius:8px;padding:6px 9px}
+  .store b{font-weight:600;color:var(--muted)}
+  .store .ok{color:#7fcf9b}
+  .store .wait{color:var(--warn)}
+  .store .bad{color:#ffb4a2}
 
   /* ---- Auswertung ---- */
   .ov{position:fixed;inset:0;background:var(--ink);overflow:auto;z-index:10;padding:16px 16px 40px;-webkit-user-select:text;user-select:text}
@@ -141,7 +144,7 @@
 <footer class="log">
   <button id="undo">Rückgängig</button>
   <div class="chips" id="log"></div>
-  <div class="store" id="store"></div>
+  <button class="store" id="store" title="An Sheet senden"></button>
 </footer>
 
 <div class="ov" id="ov" hidden>
@@ -149,6 +152,7 @@
     <h2 id="ovTitle">Auswertung</h2>
     <button class="obtn pri" id="copyXls">Tabelle kopieren (Excel)</button>
     <button class="obtn" id="copyTxt">Kurzbericht kopieren</button>
+    <button class="obtn" id="sendSheet">An Sheet senden</button>
     <button class="obtn danger" id="resetGame">Spiel leeren</button>
     <button class="obtn" id="ovClose">Zurück</button>
   </div>
@@ -159,6 +163,8 @@
 
 <script>
 const KEY = "tvd-tracker:v1";
+// Web-App-URL des Stat-Sheets (Apps Script, endet auf /exec). Leer = nur lokal speichern.
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzgLiE5mVSxTb3OYx4zadUGeCZ6D7F1YTiEkrcHyT-z58a4EnGyM6HHu6eHQ8ict5UW/exec";
 const GAMES = [   // [Datum, Gegner, Heim?]
   ["2026-10-10","TB Kirchentellinsfurt 2",0],
   ["2026-10-18","TuS Metzingen 2",1],
@@ -188,10 +194,12 @@ try{ const raw = localStorage.getItem(KEY); if(raw){ const o = JSON.parse(raw); 
 const pad = n => String(n).padStart(2,"0");
 const isoToday = () => { const t = new Date(); return t.getFullYear()+"-"+pad(t.getMonth()+1)+"-"+pad(t.getDate()); };
 function meta(id){ const g = GAMES.find(x => x[0] === id); return g ? {opp:g[1], home:!!g[2]} : {opp:"Gegner", home:true}; }
-function cur(){ if(!S.games[S.current]) S.games[S.current] = {q:"1", ev:[]}; return S.games[S.current]; }
+function cur(){ if(!S.games[S.current]) S.games[S.current] = {q:"1", ev:[], rev:0, sentRev:0}; return S.games[S.current]; }
 function defaultGame(){ const t = isoToday(); const g = GAMES.find(x => x[0] >= t); return g ? g[0] : "frei"; }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); storeOk = true; }catch(e){ storeOk = false; } renderStore(); }
 
+// alte Stände: Versionszähler ergänzen (rev = lokale Änderungen, sentRev = an Sheet gesendet)
+Object.values(S.games).forEach(g => { if(typeof g.rev !== "number"){ g.rev = g.ev.length ? 1 : 0; g.sentRev = 0; } });
 // Spielwahl: gespeichertes Spiel behalten, sonst heutiges/nächstes
 if(!S.current || !(S.games[S.current] && S.games[S.current].ev.length)) S.current = defaultGame();
 
@@ -293,16 +301,25 @@ function renderLog(){
 }
 function renderStore(){
   const el = document.getElementById("store");
-  el.className = "store"+(storeOk?"":" err");
-  el.textContent = storeOk ? "Auf diesem Gerät gespeichert" : "Speichern nicht möglich – Seite nicht neu laden!";
+  const dev = storeOk ? '<b>Gerät ✓</b>' : '<span class="bad">Gerät: Speichern nicht möglich – Seite nicht neu laden!</span>';
+  let sh;
+  if(!SHEET_URL) sh = '<span>Sheet nicht verbunden</span>';
+  else if(syncing) sh = '<span class="wait">Sheet: sende…</span>';
+  else{
+    const n = pending().length;
+    if(syncErr) sh = '<span class="bad">Sheet: '+syncErr+' · tippen zum Senden</span>';
+    else if(n) sh = '<span class="wait">Sheet: '+n+' Spiel'+(n>1?'e':'')+' ausstehend'+(navigator.onLine?'':' (offline)')+'</span>';
+    else sh = '<span class="ok">Sheet ✓'+(lastSync?' '+lastSync:'')+'</span>';
+  }
+  el.innerHTML = dev+'<br>'+sh;
 }
 function bump(id){ const el = document.getElementById(id); if(!el) return; el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump"); }
 
 // ---- Aktionen ----
 function add(side, t, made){
   const g = cur();
-  g.ev.push({id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), q:g.q, s:side, t:t, m:made});
-  save(); render();
+  g.ev.push({id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), q:g.q, s:side, t:t, m:made, ts:Date.now()});
+  touch(); render();
   bump("v"+side+t); bump(side==="H"?"scH":"scG");
   if(navigator.vibrate) try{ navigator.vibrate(12); }catch(e){}
 }
@@ -370,6 +387,43 @@ async function copy(text, okMsg){
   }catch(e){ msg.textContent = "Kopieren nicht möglich – Browser blockiert die Zwischenablage."; }
 }
 
+// ---- Sync ans Stat-Sheet (lokal zuerst, Sheet sobald Verbindung da) ----
+let syncing = false, syncTimer = null, syncErr = "", lastSync = "";
+function touch(){ const g = cur(); g.rev = (g.rev||0) + 1; save(); queueSync(); }
+function pending(){ return Object.keys(S.games).filter(id => (S.games[id].rev||0) !== (S.games[id].sentRev||0)); }
+function queueSync(){ if(!SHEET_URL || syncTimer) return; syncTimer = setTimeout(() => { syncTimer = null; syncNow(false); }, 5000); }
+function payload(id){
+  const g = S.games[id], m = meta(id);
+  return {id:id, date:id === "frei" ? isoToday() : id, opp:m.opp, home:m.home, rev:g.rev,
+          events:g.ev.map(e => [e.q, e.s, e.t, e.m, e.ts||0])};   // kompakt: [Viertel, Seite, Aktion, Treffer, Zeitstempel]
+}
+async function syncNow(manual){
+  if(!SHEET_URL){ if(manual) document.getElementById("omsg").textContent = "Keine Sheet-URL hinterlegt (SHEET_URL im Code)."; return false; }
+  if(syncing) return false;
+  const ids = manual ? Object.keys(S.games).filter(id => S.games[id].ev.length || S.games[id].rev) : pending();
+  if(!ids.length){ if(manual) document.getElementById("omsg").textContent = "Nichts zu senden."; return true; }
+  if(!manual && !navigator.onLine){ renderStore(); return false; }
+  syncing = true; renderStore();
+  const sent = {}; ids.forEach(id => sent[id] = S.games[id].rev||0);
+  let ok = false;
+  try{
+    const r = await fetch(SHEET_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"},
+                                      body:JSON.stringify({games:ids.map(payload)})});
+    const j = JSON.parse(await r.text());
+    if(!j.ok) throw new Error(j.error || "Fehler");
+    ids.forEach(id => { if(S.games[id]) S.games[id].sentRev = sent[id]; });   // spätere Taps bleiben ausstehend
+    const t = new Date(); lastSync = pad(t.getHours())+":"+pad(t.getMinutes());
+    syncErr = ""; ok = true; save();
+  }catch(e){ console.warn("sync", e); syncErr = navigator.onLine ? "nicht erreichbar" : "offline"; }
+  syncing = false; renderStore();
+  if(manual) document.getElementById("omsg").textContent = ok ? "An Sheet gesendet ✓ ("+ids.length+" Spiel"+(ids.length>1?"e":"")+")" : "Senden fehlgeschlagen – Verbindung prüfen, Daten bleiben auf dem Gerät.";
+  if(ok && pending().length) queueSync();
+  return ok;
+}
+window.addEventListener("online", () => { syncErr = ""; syncNow(false); });
+window.addEventListener("offline", renderStore);
+setInterval(() => { if(pending().length && navigator.onLine && !syncing) syncNow(false); }, 30000);
+
 // ---- Bildschirm wach halten (Tablet) ----
 let wake = null;
 async function keepAwake(){
@@ -383,23 +437,26 @@ document.addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b) return;
   if(b.dataset.act){ disarm(); const [s,t,m] = b.dataset.act.split("|"); add(s, t, Number(m)); }
   else if(b.dataset.q){ cur().q = b.dataset.q; save(); render(); }
-  else if(b.id === "undo"){ disarm(); cur().ev.pop(); save(); render(); }
+  else if(b.id === "undo"){ disarm(); if(cur().ev.length){ cur().ev.pop(); touch(); } render(); }
   else if(b.dataset.id){
-    if(armId === b.dataset.id){ const g = cur(); g.ev = g.ev.filter(x => x.id !== armId); disarm(); save(); render(); }
+    if(armId === b.dataset.id){ const g = cur(); g.ev = g.ev.filter(x => x.id !== armId); disarm(); touch(); render(); }
     else{ disarm(); armId = b.dataset.id; armTimer = setTimeout(() => { disarm(); renderLog(); }, 3000); renderLog(); }
   }
   else if(b.id === "btnStats"){ document.getElementById("omsg").textContent = ""; renderOv(); document.getElementById("ov").hidden = false; }
   else if(b.id === "ovClose"){ document.getElementById("ov").hidden = true; }
   else if(b.id === "copyXls"){ copy(excelText(), "Tabelle kopiert ✓ — in Excel in die erste Zelle einfügen."); }
   else if(b.id === "copyTxt"){ copy(summaryText(), "Kurzbericht kopiert ✓ — z. B. in den Team-Chat einfügen."); }
+  else if(b.id === "sendSheet"){ b.disabled = true; syncNow(true).then(() => { b.disabled = false; }); }
+  else if(b.id === "store"){ syncNow(true); }
   else if(b.id === "resetGame"){
     if(!resetArm){ resetArm = true; b.textContent = "Wirklich leeren?"; setTimeout(() => { resetArm = false; b.textContent = "Spiel leeren"; }, 3500); }
-    else{ resetArm = false; b.textContent = "Spiel leeren"; S.games[S.current] = {q:"1", ev:[]}; save(); render(); renderOv(); }
+    else{ resetArm = false; b.textContent = "Spiel leeren"; const g = cur(); g.ev = []; g.q = "1"; touch(); render(); renderOv(); }
   }
 });
 document.getElementById("game").addEventListener("change", e => { disarm(); S.current = e.target.value; cur(); save(); render(); });
 
 buildSelect(); buildSide("H"); buildSide("G"); render();
+if(pending().length) setTimeout(() => syncNow(false), 1500);   // beim Öffnen Ausstehendes nachsenden
 </script>
 </body>
 </html>
