@@ -165,6 +165,7 @@
     <button class="obtn pri" id="copyXls">Copy table (Excel)</button>
     <button class="obtn" id="copyTxt">Copy summary</button>
     <button class="obtn" id="sendSheet">Send to sheet</button>
+    <button class="obtn" id="loadSheet">Load from sheet</button>
     <button class="obtn danger" id="resetGame">Clear game</button>
     <button class="obtn" id="ovClose">Back</button>
   </div>
@@ -499,6 +500,27 @@ async function syncNow(manual){
   if(ok && pending().length) queueSync();
   return ok;
 }
+// Spiel aus dem Sheet laden: automatisch, wenn es auf diesem Gerät leer ist; manuell auch zum Überschreiben
+async function pullGame(id, force){
+  if(!SHEET_URL || !navigator.onLine) return "offline";
+  const loc = S.games[id];
+  if(!force && loc && (loc.ev.length || (loc.rev||0) !== (loc.sentRev||0))) return "local";
+  try{
+    const r = await fetch(SHEET_URL+"?action=game&id="+encodeURIComponent(id)+"&t="+Date.now(), {cache:"no-store"});
+    const j = JSON.parse(await r.text());
+    if(!j.ok) return "error";
+    if(!j.game || !Array.isArray(j.game.events)) return "none";
+    const now = S.games[id];
+    if(!force && now && now.ev.length) return "local";   // inzwischen lokal getippt -> nichts überschreiben
+    const ev = j.game.events.map((e,i) => ({id:"s"+i+"_"+(e[4]||0).toString(36), q:e[0], s:e[1], t:e[2], m:Number(e[3])||0, ts:e[4]||0}));
+    const rev = j.game.rev || 1;
+    S.games[id] = {q: ev.length ? ev[ev.length-1].q : "1", ev, rev, sentRev: rev};
+    save();
+    if(id === S.current){ render(); if(!document.getElementById("ov").hidden) renderOv(); }
+    return ev.length ? "loaded" : "none";
+  }catch(e){ console.warn("pull", e); return "error"; }
+}
+let loadArm = false;
 window.addEventListener("online", () => { syncErr = ""; syncNow(false); });
 window.addEventListener("offline", renderStore);
 setInterval(() => { if(pending().length && navigator.onLine && !syncing) syncNow(false); }, 30000);
@@ -542,15 +564,30 @@ document.addEventListener("click", e => {
   else if(b.id === "copyTxt"){ copy(summaryText(), "Summary copied ✓ — e.g. paste into the team chat."); }
   else if(b.id === "sendSheet"){ b.disabled = true; syncNow(true).then(() => { b.disabled = false; }); }
   else if(b.id === "store"){ syncNow(true); }
+  else if(b.id === "loadSheet"){
+    const msg = document.getElementById("omsg"), g = cur();
+    if(g.ev.length && !loadArm){
+      loadArm = true; b.textContent = "Overwrite this device?";
+      setTimeout(() => { loadArm = false; b.textContent = "Load from sheet"; }, 3500);
+      return;
+    }
+    loadArm = false; b.textContent = "Loading…"; b.disabled = true;
+    pullGame(S.current, true).then(res => {
+      b.textContent = "Load from sheet"; b.disabled = false;
+      msg.textContent = res === "loaded" ? "Loaded from sheet ✓" : res === "none" ? "This game isn't in the sheet yet."
+        : res === "offline" ? "No connection – try again later." : "Loading failed – check the connection.";
+    });
+  }
   else if(b.id === "resetGame"){
     if(!resetArm){ resetArm = true; b.textContent = "Really clear?"; setTimeout(() => { resetArm = false; b.textContent = "Clear game"; }, 3500); }
     else{ resetArm = false; b.textContent = "Clear game"; const g = cur(); g.ev = []; g.q = "1"; touch(); render(); renderOv(); }
   }
 });
-document.getElementById("game").addEventListener("change", e => { disarm(); S.current = e.target.value; cur(); save(); render(); });
+document.getElementById("game").addEventListener("change", e => { disarm(); S.current = e.target.value; cur(); save(); render(); pullGame(S.current, false); });
 
 buildSelect(); buildSide("H"); buildSide("G"); render();
 if(pending().length) setTimeout(() => syncNow(false), 1500);   // beim Öffnen Ausstehendes nachsenden
+pullGame(S.current, false);   // leeres Spiel auf diesem Gerät -> Stand aus dem Sheet holen
 </script>
 </body>
 </html>
