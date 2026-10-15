@@ -51,7 +51,15 @@
   .side{background:var(--ink);display:flex;flex-direction:column;padding:12px 14px 14px;gap:10px;min-width:0}
   .side.tvd{--acc:var(--red2);--hitbg:var(--red2);--hittx:#fff}
   .side.opp{--acc:#fff;--hitbg:#EDEDED;--hittx:#121212}
-  .side h2{font-family:var(--disp);font-weight:700;font-size:22px;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shead{display:flex;align-items:center;gap:10px;min-width:0}
+  .side h2{font-family:var(--disp);font-weight:700;font-size:22px;display:flex;align-items:center;gap:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+  .ball{flex:none;font-family:var(--disp);font-weight:700;font-size:14px;padding:4px 11px;border-radius:999px;border:1.5px solid transparent;color:transparent;transition:background .15s,color .15s;pointer-events:none}
+  .ball.on{background:var(--acc);color:var(--hittx);border-color:var(--acc)}
+  .side.opp .ball.on{color:#121212}
+  .ball.def{border-color:var(--line);color:var(--muted2);font-weight:600}
+  .ball.reb{border-color:var(--muted2);color:var(--text);font-weight:600;font-size:16px;padding:7px 14px;pointer-events:auto;cursor:pointer}
+  #swap{font-family:var(--disp);font-weight:700;font-size:17px;border:1.5px solid #555;border-radius:8px;padding:10px 14px;flex:none}
+  #swap:disabled{opacity:.35}
   .side h2::before{content:"";width:6px;height:22px;border-radius:2px;background:var(--acc);flex:none}
   .shot{flex:1;display:grid;grid-template-columns:1.35fr 1fr 86px;gap:8px;min-height:74px}
   .hit,.miss,.ex{border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .08s}
@@ -64,8 +72,8 @@
   .val{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;font-variant-numeric:tabular-nums}
   .val b{font-family:var(--disp);font-weight:700;font-size:27px;line-height:1;display:inline-block}
   .val small{color:var(--muted);font-size:12px;margin-top:4px}
-  .extras{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;min-height:74px}
-  .ex{background:var(--s1);border:1.5px solid var(--line);flex-direction:row;gap:10px;padding:0 10px}
+  .extras{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;min-height:74px}
+  .ex{background:var(--s1);border:1.5px solid var(--line);flex-direction:row;gap:8px;padding:0 8px}
   .ex .lbl{font-size:13px;font-weight:600;color:var(--muted);text-align:left;line-height:1.2}
   .ex .lbl small{font-weight:400;font-size:11px;color:var(--muted2)}
   .ex b{font-family:var(--disp);font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;display:inline-block}
@@ -119,6 +127,7 @@
   @media(max-width:640px){
     .court{grid-template-columns:1fr}
     .shot{grid-template-columns:1.3fr 1fr 74px}
+    .extras{grid-template-columns:repeat(2,1fr)}
   }
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
 </style>
@@ -143,6 +152,7 @@
 
 <footer class="log">
   <button id="undo">Rückgängig</button>
+  <button id="swap" title="Ballbesitz an die andere Mannschaft">⇄ Ballbesitz</button>
   <div class="chips" id="log"></div>
   <button class="store" id="store" title="An Sheet senden"></button>
 </footer>
@@ -158,7 +168,7 @@
   </div>
   <div class="omsg" id="omsg"></div>
   <div class="tbls" id="tbls"></div>
-  <p class="note">Possessions sind geschätzt: Würfe aus dem Feld + 0,44 × Freiwürfe − Off. Rebounds + Ballverluste. eFG % = (2er-Treffer + 1,5 × 3er-Treffer) / Würfe aus dem Feld. True Shooting % = Punkte / (2 × (Würfe aus dem Feld + 0,44 × Freiwürfe)).</p>
+  <p class="note">Ballbesitze (gezählt) ergeben sich aus der Reihenfolge der Aktionen: ein Besitz endet mit Treffer, letztem getroffenem Freiwurf oder Ballverlust; nach einem Fehlwurf entscheidet der Rebound. Ballbesitze (Formel) = Würfe aus dem Feld + 0,44 × Freiwürfe − Off. Rebounds + Ballverluste, zum Vergleich. eFG % = (2er-Treffer + 1,5 × 3er-Treffer) / Würfe aus dem Feld. True Shooting % = Punkte / (2 × (Würfe aus dem Feld + 0,44 × Freiwürfe)).</p>
 </div>
 
 <script>
@@ -184,8 +194,8 @@ const GAMES = [   // [Datum, Gegner, Heim?]
 const QS = ["1","2","3","4","OT"];
 const QLBL = {"1":"1.","2":"2.","3":"3.","4":"4.","OT":"OT"};
 const SHOTS = [["2P",2,"Zweier"],["3P",3,"Dreier"],["FT",1,"Freiwurf"]];
-const EXTRAS = [["OR","Off.<br>Rebound"],["TO","Ball&shy;verlust"],["PF","Foul<br><small>im Viertel</small>"]];
-const TLBL = {"2P":"2er","3P":"3er","FT":"FW","OR":"Off. Reb.","TO":"Ballverl.","PF":"Foul"};
+const EXTRAS = [["OR","Off.<br>Rebound"],["DR","Def.<br>Rebound"],["TO","Ball&shy;verlust"],["PF","Foul<br><small>im Viertel</small>"]];
+const TLBL = {"2P":"2er","3P":"3er","FT":"FW","OR":"Off. Reb.","DR":"Def. Reb.","BX":"⇄ Ballbesitz","TO":"Ballverl.","PF":"Foul"};
 const DOW = ["So","Mo","Di","Mi","Do","Fr","Sa"];
 
 let S = {current:"", games:{}}, storeOk = true, armId = null, armTimer = null, resetArm = false;
@@ -205,13 +215,14 @@ if(!S.current || !(S.games[S.current] && S.games[S.current].ev.length)) S.curren
 
 // ---- Zählen ----
 function agg(ev, side, q){
-  const a = {p2a:0,p2m:0,p3a:0,p3m:0,fta:0,ftm:0,or:0,to:0,pf:0};
+  const a = {p2a:0,p2m:0,p3a:0,p3m:0,fta:0,ftm:0,or:0,dr:0,to:0,pf:0};
   ev.forEach(e => {
     if(e.s !== side || (q && e.q !== q)) return;
     if(e.t === "2P"){ a.p2a++; a.p2m += e.m; }
     else if(e.t === "3P"){ a.p3a++; a.p3m += e.m; }
     else if(e.t === "FT"){ a.fta++; a.ftm += e.m; }
     else if(e.t === "OR") a.or++;
+    else if(e.t === "DR") a.dr++;
     else if(e.t === "TO") a.to++;
     else if(e.t === "PF") a.pf++;
   });
@@ -223,6 +234,62 @@ function agg(ev, side, q){
   const tsa = a.fga + 0.44*a.fta;
   a.ts = tsa ? a.pts / (2*tsa) : NaN;
   return a;
+}
+// ---- Ballbesitze aus der Tipp-Reihenfolge zählen ----
+// Ende eines Ballbesitzes: Treffer (2er/3er), letzter getroffener FW, Ballverlust.
+// Nach Fehlwurf: Off. Rebound = gleicher Besitz; Def. Rebound oder nächste Aktion des Gegners = Wechsel.
+// Foul: die gefoulte Mannschaft hat danach den Ball (Offensivfoul = Wechsel, Abwehrfoul = kein Wechsel).
+// And-one und FW-Serien bleiben ein Besitz. Offensivfoul + Ballverlust zählen nur einmal. Jedes Viertel startet neu.
+// "⇄ Ballbesitz" (BX) setzt den Ballbesitz manuell, ohne Statistik.
+const SHOT = t => t === "2P" || t === "3P";
+const OTHER = s => s === "H" ? "G" : "H";
+function possessions(ev){
+  const cnt = {}; let q = null, owner = null, ended = false, loose = false, last = null, pfFrom = null;
+  const start = s => { cnt[q][s]++; owner = s; ended = false; };
+  ev.forEach(e => {
+    if(e.q !== q){ q = e.q; owner = null; ended = false; loose = false; last = null; pfFrom = null; }
+    if(!cnt[q]) cnt[q] = {H:0, G:0};
+    if(e.t === "PF"){
+      const Y = OTHER(e.s);
+      if(owner === null){ start(Y); pfFrom = e.s; }
+      else if(owner === e.s && !ended){ start(Y); pfFrom = e.s; }   // Offensivfoul / Foul beim eigenen Rebound
+      else if(owner === e.s && ended){ start(Y); pfFrom = e.s; }    // Foul nach eigenem Treffer/Ballverlust
+      else pfFrom = null;   // Abwehrfoul (Y behält Ball) oder Foul nach Treffer des Gegners (And-one) -> kein Wechsel
+      loose = false;
+      return;
+    }
+    if(e.t === "BX"){   // manuell gesetzter Ballbesitz
+      if(owner !== e.s || ended) start(e.s);
+      loose = false; pfFrom = null;
+      return;
+    }
+    if(e.t === "TO" && pfFrom === e.s){ pfFrom = null; return; }  // Offensivfoul zusätzlich als Ballverlust getippt
+    pfFrom = null;
+    let isNew;
+    if(e.s !== owner) isNew = true;
+    else if(!ended) isNew = false;
+    else if(e.t === "FT" && last && last.s === e.s && (last.t === "FT" || (SHOT(last.t) && last.m))) isNew = false;   // And-one / FW-Serie
+    else isNew = true;
+    if(isNew) start(e.s);
+    if(e.t === "TO") ended = true;
+    else if(SHOT(e.t) || e.t === "FT") ended = !!e.m;
+    else if(e.t === "OR" || e.t === "DR") ended = false;
+    loose = (SHOT(e.t) || e.t === "FT") && !e.m;
+    last = e;
+  });
+  return {cnt, owner, ended, loose};
+}
+function aggP(ev, side, q){   // wie agg, plus gezählte Ballbesitze
+  const a = agg(ev, side, q), P = possessions(ev).cnt;
+  a.possC = q ? (P[q] ? P[q][side] : 0) : Object.values(P).reduce((s,c) => s + c[side], 0);
+  a.ppp = a.possC > 0 ? a.pts / a.possC : NaN;
+  return a;
+}
+function ballNow(){   // wer hat gerade den Ball: "H" | "G" | "reb" | null
+  const g = cur(), P = possessions(g.ev.filter(e => e.q === g.q));
+  if(P.owner === null) return null;
+  if(P.loose) return "reb";
+  return P.ended ? OTHER(P.owner) : P.owner;
 }
 const pct = (m,a) => a ? Math.round(m/a*100)+" %" : "–";
 const pctV = x => isFinite(x) ? Math.round(x*100)+" %" : "–";
@@ -248,7 +315,7 @@ function buildSelect(){
 }
 function buildSide(side){
   const host = document.getElementById("side"+side);
-  host.innerHTML = '<h2 id="name'+side+'"></h2>' +
+  host.innerHTML = '<div class="shead"><h2 id="name'+side+'"></h2><button class="ball" id="ball'+side+'" data-ball="'+side+'" aria-live="polite"></button></div>' +
     SHOTS.map(([t,p,l]) =>
       '<div class="shot">'+
         '<button class="hit" data-act="'+side+'|'+t+'|1"><span class="big">+'+p+'</span><span class="sm">'+l+' Treffer</span></button>'+
@@ -279,11 +346,19 @@ function render(){
     setTxt("v"+s+"2P", a.p2m+"/"+a.p2a); setTxt("p"+s+"2P", pct(a.p2m,a.p2a));
     setTxt("v"+s+"3P", a.p3m+"/"+a.p3a); setTxt("p"+s+"3P", pct(a.p3m,a.p3a));
     setTxt("v"+s+"FT", a.ftm+"/"+a.fta); setTxt("p"+s+"FT", pct(a.ftm,a.fta));
-    setTxt("v"+s+"OR", a.or); setTxt("v"+s+"TO", a.to);
+    setTxt("v"+s+"OR", a.or); setTxt("v"+s+"DR", a.dr); setTxt("v"+s+"TO", a.to);
     const f = foulsNow(s);
     setTxt("v"+s+"PF", f);
     document.getElementById("x"+s+"PF").classList.toggle("bonus", f >= 4);   // ab 4 Teamfouls: nächstes Foul = Freiwürfe
   });
+  const b = ballNow();
+  ["H","G"].forEach(s => {
+    const el = document.getElementById("ball"+s);
+    const free = b === "reb" || b === null;
+    el.className = "ball"+(b === s ? " on" : free ? " reb" : " def");
+    el.textContent = b === s ? "● Ballbesitz" : free ? "Ball frei" : "Verteidigung";
+  });
+  document.getElementById("swap").disabled = b === null;
   renderLog();
   renderStore();
 }
@@ -328,11 +403,12 @@ function disarm(){ armId = null; if(armTimer){ clearTimeout(armTimer); armTimer 
 // ---- Auswertung ----
 function tableFor(side){
   const g = cur(), qs = usedQs();
-  const cols = qs.map(q => agg(g.ev,side,q)).concat([agg(g.ev,side)]);
+  const cols = qs.map(q => aggP(g.ev,side,q)).concat([aggP(g.ev,side)]);
   const R = [
     ["Punkte", a => a.pts],
-    ["Possessions (geschätzt)", a => Math.round(a.poss)],
-    ["Punkte / Possession", a => dec(a.ppp,2)],
+    ["Ballbesitze (gezählt)", a => a.possC],
+    ["Punkte / Ballbesitz", a => dec(a.ppp,2)],
+    ["Ballbesitze (Formel)", a => Math.round(a.poss)],
     null,
     ["2er", a => a.p2m+"/"+a.p2a], ["2er %", a => pct(a.p2m,a.p2a)],
     ["3er", a => a.p3m+"/"+a.p3a], ["3er %", a => pct(a.p3m,a.p3a)],
@@ -341,7 +417,7 @@ function tableFor(side){
     ["eFG %", a => pctV(a.efg)], ["True Shooting %", a => pctV(a.ts)],
     ["Punkte aus 2/3/FW", a => (2*a.p2m)+"/"+(3*a.p3m)+"/"+a.ftm],
     null,
-    ["Off. Rebounds", a => a.or], ["Ballverluste", a => a.to], ["Fouls", a => a.pf]
+    ["Off. Rebounds", a => a.or], ["Def. Rebounds", a => a.dr], ["Ballverluste", a => a.to], ["Fouls", a => a.pf]
   ];
   const name = side === "H" ? "TVD 3" : meta(S.current).opp;
   return '<div class="tw"><table><caption>'+name+'</caption><thead><tr><th></th>'+
@@ -358,11 +434,11 @@ function renderOv(){
 // Zeilen wie in der bestehenden Excel-Auswertung (TVD links, Gegner rechts)
 function excelText(){
   const g = cur(), qs = usedQs();
-  const rows = [["Possessions", a => Math.round(a.poss)], ["Offensivrebounds", a => a.or], ["Turnovers", a => a.to], null,
+  const rows = [["Possessions", a => a.possC], ["Offensivrebounds", a => a.or], ["Turnovers", a => a.to], null,
     ["Punkte", a => a.pts], ["2er Attempts", a => a.p2a], ["2er Makes", a => a.p2m], ["3er Attempts", a => a.p3a],
     ["3er Makes", a => a.p3m], ["Freiwürfe", a => a.fta], ["Freiwürfe Makes", a => a.ftm]];
-  const colsH = qs.map(q => agg(g.ev,"H",q)).concat([agg(g.ev,"H")]);
-  const colsG = qs.map(q => agg(g.ev,"G",q)).concat([agg(g.ev,"G")]);
+  const colsH = qs.map(q => aggP(g.ev,"H",q)).concat([aggP(g.ev,"H")]);
+  const colsG = qs.map(q => aggP(g.ev,"G",q)).concat([aggP(g.ev,"G")]);
   const head = ["Quarter"].concat(qs.map(q => q==="OT"?"OT":q), ["Gesamt",""], qs.map(q => q==="OT"?"OT":q), ["Gesamt"]);
   const lines = [["","TVD"].concat(Array(qs.length+1).fill(""), [meta(S.current).opp]).join("\t"), head.join("\t")];
   rows.forEach(r => {
@@ -372,9 +448,9 @@ function excelText(){
   return lines.join("\n");
 }
 function summaryText(){
-  const g = cur(), m = meta(S.current), H = agg(g.ev,"H"), G = agg(g.ev,"G");
+  const g = cur(), m = meta(S.current), H = aggP(g.ev,"H"), G = aggP(g.ev,"G");
   const qs = usedQs().map(q => agg(g.ev,"H",q).pts+":"+agg(g.ev,"G",q).pts).join(", ");
-  const line = (n,a) => n+": 2er "+a.p2m+"/"+a.p2a+" ("+pct(a.p2m,a.p2a)+"), 3er "+a.p3m+"/"+a.p3a+" ("+pct(a.p3m,a.p3a)+"), FW "+a.ftm+"/"+a.fta+" ("+pct(a.ftm,a.fta)+"), Off. Reb. "+a.or+", Ballverluste "+a.to+", Pkt/Poss "+dec(a.ppp,2);
+  const line = (n,a) => n+": 2er "+a.p2m+"/"+a.p2a+" ("+pct(a.p2m,a.p2a)+"), 3er "+a.p3m+"/"+a.p3a+" ("+pct(a.p3m,a.p3a)+"), FW "+a.ftm+"/"+a.fta+" ("+pct(a.ftm,a.fta)+"), Off. Reb. "+a.or+", Ballverluste "+a.to+", Ballbesitze "+a.possC+", Pkt/Ballbesitz "+dec(a.ppp,2);
   return "🏀 TVD 3 "+(m.home?"vs":"@")+" "+m.opp+" "+H.pts+":"+G.pts+"\nViertel: "+qs+"\n"+line("TVD",H)+"\n"+line("Gegner",G);
 }
 async function copy(text, okMsg){
@@ -435,8 +511,23 @@ document.addEventListener("pointerdown", keepAwake, {passive:true});
 // ---- Ereignisse ----
 document.addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b) return;
-  if(b.dataset.act){ disarm(); const [s,t,m] = b.dataset.act.split("|"); add(s, t, Number(m)); }
+  if(b.dataset.ball){   // "Ball frei" angetippt: diese Seite hat den Rebound
+    const now = ballNow();
+    if(now === null){ disarm(); add(b.dataset.ball, "BX", 0); }   // Viertelbeginn: wer startet mit Ball
+    else if(now === "reb"){
+      disarm();
+      const g = cur(), shooter = possessions(g.ev.filter(e => e.q === g.q)).owner;
+      add(b.dataset.ball, b.dataset.ball === shooter ? "OR" : "DR", 0);
+    }
+  }
+  else if(b.dataset.act){ disarm(); const [s,t,m] = b.dataset.act.split("|"); add(s, t, Number(m)); }
   else if(b.dataset.q){ cur().q = b.dataset.q; save(); render(); }
+  else if(b.id === "swap"){
+    const now = ballNow(); if(now === null) return;
+    disarm();
+    const g = cur(), target = now === "reb" ? OTHER(possessions(g.ev.filter(e => e.q === g.q)).owner) : OTHER(now);
+    add(target, "BX", 0);
+  }
   else if(b.id === "undo"){ disarm(); if(cur().ev.length){ cur().ev.pop(); touch(); } render(); }
   else if(b.dataset.id){
     if(armId === b.dataset.id){ const g = cur(); g.ev = g.ev.filter(x => x.id !== armId); disarm(); touch(); render(); }
