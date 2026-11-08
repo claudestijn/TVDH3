@@ -1119,6 +1119,21 @@ const STATS = {
       [13,"Lucas Rojas",           "21:23",15, 1,1, 1,4, 0, -12, 1],
       [14,"Jan Griewatz",          "11:49", 0, 0,0, 0,0, 5, -15, 1],
       [15,"Gerhard Loeschke",      "21:55", 4, 0,2, 2,0, 1,  -9, 0]
+    ]},
+  "2026-10-18": { q:[14,12,15,17], oq:[11,15,16,11], opp:{ftm:12,p2:13,p3:5,pf:15},
+    p:[
+      [4, "Matthias Schöning",     "19:54", 4, 0,2, 2,0, 1,  11, 0],
+      [5, "Jonas Dau",             "20:55", 7, 1,2, 3,0, 2,   1, 1],
+      [6, "Sadik Alkan",           "00:00", 0, 0,0, 0,0, 0,   0, 0],
+      [7, "Tom Schneider",         "09:06", 0, 0,0, 0,0, 1,  -1, 0],
+      [8, "Til Grünwaldt",         "18:12", 8, 0,0, 4,0, 1,   9, 0],
+      [9, "Stijn Van Den Broek",   "13:49", 4, 0,0, 2,0, 2,   1, 0],
+      [10,"Jannick Swoboda",       "00:44", 0, 0,0, 0,0, 0,   0, 0],
+      [11,"Fabian Birk",           "29:08",12, 2,3, 5,0, 0,   5, 1],
+      [12,"Roman Kirsch",          "21:47", 4, 0,1, 2,0, 4,  -4, 1],
+      [13,"Alexander Poser",       "13:30", 2, 0,0, 1,0, 3,  16, 0],
+      [14,"Jan Griewatz",          "26:29", 3, 1,3, 1,0, 4, -11, 1],
+      [15,"Lucas Rojas",           "26:21",14, 0,0, 1,4, 3,  -2, 1]
     ]}
 };
 
@@ -1169,7 +1184,7 @@ const Stats = (function(){
       return (typeof x==="string"?x.localeCompare(y):(x-y))*sortDir || b.pts-a.pts;});
     const cols=[["name","Spieler"],["gp","Sp"],["min","Min Ø"],["pts","Pkt"],["ppg","Ø"],["ft","FW"],["p3","3er"],["pf","F"],["pm","+/-"]];
     let h='<table class="stbl"><thead><tr>'+cols.map(([k,l])=>'<th data-sort="'+k+'"'+(k===sortKey?' class="on"':'')+'>'+l+(k===sortKey?(sortDir<0?' ▾':' ▴'):'')+'</th>').join("")+'</tr></thead><tbody>';
-    h+=rows.map(a=>'<tr><td class="nm" title="'+esc(a.name)+'"><i>'+a.no+'</i>'+esc(a.name)+'</td><td>'+a.gp+'</td><td>'+(a.gp?mmss(a.sec/a.gp):"–")+'</td>'+
+    h+=rows.map(a=>'<tr><td class="nm" title="'+esc(a.name)+'">'+esc(a.name)+'</td><td>'+a.gp+'</td><td>'+(a.gp?mmss(a.sec/a.gp):"–")+'</td>'+
       '<td class="hi">'+a.pts+'</td><td>'+(a.gp?r1(a.pts/a.gp):"–")+'</td><td'+(a.fta?'':' class="dim"')+'>'+a.ftm+'/'+a.fta+'</td>'+
       '<td'+(a.p3?'':' class="dim"')+'>'+a.p3+'</td><td>'+a.pf+'</td><td'+(a.pm>0?' class="pos"':'')+'>'+sgn(a.pm)+'</td></tr>').join("");
     document.getElementById("stPlayers").innerHTML=list.length?h+'</tbody></table>':'<p class="hint" style="margin:0">Noch keine Spiele erfasst.</p>';
@@ -1191,7 +1206,7 @@ const Stats = (function(){
     return '<details class="sgame '+(g.home?'home':'away')+'"><summary><span class="sg-d">'+dm(g.date)+'</span>'+
       '<span class="sg-o">'+(g.home?'vs ':'@ ')+esc(g.opp)+'</span><span class="score">'+scoreHtml({our:us,opp:them,win})+'</span></summary>'+
       '<div class="sg-body"><h4>Viertel</h4><div class="stbl-wrap">'+qt+'</div><h4>Teamvergleich</h4><div class="stbl-wrap">'+cmp+'</div>'+
-      '<h4>Boxscore TVD 3</h4><div class="stbl-wrap">'+box+'</div><p class="stnote">● = Starter · Quelle: DBB.Scores (Spiel-ID '+s.match+')</p></div></details>';
+      '<h4>Boxscore TVD 3</h4><div class="stbl-wrap">'+box+'</div><p class="stnote">● = Starter · Quelle: DBB.Scores'+(s.match?' (Spiel-ID '+s.match+')':'')+'</p></div></details>';
   }
 
   function render(){
