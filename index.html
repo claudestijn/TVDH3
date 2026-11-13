@@ -387,16 +387,18 @@
   .game.past:has(.vid){opacity:.85}
 
   /* ---- Taktik ---- */
-  .pb-plays{display:flex;gap:2px;margin:16px 0 2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line)}
-  .pb-plays button{flex:0 0 auto;appearance:none;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font-family:var(--disp);font-weight:700;font-size:20px;line-height:1;padding:10px 12px 9px;min-height:44px;cursor:pointer;text-align:left}
-  .pb-plays button[aria-selected=true]{color:var(--text);border-bottom-color:var(--home)}
-  .pb-plays small{display:block;font-family:var(--body);font-weight:500;font-size:11px;color:var(--muted-2);margin-top:3px}
-  .pb-groups{display:flex;gap:6px;margin:4px 0 10px;flex-wrap:wrap}
-  .pb-groups:empty{display:none}
-  .pb-gb{flex:1 1 0;min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-family:var(--disp);font-weight:600;font-size:18px;border-radius:4px;cursor:pointer;padding:0 8px}
-  .pb-gb[aria-pressed=true]{background:var(--home);color:#fff;border-color:var(--home)}
-  .pb-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-  .pb-ch{min-height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--line-strong);background:transparent;color:var(--text);font-family:var(--body);font-weight:500;font-size:14px;cursor:pointer}
+  .pb-plays{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0 10px}
+  .pb-plays button{appearance:none;min-width:0;hyphens:auto;-webkit-hyphens:auto;min-height:72px;display:flex;flex-direction:column;justify-content:space-between;gap:6px;text-align:left;padding:12px 12px 10px;border:1px solid var(--line-strong);border-radius:4px;background:var(--surface);color:var(--text);font-family:var(--disp);font-weight:700;font-size:24px;line-height:1;cursor:pointer}
+  .pb-plays button[aria-selected=true]{background:var(--home);border-color:var(--home);color:#fff}
+  .pb-plays small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
+  .pb-plays button[aria-selected=true] small{color:#F2C4C5}
+  .pb-menu{margin:4px 0 12px}
+  .pb-row{display:grid;grid-template-columns:80px minmax(0,1fr);gap:10px;align-items:start;padding:8px 0;border-top:1px solid var(--line)}
+  .pb-row:first-child{border-top:0}
+  .pb-row.solo{grid-template-columns:minmax(0,1fr)}
+  .pb-gl{font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:11px}
+  .pb-cs{display:flex;gap:6px;flex-wrap:wrap}
+  .pb-ch{min-height:38px;padding:0 14px;border-radius:20px;border:1px solid var(--line-strong);background:transparent;color:var(--text);font-family:var(--body);font-weight:500;font-size:14px;cursor:pointer}
   .pb-ch[aria-pressed=true]{background:#fff;color:#121212;border-color:#fff}
   .pb-court{background:var(--surface);border-radius:4px;padding:8px}
   .pb-ctl{display:flex;align-items:center;gap:8px;margin-top:10px}
@@ -404,7 +406,7 @@
   .pb-bt.pri{background:var(--home);border-color:var(--home);min-width:92px}
   .pb-bt svg{width:18px;height:18px;fill:currentColor}
   .pb-ctl input[type=range]{flex:1;min-width:0;accent-color:var(--home);height:44px}
-  .pb-bt:focus-visible,.pb-ch:focus-visible,.pb-gb:focus-visible,.pb-plays button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .pb-bt:focus-visible,.pb-ch:focus-visible,.pb-plays button:focus-visible{outline:2px solid #fff;outline-offset:2px}
   .pb-ttl{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin:16px 0 6px}
   .pb-ttl h2{font-family:var(--disp);font-weight:700;font-size:24px;line-height:1.1}
   .pb-ttl span{color:var(--muted);font-family:var(--disp);font-weight:600;font-size:16px;white-space:nowrap}
@@ -419,7 +421,7 @@
   .lk b{color:var(--muted);font-weight:600}
   .lk:hover{background:var(--surface-2)}
   .lk:focus-visible{outline:2px solid var(--text);outline-offset:2px}
-  @media(max-width:420px){.pb-gb{font-size:16px}.pb-bt.pri{min-width:78px}.pb-plays button{font-size:18px;padding:10px 9px 9px}}
+  @media(max-width:420px){.pb-bt.pri{min-width:78px}.pb-plays{gap:6px}.pb-plays button{font-size:19px;padding:10px 8px 9px;min-height:66px}.pb-row{grid-template-columns:74px minmax(0,1fr);gap:6px}.pb-gl{font-size:12px;letter-spacing:.03em}}
 </style>
 </head>
 <body>
@@ -579,8 +581,7 @@
   <section class="panel" id="taktik" role="tabpanel">
     <div class="pb-plays" id="pbPlays" role="tablist" aria-label="Spielzug"></div>
     <p class="maphead" id="pbSub"></p>
-    <div class="pb-groups" id="pbGroups" role="group" aria-label="Gruppe"></div>
-    <div class="pb-chips" id="pbChips" role="group" aria-label="Variante"></div>
+    <div class="pb-menu" id="pbChips" role="group" aria-label="Variante"></div>
     <div class="pb-court">
       <svg viewBox="-0.4 -1.1 15.8 15.5" role="img" aria-label="Animiertes Spielfeld">
         <g id="pbLines" fill="none" stroke="rgba(255,255,255,.5)" stroke-width=".06"></g>
@@ -1491,6 +1492,10 @@ const BOX=[
   steps:[...B_BASE,st(.5,P('1','3')),st(1.6,{p:'1',k:'c',pts:[[7.5,0.4],[11.4,1.6],[13.2,5.3]]},{p:'2',k:'c',pts:[[7.9,7.2],[7.3,8.4]]})]}
 ].map(s=>({...s,play:'box',pl:B_PL,ball:'1'}));
 
+const CH={'baseline-45':'vom 45','baseline-ecke':'aus der Ecke','baseline-slot':'vom Slot','baseline-bsp1':'Spacing 1','baseline-bsp2':'Spacing 2',
+  'middle-45':'vom 45','middle-bsp':'Spacing','lowpost-baseline':'zur Baseline','lowpost-mitte':'zur Mitte',
+  'ballseite-baseline':'Baseline → Elbow','ballseite-middle':'Middle → Short Corner'};
+CM.forEach(x=>{if(CH[x.id])x.ch=CH[x.id];});
 const SC=[...HORNS,...BOX,...CM];
 const $=id=>document.getElementById('pb'+id[0].toUpperCase()+id.slice(1));
 
@@ -1661,8 +1666,9 @@ function select(i,auto){
   if(shown&&!/sync=/.test(location.hash)&&location.hash.slice(1)!==s.id)history.replaceState(null,'',location.pathname+location.search+'#'+s.id);
   $('plays').innerHTML=PLAYS.map(p=>`<button role="tab" aria-selected="${p.id===s.play}" data-p="${p.id}">${p.name}<small>${p.kind}</small></button>`).join('');
   $('sub').textContent=pl.sub;
-  $('groups').innerHTML=pl.groups.length>1?pl.groups.map(g=>`<button class="pb-gb" aria-pressed="${g===s.g}" data-g="${g}">${g}</button>`).join(''):'';
-  $('chips').innerHTML=SC.map((x,j)=>x.play===s.play&&x.g===s.g?`<button class="pb-ch" aria-pressed="${j===cur}" data-i="${j}">${x.name}</button>`:'').join('');
+  const solo=pl.groups.length<2;
+  $('chips').innerHTML=pl.groups.map(g=>`<div class="pb-row${solo?' solo':''}">${solo?'':`<span class="pb-gl">${g}</span>`}<div class="pb-cs">`+
+    SC.map((x,j)=>x.play===s.play&&x.g===g?`<button class="pb-ch" aria-pressed="${j===cur}" data-i="${j}">${x.ch||x.name}</button>`:'').join('')+`</div></div>`).join('');
   $('name').innerHTML=(s.lab?`<span class="pb-lab">${s.lab}</span>`:'')+(s.lab?s.name:s.g+' · '+s.name);
   $('cnt').textContent=(list.indexOf(s)+1)+' / '+list.length;
   $('txt').textContent=s.txt;$('hll').textContent=pl.hll;$('src').textContent=pl.src;
@@ -1677,7 +1683,6 @@ function step(d){
 }
 
 $('plays').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b)select(SC.findIndex(x=>x.play===b.dataset.p),true);});
-$('groups').addEventListener('click',e=>{const g=e.target.closest('[data-g]');if(g)select(SC.findIndex(x=>x.play===SC[cur].play&&x.g===g.dataset.g),true);});
 $('chips').addEventListener('click',e=>{const c=e.target.closest('[data-i]');if(c)select(+c.dataset.i,true);});
 $('prev').addEventListener('click',()=>step(-1));
 $('next').addEventListener('click',()=>step(1));
