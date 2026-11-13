@@ -146,29 +146,32 @@
     .match .opp{font-size:15px}
   }
 
-  /* ---- Map ---- */
+  /* ---- Abschnittstexte ---- */
   .maphead{color:var(--muted);font-size:13px;margin:16px 2px 12px;max-width:60ch}
-  .mapcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px 8px 4px;overflow:hidden}
   svg{display:block;width:100%;height:auto}
-  .legend{display:flex;gap:18px;flex-wrap:wrap;margin:14px 2px 4px;font-size:13px;color:var(--muted)}
-  .legend .k{display:inline-flex;align-items:center;gap:7px}
-  .dotk{width:11px;height:11px;border-radius:50%;flex:none}
-  .dotk.h{background:var(--home)}
-  .dotk.a{background:var(--away)}
-
-  .dist{margin-top:20px}
-  .dist h3{font-family:var(--disp);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-size:13px;margin:0 2px 10px}
-  .drow{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--away);border-radius:12px;margin-bottom:7px}
-  .drow .t{font-weight:600;flex:1}
-  .drow .t small{display:block;color:var(--muted);font-weight:400;font-size:12px;margin-top:2px}
-  .drow .bar{flex:1.4;height:6px;background:color-mix(in srgb,var(--text) 6%,transparent);border-radius:999px;overflow:hidden;max-width:220px}
-  .drow .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--away),var(--away-light));border-radius:999px}
-  .drow .val{font-family:var(--disp);font-weight:700;font-size:18px;min-width:64px;text-align:right}
-  .drow .val small{font-weight:500;font-size:12px;color:var(--muted)}
-  @media(max-width:520px){.drow .bar{display:none}}
 
   footer{color:var(--muted-2);font-size:12px;text-align:center;margin-top:30px;line-height:1.6}
   footer b{color:var(--muted);font-weight:600}
+
+  /* ---- Route-Link (Auswärtsspiele) ---- */
+  .route{color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;border-bottom:1px solid var(--line-strong);white-space:nowrap}
+  .route:hover{color:var(--text)}
+  .next .route{font-size:13px;margin-left:6px}
+
+  /* ---- Tabelle ---- */
+  .ltab summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .ltab summary::-webkit-details-marker{display:none}
+  .ltab summary h3{font-family:var(--disp);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text);font-size:14px}
+  .ltab summary .lt-me{font-family:var(--disp);font-weight:700;font-size:18px;color:var(--text)}
+  .ltab summary .lt-me small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);margin-left:6px}
+  .ltab summary::after{content:"＋";color:var(--muted-2);margin-left:auto}
+  .ltab[open] summary::after{content:"－"}
+  .ltab .stbl{min-width:0;margin-top:12px}
+  .ltab .stbl tr.us td{color:var(--text);font-weight:700;background:color-mix(in srgb,var(--home) 14%,transparent)}
+  .ltab .stbl td.tm{text-align:left;white-space:normal;position:static;background:none}
+  .ltab .stbl tr.us td.tm{background:color-mix(in srgb,var(--home) 14%,transparent)}
+  .ltab .stbl th:nth-child(2){text-align:left;position:static;background:none}
+  .ltab .lt-note{color:var(--muted-2);font-size:12px;margin-top:8px}
 
   /* ---- Tischdienst ---- */
   .dutystatus{color:var(--muted);font-size:14px;padding:20px 2px}
@@ -261,12 +264,6 @@
   .linkbtn{appearance:none;background:transparent;border:0;color:var(--away-light);text-decoration:underline;cursor:pointer;font-family:var(--body);font-size:12.5px;padding:0}
   .modenote{background:color-mix(in srgb,var(--away) 12%,transparent);border:1px solid color-mix(in srgb,var(--away) 30%,transparent);color:var(--away-light);border-radius:10px;padding:9px 12px;font-size:12.5px;line-height:1.5;margin:-6px 2px 14px}
   .modenote b{color:var(--away-light);font-weight:700}
-  .modenote.ok{background:rgba(80,200,140,.12);border-color:rgba(80,200,140,.35);color:#9be3bd}
-  .modenote.ok b{color:#c9f2dc}
-  .rostermgr.sync summary{color:var(--away-light)}
-  .synctext{width:100%;min-height:66px;background:var(--ink);border:1px solid var(--line-strong);border-radius:10px;color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;padding:9px 11px;margin:8px 0;resize:vertical;word-break:break-all}
-  .synctext:focus{outline:2px solid var(--home);outline-offset:0}
-  .synhr{height:1px;background:var(--line);margin:14px 0}
 
   .deadline{display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 14px;margin-bottom:16px;font-size:13.5px;border:1px solid var(--line-strong)}
   .deadline .dl-ic{font-family:var(--disp);font-weight:700;font-size:20px;line-height:1}
@@ -325,16 +322,6 @@
     *{animation:none !important;transition:none !important}
   }
 
-  /* ---- Karte (SVG) über Tokens ---- */
-  .m-ring{stroke:color-mix(in srgb,var(--text) 10%,transparent)}
-  .m-rt{fill:var(--muted-2)}
-  .m-north line{stroke:var(--muted-2)} .m-north path,.m-north text{fill:var(--muted-2)}
-  .m-spoke{stroke:color-mix(in srgb,var(--away) 30%,transparent)}
-  .m-pin{fill:var(--away);stroke:var(--surface)}
-  .m-town{fill:var(--text)} .m-sub{fill:var(--muted)}
-  .m-home{fill:var(--home);stroke:var(--surface)}
-  .m-homering{stroke:color-mix(in srgb,var(--home) 40%,transparent)}
-  .m-homelbl{fill:var(--home)}
   /* TVD-Design (C1): rote Kopfzeile, schwarzer Körper; beim Scrollen kompakt */
   :root[data-theme="c1"]{
     --ink:#121212; --surface:#1C1C1C; --surface-2:#262626;
@@ -356,7 +343,7 @@
   [data-theme="c1"] .next{background:var(--surface);border:0;border-top:4px solid var(--home);border-radius:4px}
   [data-theme="c1"] .next .lbl{color:var(--home)}
   [data-theme="c1"] .next .when .d{font-size:32px}
-  [data-theme="c1"] .stat{border-radius:4px} [data-theme="c1"] .game,[data-theme="c1"] .dutygame,[data-theme="c1"] .dcard,[data-theme="c1"] .drow{border-radius:4px}
+  [data-theme="c1"] .stat{border-radius:4px} [data-theme="c1"] .game,[data-theme="c1"] .dutygame,[data-theme="c1"] .dcard{border-radius:4px}
   [data-theme="c1"] .stat.home .n{color:var(--home)} [data-theme="c1"] .stat.away .n{color:#fff}
   [data-theme="c1"] .role .act.add,[data-theme="c1"] .btn{background:var(--home);color:#fff}
   [data-theme="c1"] .btn.ghost{background:transparent;color:var(--muted)}
@@ -430,10 +417,8 @@
   <div class="head-inner">
     <div class="eyebrow">BBW4 Kreisliga Mitte · Alb/Bodensee</div>
     <div class="title">TVD Herren <span>3</span> · Saison 26/27</div>
-    <div class="sub">Spielplan &amp; Anfahrten — TV Derendingen 3</div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" aria-selected="true" data-tab="plan">Spielplan</button>
-      <button class="tab" role="tab" aria-selected="false" data-tab="map">Karte</button>
       <button class="tab" role="tab" aria-selected="false" data-tab="duty">Tischdienst</button>
       <button class="tab" role="tab" aria-selected="false" data-tab="stats">Stats</button>
       <button class="tab" role="tab" aria-selected="false" data-tab="taktik">Taktik</button>
@@ -451,22 +436,9 @@
       <div class="stat"><div class="n">127<small style="font-size:13px"> km</small></div><div class="l">Auswärts einfach</div></div>
     </div>
     <div class="next" id="nextGame"></div>
+    <details class="dcard ltab" id="ligaTable" style="display:none"></details>
     <div id="schedule"></div>
     <div class="resbar"><button id="resRefresh" class="btn ghost">Ergebnisse aktualisieren</button><span id="resInfo"></span></div>
-  </section>
-
-  <!-- KARTE -->
-  <section class="panel" id="map" role="tabpanel">
-    <p class="maphead">Alle Spielorte relativ zu Derendingen (Heimbasis). Ringe = Luftlinie 10 / 20 / 30 km, Zahlen = <b style="color:var(--muted)">ca. Fahrstrecke</b> ab der Kreissporthalle. Norden ist oben.</p>
-    <div class="mapcard"><div id="svgHost"></div></div>
-    <div class="legend">
-      <span class="k"><span class="dotk h"></span> Heim · Derendingen (7 Spiele)</span>
-      <span class="k"><span class="dotk a"></span> Auswärts (7 Orte)</span>
-    </div>
-    <div class="dist">
-      <h3>Anfahrt ab Derendingen · ca.</h3>
-      <div id="distList"></div>
-    </div>
   </section>
 
   <!-- TISCHDIENST -->
@@ -528,28 +500,7 @@
             <div id="adminOpen" class="hint" style="margin-bottom:12px"></div>
             <button id="distribute" class="btn">Offene fair verteilen</button>
             <button id="adminReset" class="btn ghost" style="margin-left:8px">Alle Zuteilungen leeren</button>
-            <div class="synhr"></div>
-            <h4 class="synch">Live-Sync (Server)</h4>
-            <p class="hint">Echtes Teilen über einen JSON-Endpunkt (GET/PUT), z.B. ein Blob von <b style="color:var(--muted)">jsonblob.com</b>. URL einfügen und „Verbinden" — alle Geräte mit derselben URL sehen live denselben Stand. Ob die App-Umgebung externe Verbindungen zulässt, zeigt sich sofort beim Verbinden.</p>
-            <div class="addrow"><input id="syncUrlInput" type="text" placeholder="https://jsonblob.com/api/jsonBlob/…" autocomplete="off" /><button id="syncUrlSet" class="btn">Verbinden</button></div>
-            <button id="syncUrlClear" class="btn ghost">Trennen</button>
-            <div id="syncUrlMsg" class="hint" style="margin-top:8px"></div>
           </div>
-        </div>
-      </details>
-
-      <!-- Sichern & Teilen -->
-      <details class="rostermgr sync">
-        <summary>Sichern &amp; Teilen (Code)</summary>
-        <div class="rosterbox">
-          <p class="hint">Server-unabhängige Sicherung: erzeugt einen Code des aktuellen Stands (Kader, Eintragungen, Befreiungen). Poste ihn z.B. im Team-Chat. Zum Übernehmen Code einfügen und laden (nur Admin).</p>
-          <button id="syncExport" class="btn">Aktuellen Stand als Code</button>
-          <textarea id="syncOut" class="synctext" readonly placeholder="Hier erscheint der Code…"></textarea>
-          <button id="syncCopy" class="btn ghost">Markieren / kopieren</button>
-          <div class="synhr"></div>
-          <textarea id="syncIn" class="synctext" placeholder="Code hier einfügen…"></textarea>
-          <button id="syncImport" class="btn">Stand aus Code laden</button>
-          <div id="syncMsg" class="hint" style="margin-top:8px"></div>
         </div>
       </details>
 
@@ -620,13 +571,12 @@
   </section>
 
   <footer>
-    Datenquelle: basketball-bund.net (TeamSL), Liga&nbsp;55489 · Fahrstrecken gerundet (ca.), Luftlinien geokodiert.<br>
+    Datenquelle: basketball-bund.net (TeamSL), Liga&nbsp;55489 · Fahrstrecken gerundet (ca.).<br>
     Anwurfzeiten mit <b>„Zeit offen"</b> sind im Verband noch nicht angesetzt.
   </footer>
 </main>
 
 <script>
-const HOME = {name:"Derendingen", lat:48.500802, lon:9.056901};
 
 const games = [
   {date:"2026-10-10", time:"12:45", opp:"TB Kirchentellinsfurt 2", home:false, town:"Kirchentellinsfurt", km:11, lat:48.531019, lon:9.149446, hall:"Neue Sporthalle"},
@@ -659,16 +609,18 @@ const isPast = g => gameStart(g).getTime()+GAME_LEN_MS <= Date.now();
 
 // ---- ERGEBNISSE (aus Apps Script, Quelle basketball-bund.net) ----
 const API_URL = "https://script.google.com/macros/s/AKfycbz6wi1cBqOI4Pa7vONWNMX8hZhjNwPNLz3EcGdKYqUiRNvJZm5wfsooQdRhtcNUWJXEtw/exec";   // Apps Script Web-App (einzige Stelle für die URL)
-let RESULTS = {}, RES_UPDATED = "";
-// Spielvideos: Sheet-Tab "Videos" (Datum + Drive-Link), kommt mit ?action=results.
-// VIDEOS_LOCAL nur als Notfall, falls der Server nichts liefert: {"2026-10-10":"https://drive.google.com/…"}
-let VIDEOS = {};
-const VIDEOS_LOCAL = {
-  "2026-10-10":"https://drive.google.com/file/d/1ceb4PCyNKpywoxP8NMc6jNgFKQYuMIVy/view",
-  "2026-10-18":"https://drive.google.com/file/d/1kEgQlTTN7Bf-BBGHr3fnFIGDEx8r0PI_/view",
-  "2026-11-08":"https://drive.google.com/file/d/1IKSOCS78dTbumz6fR7CRmrrST8meXp_W/view"
-};
-function videoUrl(g){const u=VIDEOS[g.date]||VIDEOS_LOCAL[g.date]||"";return /^https:\/\//.test(u)?u.replace(/"/g,"%22"):"";}
+// Zwischenspeicher pro Gerät: zuletzt vom Server geladene Ergebnisse/Videos/Tabelle/Stats.
+// Nur Lese-Cache für den Start und für Funklöcher — die Wahrheit bleibt der Server.
+const CACHE_KEY = "tvdh3:cache:v1";
+function cacheGet(k){try{return (JSON.parse(localStorage.getItem(CACHE_KEY)||"{}"))[k]||null;}catch(e){return null;}}
+function cacheSet(k,v){try{const o=JSON.parse(localStorage.getItem(CACHE_KEY)||"{}");o[k]=v;localStorage.setItem(CACHE_KEY,JSON.stringify(o));}catch(e){}}
+const RC = cacheGet("results") || {};
+let RESULTS = RC.results || {}, RES_UPDATED = RC.updated || "";
+// Spielvideos: Sheet-Tab "Videos" (Datum + Drive-Link), Ligatabelle: Tab "Tabelle" — beides kommt mit ?action=results
+let VIDEOS = RC.videos || {};
+let TABLE = RC.table || null;
+function videoUrl(g){const u=VIDEOS[g.date]||"";return /^https:\/\//.test(u)?u.replace(/"/g,"%22"):"";}
+function routeUrl(g){return "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent((g.hall?g.hall+", ":"")+g.town);}
 function scoreHtml(r){return '<span class="res '+(r.win?'w':'l')+'">'+(r.win?'S':'N')+'</span>'+r.our+':'+r.opp;}
 async function loadResults(refresh){
   for(let a=0;a<3;a++){                               // bis zu 3 Versuche (Apps Script Kaltstart)
@@ -677,8 +629,11 @@ async function loadResults(refresh){
       if(r.ok){
         const j = JSON.parse(await r.text());
         if(j && j.results && typeof j.results==="object"){
-          RESULTS = j.results; RES_UPDATED = j.updated || ""; if(j.videos && typeof j.videos==="object" && JSON.stringify(j.videos)!==JSON.stringify(VIDEOS)){ VIDEOS = j.videos; try{ Stats.render(); }catch(e){} }
-          renderSchedule(); renderNext(); renderResInfo();
+          RESULTS = j.results; RES_UPDATED = j.updated || "";
+          if(j.videos && typeof j.videos==="object" && JSON.stringify(j.videos)!==JSON.stringify(VIDEOS)){ VIDEOS = j.videos; try{ Stats.render(); }catch(e){} }
+          if(j.table && Array.isArray(j.table.rows) && j.table.rows.length) TABLE = j.table;
+          cacheSet("results",{results:RESULTS,updated:RES_UPDATED,videos:VIDEOS,table:TABLE});
+          renderSchedule(); renderNext(); renderResInfo(); renderTable();
           return true;
         }
       }
@@ -699,6 +654,23 @@ async function initResults(){
 }
 function renderResInfo(){const el=document.getElementById("resInfo");if(el)el.textContent=RES_UPDATED?"Stand: "+RES_UPDATED:"";}
 
+// ---- TABELLE ----
+function renderTable(){
+  const el=document.getElementById("ligaTable");
+  if(!TABLE||!TABLE.rows||!TABLE.rows.length){el.style.display="none";return;}
+  const rows=TABLE.rows, me=rows.find(r=>r.us), full=TABLE.ok!==false, wasOpen=el.open;
+  const esc=x=>String(x).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const sg=v=>v===null||v===undefined?"":(v>0?"+":"")+v;
+  const sum='<summary><h3>Tabelle</h3>'+(me?'<span class="lt-me">Platz '+me.rank+'<small>von '+rows.length+(full?' · '+me.wins+'–'+me.losses:'')+'</small></span>':'')+'</summary>';
+  const head=full?'<tr><th>Pl.</th><th>Team</th><th>Sp</th><th>S</th><th>N</th><th>Diff</th></tr>':'<tr><th>Pl.</th><th>Team</th></tr>';
+  const body=rows.map(r=>'<tr'+(r.us?' class="us"':'')+'><td>'+r.rank+'</td><td class="tm">'+esc(r.team)+'</td>'+
+    (full?'<td>'+r.games+'</td><td>'+r.wins+'</td><td>'+r.losses+'</td><td'+(r.diff>0?' class="pos"':'')+'>'+sg(r.diff)+'</td>':'')+'</tr>').join("");
+  el.innerHTML=sum+'<table class="stbl"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>'+
+    '<p class="lt-note">Quelle: basketball-bund.net'+(TABLE.updated?' · Stand '+esc(TABLE.updated):'')+'</p>';
+  el.open=wasOpen; el.style.display="block";
+}
+renderTable();
+
 // ---- NEXT GAME CARD ----
 function renderNext(){
   const host = document.getElementById("nextGame");
@@ -715,7 +687,7 @@ function renderNext(){
   let lastHtml = "";
   for(let i=nextIdx-1;i>=0;i--){ const lg=games[i], lr=RESULTS[lg.date];
     if(lr){ lastHtml='<div class="last">Letztes Spiel: <b>'+scoreHtml(lr).replace('<span','<span style="vertical-align:1px"')+'</b> '+(lg.home?'vs ':'@ ')+lg.opp+'</div>'; break; } }
-  const place = g.home ? "Heim · Derendingen" : "Auswärts · "+g.town+(g.km?" · ca. "+g.km+" km":"");
+  const place = g.home ? "Heim · Derendingen" : "Auswärts · "+g.town+(g.km?" · ca. "+g.km+" km":"")+'<a class="route" href="'+routeUrl(g)+'" target="_blank" rel="noopener">Route ↗</a>';
   host.innerHTML =
     '<div><div class="lbl">'+lbl.trim()+'</div>'+
     '<div class="mu">TVD 3 '+(g.home?'vs':'@')+' '+g.opp+'</div>'+
@@ -745,7 +717,7 @@ function renderSchedule(){
       : g.time ? '<div class="time">'+g.time+'</div>' : '<div class="time open">Zeit offen</div>';
     const venue = g.home
       ? '<span class="pin" style="background:var(--home)"></span> Derendingen (Heim)'
-      : '<span class="pin" style="background:var(--away)"></span> '+g.town+' <span class="km">· ca. '+g.km+' km</span>';
+      : '<span class="pin" style="background:var(--away)"></span> '+g.town+' <span class="km">· ca. '+g.km+' km</span> <a class="route" href="'+routeUrl(g)+'" target="_blank" rel="noopener">Route ↗</a>';
     const hallLine = g.hall ? '<div class="hall">'+g.hall+'</div>' : '';
     row.innerHTML =
       '<div class="date"><div class="dow">'+DOW[dt.getDay()]+'</div><div class="dm">'+dt.getDate()+'.'+(dt.getMonth()+1)+'.</div></div>'+
@@ -775,91 +747,13 @@ document.getElementById("resRefresh").addEventListener("click", async e=>{
   if(!ok) info.textContent="Abruf fehlgeschlagen – Apps Script neu bereitgestellt?";
 });
 
-// ---- DISTANCE LIST ----
-(function(){
-  const host = document.getElementById("distList");
-  const away = games.filter(g=>!g.home).sort((a,b)=>b.km-a.km);
-  const max = Math.max(...away.map(g=>g.km));
-  away.forEach(g=>{
-    const dt = d(g.date);
-    const r = document.createElement("div"); r.className="drow";
-    r.innerHTML =
-      '<div class="t">'+g.town+'<small>@ '+g.opp+' · '+DOW[dt.getDay()]+' '+dt.getDate()+'.'+(dt.getMonth()+1)+'.</small></div>'+
-      '<div class="bar"><i style="width:'+(g.km/max*100)+'%"></i></div>'+
-      '<div class="val">'+g.km+'<small> km</small></div>';
-    host.appendChild(r);
-  });
-})();
-
-// ---- MAP (self-contained SVG, geo-accurate, uniform scale) ----
-(function(){
-  const kmLat = 111.19, kmLon = 111.32*Math.cos(HOME.lat*Math.PI/180);
-  const away = games.filter(g=>!g.home);
-  // project to km east/north relative to home
-  const pts = away.map(g=>({
-    ...g,
-    e:(g.lon-HOME.lon)*kmLon,
-    n:(g.lat-HOME.lat)*kmLat
-  }));
-  const all = [{e:0,n:0}, ...pts];
-  const pad = 6.5;
-  let minE=Math.min(...all.map(p=>p.e))-pad, maxE=Math.max(...all.map(p=>p.e))+pad;
-  let minN=Math.min(...all.map(p=>p.n))-pad, maxN=Math.max(...all.map(p=>p.n))+pad;
-  const spanE=maxE-minE, spanN=maxN-minN;
-  const PX = 620/spanE;                 // uniform px per km
-  const W = spanE*PX, H = spanN*PX;
-  const X = e => (e-minE)*PX;
-  const Y = n => (maxN-n)*PX;           // north up
-  const hx=X(0), hy=Y(0);
-
-  let s = '<svg viewBox="0 0 '+W.toFixed(0)+' '+H.toFixed(0)+'" role="img" aria-label="Karte der Spielorte um Derendingen">';
-  // subtle background
-  s += '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="none"/>';
-  // distance rings
-  [10,20,30].forEach(km=>{
-    const r=km*PX;
-    s += '<circle cx="'+hx+'" cy="'+hy+'" r="'+r+'" class="m-ring" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="1" stroke-dasharray="3 5"/>';
-    s += '<text x="'+hx+'" y="'+(hy-r+16)+'" class="m-rt" fill="#5a6c88" font-family="Barlow Condensed,sans-serif" font-size="13" text-anchor="middle">'+km+' km</text>';
-  });
-  // north arrow
-  s += '<g class="m-north" opacity=".55"><line x1="'+(W-26)+'" y1="26" x2="'+(W-26)+'" y2="52" stroke="#8093ad" stroke-width="1.5"/>'+
-       '<path d="M'+(W-26)+' 20 l5 10 h-10 z" fill="#8093ad"/>'+
-       '<text x="'+(W-26)+'" y="66" fill="#8093ad" font-family="Barlow Condensed,sans-serif" font-size="12" text-anchor="middle">N</text></g>';
-  // spokes
-  pts.forEach(p=>{
-    s += '<line x1="'+hx+'" y1="'+hy+'" x2="'+X(p.e)+'" y2="'+Y(p.n)+'" class="m-spoke" stroke="rgba(245,165,36,.28)" stroke-width="1.4"/>';
-  });
-  // away pins + labels (radial outward)
-  pts.forEach(p=>{
-    const px=X(p.e), py=Y(p.n);
-    const dist=Math.hypot(p.e,p.n)||1;
-    const ux=p.e/dist, uy=p.n/dist;
-    const off=15;
-    const lx=px+ux*off, ly=py-uy*off;      // svg y inverted
-    const anchor = ux>0.35?"start":(ux<-0.35?"end":"middle");
-    const dt=d(p.date);
-    const dmy=dt.getDate()+'.'+(dt.getMonth()+1)+'.';
-    s += '<circle cx="'+px+'" cy="'+py+'" r="6.5" class="m-pin" fill="#F5A524" stroke="#0E1726" stroke-width="2"/>';
-    s += '<text x="'+lx+'" y="'+ly+'" text-anchor="'+anchor+'" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="16" class="m-town" fill="#EAF0F8">'+p.town+'</text>';
-    s += '<text x="'+lx+'" y="'+(ly+15)+'" text-anchor="'+anchor+'" font-family="Inter,sans-serif" font-size="12" class="m-sub" fill="#93A4BE">'+dmy+' · ca. '+p.km+' km</text>';
-  });
-  // home hub on top
-  s += '<circle cx="'+hx+'" cy="'+hy+'" r="10" class="m-home" fill="#3E7BFA" stroke="#0E1726" stroke-width="2.5"/>';
-  s += '<circle cx="'+hx+'" cy="'+hy+'" r="18" fill="none" class="m-homering" stroke="rgba(62,123,250,.4)" stroke-width="1.5"/>';
-  s += '<text x="'+(hx)+'" y="'+(hy+34)+'" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="17" class="m-homelbl" fill="#3E7BFA">Derendingen</text>';
-  s += '<text x="'+(hx)+'" y="'+(hy+50)+'" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" class="m-sub" fill="#93A4BE">Heimbasis · 7 Heimspiele</text>';
-  s += '</svg>';
-  document.getElementById("svgHost").innerHTML = s;
-})();
-
 // ---- TISCHDIENST (geteilt & persistent) ----
 const DutyApp = (function(){
-  const KEY = "tischdienst:v1";
   const ROLES = [["anschreiber","Anschreiber"],["zeitnehmer","Zeit"],["sekunden","24 Sek."]];
   const DEFAULT_ROSTER = ["Alex","Benno","Colin","Daniel","Dom","Fabi","Jan","Jannick","Jonas","Matze","Robert","Roman","Roy","Sadik","Simon","Stijn","Til","Gerhard"];
   const DEFAULT_EXEMPT = ["Gerhard"];
   const ADMIN_CODE = "120895";
-  const SYNC_URL = API_URL;   // feste Live-Sync-URL (Google Apps Script Web-App)
+  const SYNC_URL = API_URL;   // Google Apps Script Web-App = einzige Wahrheit für den Tischdienst
   // Zugeteilte Schreibdienste (Schlüssel = unser Heimspieltag). ok:false = noch nicht offiziell zugeteilt
   const DUTY_INFO = {
     "2026-10-18":{time:"14:00",team:"Herren 2",opp:"TSG Reutlingen Ravens 3",ok:true},
@@ -873,10 +767,8 @@ const DutyApp = (function(){
   const dutyGames = games.filter(g=>g.home);               // 7 Heimtermine
   const SLOTS = dutyGames.length * ROLES.length;           // 21
   const SIGNUP_DEADLINE = new Date(2026,9,31,23,59,59);     // Ende Oktober 2026
-  const hasStorage = typeof window!=="undefined" && window.storage && typeof window.storage.get==="function";
-  let state=null, pollTimer=null, openPicker=null, started=false, adminUnlocked=false, resetArm=false, dirty=false, storageMode=null, runtimeSyncUrl="";
+  let state=null, pollTimer=null, openPicker=null, started=false, adminUnlocked=false, resetArm=false, dirty=false, serverDown=false;
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-  const syncUrl=()=>runtimeSyncUrl||SYNC_URL||"";
 
   function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
   function blank(){const duties={};dutyGames.forEach(g=>duties[g.date]={anschreiber:"",zeitnehmer:"",sekunden:""});return {roster:[],exempt:[],duties,adminCode:""};}
@@ -892,90 +784,55 @@ const DutyApp = (function(){
   }
   const isEx=(st,n)=>st.exempt.includes(n);
   const active=st=>st.roster.filter(n=>!isEx(st,n));
+  // Server ist die einzige Wahrheit: schlägt das Lesen fehl, wird ABGEBROCHEN (kein Rückfall auf leeren/alten Stand,
+  // sonst überschreibt der nächste Schreibvorgang den Server mit veralteten Daten)
   async function load(){
-    const url=syncUrl();
-    if(url){
-      // Server ist die einzige Wahrheit: schlägt das Lesen fehl, wird ABGEBROCHEN (kein Rückfall auf leeren/alten Stand,
-      // sonst überschreibt der nächste Schreibvorgang den Server mit veralteten Daten)
-      let lastErr=null;
-      for(let a=0;a<3;a++){
-        try{
-          const r=await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now(),{cache:"no-store"});
-          if(r.ok){const j=JSON.parse(await r.text());
-            if(j&&typeof j==="object"){if(storageMode!=="server"){storageMode="server";renderModeNote();}return normalize(Array.isArray(j.roster)?j:blank());}}
-          lastErr=new Error("status "+r.status);
-        }catch(e){lastErr=e;console.warn("sync get "+(a+1),e);}
-        await sleep(600*(a+1));
-      }
-      storageMode="serverfail";renderModeNote();
-      throw lastErr||new Error("load failed");
+    let lastErr=null;
+    for(let a=0;a<3;a++){
+      try{
+        const r=await fetch(SYNC_URL+"?t="+Date.now(),{cache:"no-store"});
+        if(r.ok){const j=JSON.parse(await r.text());
+          if(j&&typeof j==="object"){setDown(false);return normalize(Array.isArray(j.roster)?j:blank());}}
+        lastErr=new Error("status "+r.status);
+      }catch(e){lastErr=e;console.warn("sync get "+(a+1),e);}
+      await sleep(600*(a+1));
     }
-    if(!hasStorage) return normalize(state||blank());
-    const shared = storageMode!=="local";   // bevorzugt geteilt, außer wir wissen dass nur lokal geht
-    try{const r=await window.storage.get(KEY,shared);return normalize(r?JSON.parse(r.value):blank());}
-    catch(e){return normalize(state||blank());}
+    setDown(true);
+    throw lastErr||new Error("load failed");
   }
+  function setDown(v){ if(serverDown!==v){serverDown=v;renderModeNote();} }
   function renderModeNote(){
     const el=document.getElementById("modeNote"); if(!el) return;
-    el.className="modenote";
-    if(storageMode==="server"){el.classList.add("ok");el.style.display="block";el.innerHTML='🟢 <b>Live-Sync aktiv</b> — alle Geräte mit derselben Sync-URL teilen denselben Stand.';}
-    else if(storageMode==="serverfail"){el.style.display="block";el.innerHTML='⚠ Sync-Server nicht erreichbar (evtl. von der App-Umgebung blockiert). Änderungen bleiben lokal — notfalls „Sichern &amp; Teilen (Code)" nutzen.';}
-    else if(storageMode==="local"){el.style.display="block";el.innerHTML='⚠ Geteilter Speicher ist hier nicht erreichbar — Einträge werden nur auf <b>diesem Gerät</b> gespeichert und <b>nicht</b> mit anderen geteilt.';}
-    else if(storageMode==="none"){el.style.display="block";el.innerHTML='⚠ Automatisches Speichern ist hier nicht möglich — Änderungen gehen beim Neuladen verloren. Sichere den Stand über <b>„Sichern &amp; Teilen (Code)"</b> unten und teile ihn im Team.';}
-    else{el.style.display="none";}
+    el.style.display=serverDown?"block":"none";
+    el.innerHTML='⚠ Server gerade nicht erreichbar. Deine Änderung wird gespeichert, sobald die Verbindung wieder steht — Seite offen lassen oder später „Aktualisieren".';
   }
   let okTimer=null;
   function setSaveStatus(s){
     const el=document.getElementById("saveStatus"); if(!el) return;
     if(okTimer){clearTimeout(okTimer);okTimer=null;}
     if(s==="saving"){el.className="savestat saving";el.textContent="Speichere…";}
-    else if(s==="ok"){el.className="savestat ok";el.textContent=storageMode==="local"?"Gespeichert – nur auf diesem Gerät ⚠":"Alles gespeichert ✓";okTimer=setTimeout(()=>{const e2=document.getElementById("saveStatus");if(e2&&!dirty){e2.className="savestat";e2.textContent="";}},2500);}
+    else if(s==="ok"){el.className="savestat ok";el.textContent="Alles gespeichert ✓";okTimer=setTimeout(()=>{const e2=document.getElementById("saveStatus");if(e2&&!dirty){e2.className="savestat";e2.textContent="";}},2500);}
     else if(s==="err"){el.className="savestat err";el.innerHTML='Speichern fehlgeschlagen — <button id="saveRetry" class="linkbtn">erneut versuchen</button>';}
     else {el.className="savestat";el.textContent="";}
   }
-  // Schreibt einen Stand. Server: mit Versionsprüfung (base = gelesene rev) -> "ok" | "conflict" | "err"
-  async function writeServer(url,st){
-    const gs=/script\.google\.com/.test(url);   // Google Apps Script Web-App → POST + text/plain (kein CORS-Preflight)
-    const body=JSON.stringify(Object.assign({},st,{base:st.rev||0}));
-    const opts=gs
-      ? {method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body}
-      : {method:"PUT",headers:{"Content-Type":"application/json"},body};
+  // Schreibt einen Stand mit Versionsprüfung (base = gelesene rev) -> "ok" | "conflict" | "err"
+  // POST + text/plain: kein CORS-Preflight bei Apps Script
+  async function saveState(st){
+    const opts={method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({},st,{base:st.rev||0}))};
     for(let a=0;a<3;a++){
       try{
-        const r=await fetch(url,opts);
+        const r=await fetch(SYNC_URL,opts);
         if(r.ok){
           let j=null; try{j=JSON.parse(await r.text());}catch(e){}
-          if(j&&j.conflict) return "conflict";
-          if(!(j&&j.ok===false)){ if(j&&typeof j.rev==="number") st.rev=j.rev; return "ok"; }
+          if(j&&j.conflict){setDown(false);return "conflict";}
+          if(!(j&&j.ok===false)){ if(j&&typeof j.rev==="number") st.rev=j.rev; setDown(false); return "ok"; }
           console.warn("sync write abgelehnt",j);
         }else console.warn("sync write status",r.status);
       }catch(e){console.warn("sync write",e);}
       await sleep(500*(a+1));
     }
+    setDown(true);
     return "err";
-  }
-  async function saveState(st){
-    const url=syncUrl();
-    if(url){
-      const res=await writeServer(url,st);
-      if(res==="ok"&&storageMode!=="server"){storageMode="server";renderModeNote();}
-      if(res==="err"){storageMode="serverfail";renderModeNote();}
-      return res;
-    }
-    if(!hasStorage){storageMode="none";renderModeNote();return "err";}
-    const json=JSON.stringify(st);
-    const order = storageMode==="local" ? [false,true] : [true,false];
-    for(const shared of order){
-      for(let a=0;a<2;a++){
-        try{
-          await window.storage.set(KEY,json,shared);
-          const m=shared?"shared":"local";
-          if(storageMode!==m){storageMode=m;renderModeNote();}
-          return "ok";
-        }catch(e){ console.warn("storage set shared="+shared+" versuch "+(a+1),e); await sleep(250); }
-      }
-    }
-    storageMode="none";renderModeNote();return "err";
   }
   // Änderungen werden als Operationen gemerkt und immer auf den FRISCH geladenen Server-Stand angewendet.
   // So überschreibt nie ein Gerät mit veraltetem Stand die Einträge anderer (Lucas/Tom-Bug).
@@ -1003,14 +860,6 @@ const DutyApp = (function(){
     pending.push(fn);
     if(state){try{fn(state);}catch(e){} render();}   // sofort anzeigen, gespeichert wird auf frischem Stand
     return flush();
-  }
-  function exportCode(){try{return btoa(unescape(encodeURIComponent(JSON.stringify(state))));}catch(e){return "";}}
-  async function importCode(raw){
-    let obj; try{obj=JSON.parse(decodeURIComponent(escape(atob(raw.trim()))));}catch(e){return false;}
-    if(!obj||typeof obj!=="object"||!Array.isArray(obj.roster)||!obj.duties) return false;
-    const st=normalize(obj);
-    await mutate(f=>{f.roster=st.roster.slice();f.exempt=st.exempt.slice();f.duties=JSON.parse(JSON.stringify(st.duties));});
-    return true;
   }
 
   function counts(st){const c={};st.roster.forEach(n=>c[n]=0);Object.values(st.duties).forEach(sl=>Object.values(sl).forEach(n=>{if(n)c[n]=(c[n]||0)+1;}));return c;}
@@ -1126,7 +975,6 @@ const DutyApp = (function(){
         ? 'Aktuell <b>'+open+'</b> offene Slots.'
         : 'Alle Slots sind besetzt.';
       document.getElementById("distribute").disabled = !open || !active(st).length;
-      const sui=document.getElementById("syncUrlInput"); if(sui && document.activeElement!==sui) sui.value=syncUrl();
     }
   }
   // faire Auto-Verteilung: füllt nur offene Slots, wenigste Dienste zuerst, niemand doppelt pro Spieltag
@@ -1163,20 +1011,6 @@ const DutyApp = (function(){
       else if(t.dataset.exempt){if(!adminUnlocked)return;const name=decodeURIComponent(t.dataset.exempt);const makeEx=!state.exempt.includes(name);await mutate(st=>{if(!makeEx){st.exempt=st.exempt.filter(x=>x!==name);}else{if(!st.exempt.includes(name))st.exempt.push(name);Object.values(st.duties).forEach(sl=>Object.keys(sl).forEach(k=>{if(sl[k]===name)sl[k]="";}));}});}
       else if(t.id==="dutyRefresh"){t.textContent="Aktualisiere…";if(pending.length){await flush();}else{try{state=await load();render();}catch(e){}}t.textContent="Aktualisieren";}
       else if(t.id==="saveRetry"){await flush();}
-      else if(t.id==="syncExport"){document.getElementById("syncOut").value=exportCode();document.getElementById("syncMsg").textContent="Code erzeugt — markieren, kopieren und teilen.";}
-      else if(t.id==="syncCopy"){const ta=document.getElementById("syncOut");const msg=document.getElementById("syncMsg");if(!ta.value){msg.textContent="Erst oben den Code erzeugen.";return;}ta.focus();ta.select();try{await navigator.clipboard.writeText(ta.value);msg.textContent="In die Zwischenablage kopiert ✓";}catch(e){msg.textContent="Text ist markiert — jetzt manuell kopieren (lange drücken → Kopieren).";}}
-      else if(t.id==="syncUrlSet"){
-        const url=document.getElementById("syncUrlInput").value.trim();
-        const msg=document.getElementById("syncUrlMsg");
-        if(!/^https:\/\/.+/.test(url)){msg.textContent="Bitte eine gültige https-URL einfügen.";return;}
-        runtimeSyncUrl=url; try{location.hash="sync="+encodeURIComponent(url);}catch(e){}
-        msg.textContent="Verbinde…";
-        let remote=null; try{remote=await load();}catch(e){}
-        if(!remote){msg.textContent="Verbindung fehlgeschlagen — Umgebung blockiert evtl. externe Aufrufe.";render();}
-        else if(remote.roster.length){state=remote;render();msg.textContent="Verbunden — Stand vom Server geladen ✓";}
-        else{const snap=JSON.parse(JSON.stringify(state));const ok=await mutate(f=>{if(!f.roster.length){f.roster=snap.roster;f.exempt=snap.exempt;f.duties=snap.duties;}});msg.textContent=ok?"Verbunden — aktueller Stand hochgeladen ✓":"Hochladen fehlgeschlagen.";}
-      }
-      else if(t.id==="syncUrlClear"){runtimeSyncUrl="";try{if(/[#&]sync=/.test(location.hash))location.hash="";}catch(e){}storageMode=null;document.getElementById("syncUrlMsg").textContent="Getrennt — zurück auf lokalen Speicher/Code.";renderModeNote();render();}
       else if(t.id==="adminUnlock"){
         const code=document.getElementById("adminCode").value.trim();
         const msg=document.getElementById("adminMsg");
@@ -1191,7 +1025,7 @@ const DutyApp = (function(){
     });
     document.getElementById("newPlayer").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addPlayers();}});
   }
-  function startPoll(){stopPoll();if(!hasStorage&&!syncUrl())return;pollTimer=setInterval(async()=>{
+  function startPoll(){stopPoll();pollTimer=setInterval(async()=>{
     if(openPicker||flushing) return;
     if(pending.length){ await flush(); return; }          // erst ausstehende Änderungen nachholen (auf frischem Stand)
     let f; try{f=await load();}catch(e){return;}
@@ -1200,8 +1034,6 @@ const DutyApp = (function(){
   function stopPoll(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}}
   async function start(){
     if(!started){started=true;wire();
-      try{const m=/[#&]sync=([^&]+)/.exec(location.hash||"");if(m)runtimeSyncUrl=decodeURIComponent(m[1]);}catch(e){}
-      if(!hasStorage && !syncUrl())document.getElementById("dutyStatus").innerHTML='<span class="err">Hinweis: automatischer Speicher ist hier nicht aktiv — Live-Sync im Admin-Bereich einrichten oder „Sichern &amp; Teilen (Code)" nutzen.</span>';
     }
     let loaded;
     try{loaded=await load();}
@@ -1221,41 +1053,10 @@ const DutyApp = (function(){
 
 // ---- STATS (offiziell aus DBB.Scores) ----
 // Quelle: Google Sheet (Tabs "Stats_Spiele" + "Stats_Spieler") über Apps Script ?action=stats.
-// Die Daten hier unten sind nur der Notfall-Stand, falls der Server nicht erreichbar ist.
+// Beim Start der zuletzt geladene Stand dieses Geräts, bis der Server antwortet.
 // Pro Spiel: q = unsere Viertel, oq = Gegner-Viertel, opp = Gegner-Teamwerte
 // p: [Nr, Name, Min, Pkt, FW-Treffer, FW-Versuche, 2er, 3er, Fouls, +/-, Starter(1/0)]
-let STATS = {
-  "2026-10-10": { match:2894558, q:[15,10,15,10], oq:[28,13,16,14], opp:{ftm:10,p2:14,p3:11,pf:16},
-    p:[
-      [4, "Matthias Schöning",     "16:29", 7, 0,0, 2,1, 0,  -6, 0],
-      [5, "Jonas Dau",             "19:27", 8, 2,3, 3,0, 0,  -2, 0],
-      [6, "Stijn Van Den Broek",   "16:51", 6, 2,4, 2,0, 3, -19, 1],
-      [7, "Tom Schneider",         "20:34", 0, 0,0, 0,0, 3, -14, 1],
-      [8, "Til Grünwaldt",         "19:54", 6, 2,2, 2,0, 4,  -9, 1],
-      [9, "Alexander Poser",       "13:38", 0, 0,0, 0,0, 1,  -9, 0],
-      [10,"Roy Chandrakant Mehta", "11:31", 0, 0,0, 0,0, 1,  -4, 0],
-      [11,"Fabian Birk",           "13:06", 2, 0,2, 1,0, 1,  -5, 0],
-      [12,"Sadik Alkan",           "13:18", 2, 2,2, 0,0, 0,  -1, 0],
-      [13,"Lucas Rojas",           "21:23",15, 1,1, 1,4, 0, -12, 1],
-      [14,"Jan Griewatz",          "11:49", 0, 0,0, 0,0, 5, -15, 1],
-      [15,"Gerhard Loeschke",      "21:55", 4, 0,2, 2,0, 1,  -9, 0]
-    ]},
-  "2026-10-18": { q:[14,12,15,17], oq:[11,15,16,11], opp:{ftm:12,p2:13,p3:5,pf:15},
-    p:[
-      [4, "Matthias Schöning",     "19:54", 4, 0,2, 2,0, 1,  11, 0],
-      [5, "Jonas Dau",             "20:55", 7, 1,2, 3,0, 2,   1, 1],
-      [6, "Sadik Alkan",           "00:00", 0, 0,0, 0,0, 0,   0, 0],
-      [7, "Tom Schneider",         "09:06", 0, 0,0, 0,0, 1,  -1, 0],
-      [8, "Til Grünwaldt",         "18:12", 8, 0,0, 4,0, 1,   9, 0],
-      [9, "Stijn Van Den Broek",   "13:49", 4, 0,0, 2,0, 2,   1, 0],
-      [10,"Jannick Swoboda",       "00:44", 0, 0,0, 0,0, 0,   0, 0],
-      [11,"Fabian Birk",           "29:08",12, 2,3, 5,0, 0,   5, 1],
-      [12,"Roman Kirsch",          "21:47", 4, 0,1, 2,0, 4,  -4, 1],
-      [13,"Alexander Poser",       "13:30", 2, 0,0, 1,0, 3,  16, 0],
-      [14,"Jan Griewatz",          "26:29", 3, 1,3, 1,0, 4, -11, 1],
-      [15,"Lucas Rojas",           "26:21",14, 0,0, 1,4, 3,  -2, 1]
-    ]}
-};
+let STATS = cacheGet("stats") || {};
 
 const Stats = (function(){
   let sortKey="pts", sortDir=-1;
@@ -1347,7 +1148,7 @@ const Stats = (function(){
       try{
         const r=await fetch(API_URL+"?action=stats&t="+Date.now(),{cache:"no-store"});
         if(r.ok){const j=JSON.parse(await r.text());
-          if(j&&j.stats&&typeof j.stats==="object"&&Object.keys(j.stats).length){STATS=j.stats;render();try{DutyApp.render();}catch(e){}return true;}
+          if(j&&j.stats&&typeof j.stats==="object"&&Object.keys(j.stats).length){STATS=j.stats;cacheSet("stats",STATS);render();try{DutyApp.render();}catch(e){}return true;}
           return false;}
       }catch(e){console.warn("stats try "+(a+1),e);}
       await new Promise(res=>setTimeout(res,800*(a+1)));
@@ -1671,7 +1472,7 @@ function pause(){playing=false;setBtn();}
 function select(i,auto){
   cur=(i+SC.length)%SC.length;const s=SC[cur],pl=playOf(s),list=inPlay(s.play);
   t=0;playing=false;
-  if(shown&&!/sync=/.test(location.hash)&&location.hash.slice(1)!==s.id)history.replaceState(null,'',location.pathname+location.search+'#'+s.id);
+  if(shown&&location.hash.slice(1)!==s.id)history.replaceState(null,'',location.pathname+location.search+'#'+s.id);
   $('plays').innerHTML=PLAYS.map(p=>`<button role="tab" aria-selected="${p.id===s.play}" data-p="${p.id}">${p.name}<small>${p.kind}</small></button>`).join('');
   $('sub').textContent=pl.sub;
   const solo=pl.groups.length<2;
