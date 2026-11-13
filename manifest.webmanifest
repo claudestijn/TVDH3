@@ -1,0 +1,18 @@
+{
+  "name": "TVD Herren 3",
+  "short_name": "TVD H3",
+  "description": "Spielplan, Tabelle, Tischdienst, Stats und Taktik von TV Derendingen 3",
+  "lang": "de",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#9D181D",
+  "theme_color": "#9D181D",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
