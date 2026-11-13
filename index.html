@@ -1736,8 +1736,12 @@ window.addEventListener("hashchange",()=>{if(Playbook.isPlayHash()){if(!document
   // Platzhalter = Höhe der vollen Kopfzeile (nur im ausgeklappten Zustand messen)
   const head=document.querySelector("header"), main=document.querySelector("main");
   const fit=()=>{ if(!on) main.style.paddingTop=head.offsetHeight+"px"; };
+  // Erst messen, wenn das Aufklappen fertig ist: iOS meldet beim Hochscrollen ein "resize" (Adressleiste),
+  // während die Kopfzeile noch animiert -> sonst zu kleiner Abstand und Inhalt rutscht unter die Kopfzeile
+  let fitT=null; const fitLater=()=>{clearTimeout(fitT);fitT=setTimeout(fit,350);};
   window.addEventListener("scroll",sc,{passive:true});
-  window.addEventListener("resize",fit);
+  window.addEventListener("resize",fitLater);
+  head.addEventListener("transitionend",()=>{ if(!on) fitLater(); });
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fit);
   fit(); sc();
 })();
