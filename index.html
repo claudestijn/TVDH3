@@ -316,6 +316,7 @@
   .sgame summary::after{content:"＋";color:var(--muted-2);margin-left:4px}
   .sgame[open] summary::after{content:"－"}
   .sgame .sg-body{padding:0 14px 14px}
+  .sgame .sg-video{margin-top:12px}
   .sgame .sg-body h4{font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.06em;color:var(--muted);margin:14px 0 6px}
   .stnote{color:var(--muted-2);font-size:12px;margin-top:10px;line-height:1.5}
   .stbl tr.opp td{color:var(--muted)}
@@ -676,7 +677,7 @@ async function loadResults(refresh){
       if(r.ok){
         const j = JSON.parse(await r.text());
         if(j && j.results && typeof j.results==="object"){
-          RESULTS = j.results; RES_UPDATED = j.updated || ""; if(j.videos && typeof j.videos==="object") VIDEOS = j.videos;
+          RESULTS = j.results; RES_UPDATED = j.updated || ""; if(j.videos && typeof j.videos==="object" && JSON.stringify(j.videos)!==JSON.stringify(VIDEOS)){ VIDEOS = j.videos; try{ Stats.render(); }catch(e){} }
           renderSchedule(); renderNext(); renderResInfo();
           return true;
         }
@@ -1324,7 +1325,7 @@ const Stats = (function(){
       '<tr class="tot"><td>Gesamt</td><td></td><td>'+us+'</td><td>'+T("ftm")+'/'+T("fta")+'</td><td>'+T("p2")+'</td><td>'+T("p3")+'</td><td>'+T("pf")+'</td><td></td></tr></tbody></table>';
     return '<details class="sgame '+(g.home?'home':'away')+'"><summary><span class="sg-d">'+dm(g.date)+'</span>'+
       '<span class="sg-o">'+(g.home?'vs ':'@ ')+esc(g.opp)+'</span><span class="score">'+scoreHtml({our:us,opp:them,win})+'</span></summary>'+
-      '<div class="sg-body"><h4>Viertel</h4><div class="stbl-wrap">'+qt+'</div><h4>Teamvergleich</h4><div class="stbl-wrap">'+cmp+'</div>'+
+      '<div class="sg-body">'+(videoUrl(g)?'<div class="sg-video"><a class="vid" href="'+videoUrl(g)+'" target="_blank" rel="noopener">▶ Video ansehen</a></div>':'')+'<h4>Viertel</h4><div class="stbl-wrap">'+qt+'</div><h4>Teamvergleich</h4><div class="stbl-wrap">'+cmp+'</div>'+
       '<h4>Boxscore TVD 3</h4><div class="stbl-wrap">'+box+'</div><p class="stnote">● = Starter · Quelle: DBB.Scores'+(s.match?' (Spiel-ID '+s.match+')':'')+'</p></div></details>';
   }
 
