@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="theme-color" content="#9D181D" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<!-- Als App installierbar (Android: Manifest, iPhone: apple-* Tags) -->
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="TVD H3" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>TVD Herren 3 · Spielplan 2026/27</title>
 <link rel="icon" type="image/svg+xml" href="https://www.tvderendingen.de/de-wGlobal/wGlobal/layout/images/Logo-TVD.svg" />
 <link rel="alternate icon" href="https://www.tvderendingen.de/favicon.ico" />
@@ -53,7 +60,7 @@
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
-  .head-inner{max-width:760px;margin:0 auto;padding:14px 16px 0}
+  .head-inner{max-width:760px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left))}
   .eyebrow{font-family:var(--disp);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--header-muted);font-size:12px}
   .title{font-family:var(--disp);font-weight:700;font-size:30px;color:var(--header-text);letter-spacing:.01em;line-height:1;margin-top:2px}
   .title span{color:var(--away)}
@@ -152,6 +159,10 @@
 
   footer{color:var(--muted-2);font-size:12px;text-align:center;margin-top:30px;line-height:1.6}
   footer b{color:var(--muted);font-weight:600}
+  .install{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:14px 16px;margin:0 0 18px;text-align:center}
+  .install[hidden],.install [hidden]{display:none}
+  .install p{color:var(--muted);font-size:13px;line-height:1.5;margin:0}
+  .install b{color:var(--text)}
 
   /* ---- Route-Link (Auswärtsspiele) ---- */
   .route{color:var(--muted);font-size:12px;font-weight:600;text-decoration:none;border-bottom:1px solid var(--line-strong);white-space:nowrap}
@@ -356,7 +367,7 @@
   [data-theme="c1"].scrolled .title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   [data-theme="c1"] .tabs{transition:background .25s ease}
   [data-theme="c1"] header{position:fixed;top:0;left:0;right:0}   /* fest, damit das Einklappen den Inhalt nicht verschiebt */
-  [data-theme="c1"].scrolled .head-inner{padding-top:10px}
+  [data-theme="c1"].scrolled .head-inner{padding-top:calc(10px + env(safe-area-inset-top))}
   [data-theme="c1"].scrolled .head-inner .eyebrow,[data-theme="c1"].scrolled .head-inner .sub{max-height:0;opacity:0;margin:0}
   [data-theme="c1"].scrolled .title{font-size:clamp(19px,5.6vw,24px);margin:0 0 10px}
   [data-theme="c1"].scrolled .tabs{margin-top:0;background:#121212;box-shadow:0 0 0 100vmax #121212;clip-path:inset(0 -100vmax);border-bottom:1px solid var(--line)}
@@ -571,6 +582,10 @@
   </section>
 
   <footer>
+    <div class="install" id="installBox" hidden>
+      <button id="installBtn" class="btn" hidden>App installieren</button>
+      <p id="installHint"></p>
+    </div>
     Datenquelle: basketball-bund.net (TeamSL), Liga&nbsp;55489 · Fahrstrecken gerundet (ca.).<br>
     Anwurfzeiten mit <b>„Zeit offen"</b> sind im Verband noch nicht angesetzt.
   </footer>
@@ -1529,6 +1544,37 @@ document.querySelectorAll(".tab").forEach(t=>{
 // Direktlink auf einen Spielzug (z.B. …/#horns-roll) öffnet den Taktik-Tab
 if(Playbook.isPlayHash()) openTab("taktik");
 window.addEventListener("hashchange",()=>{if(Playbook.isPlayHash()){if(!document.getElementById("taktik").classList.contains("active"))openTab("taktik");else Playbook.show();}});
+
+// ---- ALS APP INSTALLIEREN ----
+// Android (Chrome): echter Installieren-Button über "beforeinstallprompt".
+// iPhone: kein Button möglich -> kurze Anleitung (Teilen -> Zum Home-Bildschirm). In der App selbst: nichts zeigen.
+(function(){
+  const box=document.getElementById("installBox"), btn=document.getElementById("installBtn"), hint=document.getElementById("installHint");
+  const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  if(standalone) return;
+  const ua=navigator.userAgent;
+  const ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  let deferred=null;
+  window.addEventListener("beforeinstallprompt",e=>{
+    e.preventDefault(); deferred=e;
+    box.hidden=false; btn.hidden=false;
+    hint.textContent="Startet dann wie eine App – mit eigenem Icon und ohne Browserleiste.";
+  });
+  btn.addEventListener("click",async()=>{
+    if(!deferred) return;
+    deferred.prompt();
+    try{ await deferred.userChoice; }catch(e){}
+    deferred=null; box.hidden=true;
+  });
+  window.addEventListener("appinstalled",()=>{ box.hidden=true; });
+  if(ios){
+    box.hidden=false;
+    hint.innerHTML='<b>Als App aufs iPhone:</b> Teilen-Symbol antippen (Quadrat mit Pfeil) → <b>Zum Home-Bildschirm</b>.';
+  }else if(/Android/.test(ua)){
+    setTimeout(()=>{ if(!deferred){ box.hidden=false;
+      hint.innerHTML='<b>Als App aufs Handy:</b> Browser-Menü <b>⋮</b> → <b>App installieren</b> bzw. <b>Zum Startbildschirm hinzufügen</b>.'; } },2500);
+  }
+})();
 
 // ---- KOPFZEILE: beim Scrollen kompakt ----
 (function(){
