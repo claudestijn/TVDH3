@@ -659,7 +659,11 @@ let RESULTS = {}, RES_UPDATED = "";
 // Spielvideos: Sheet-Tab "Videos" (Datum + Drive-Link), kommt mit ?action=results.
 // VIDEOS_LOCAL nur als Notfall, falls der Server nichts liefert: {"2026-10-10":"https://drive.google.com/…"}
 let VIDEOS = {};
-const VIDEOS_LOCAL = {};
+const VIDEOS_LOCAL = {
+  "2026-10-10":"https://drive.google.com/file/d/1ceb4PCyNKpywoxP8NMc6jNgFKQYuMIVy/view",
+  "2026-10-18":"https://drive.google.com/file/d/1kEgQlTTN7Bf-BBGHr3fnFIGDEx8r0PI_/view",
+  "2026-11-08":"https://drive.google.com/file/d/1IKSOCS78dTbumz6fR7CRmrrST8meXp_W/view"
+};
 function videoUrl(g){const u=VIDEOS[g.date]||VIDEOS_LOCAL[g.date]||"";return /^https:\/\//.test(u)?u.replace(/"/g,"%22"):"";}
 function scoreHtml(r){return '<span class="res '+(r.win?'w':'l')+'">'+(r.win?'S':'N')+'</span>'+r.our+':'+r.opp;}
 async function loadResults(refresh){
