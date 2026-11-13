@@ -666,7 +666,7 @@ function renderTable(){
   const body=rows.map(r=>'<tr'+(r.us?' class="us"':'')+'><td>'+r.rank+'</td><td class="tm">'+esc(r.team)+'</td>'+
     (full?'<td>'+r.games+'</td><td>'+r.wins+'</td><td>'+r.losses+'</td><td'+(r.diff>0?' class="pos"':'')+'>'+sg(r.diff)+'</td>':'')+'</tr>').join("");
   el.innerHTML=sum+'<table class="stbl"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>'+
-    '<p class="lt-note">Quelle: basketball-bund.net'+(TABLE.updated?' · Stand '+esc(TABLE.updated):'')+'</p>';
+    '<p class="lt-note">'+(TABLE.source==="berechnet"?'Berechnet aus allen Liga-Ergebnissen (basketball-bund.net) – bei Gleichstand ohne direkten Vergleich':'Quelle: basketball-bund.net')+(TABLE.updated?' · Stand '+esc(TABLE.updated):'')+'</p>';
   el.open=wasOpen; el.style.display="block";
 }
 renderTable();
