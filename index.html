@@ -179,7 +179,12 @@
   .fairmeta{font-size:12px;color:var(--muted)}
 
   .overview{display:flex;flex-direction:column;gap:8px}
-  .ovrow{display:grid;grid-template-columns:1fr 130px 34px;align-items:center;gap:10px}
+  .ovrow{display:grid;grid-template-columns:1fr 130px 34px 46px;align-items:center;gap:10px}
+  .ovgp{font-size:12px;color:var(--muted);text-align:right;white-space:nowrap}
+  .ovgp.zero{color:var(--muted-2)}
+  .ovhead{font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
+  .ovhead span:nth-child(n+3){text-align:right;white-space:nowrap}
+  .ovhead span:nth-child(3){direction:rtl}
   .ovrow .nm{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ovrow .nm.zero{color:var(--muted-2)}
   .ovbar{height:8px;background:color-mix(in srgb,var(--text) 6%,transparent);border-radius:999px;overflow:hidden}
@@ -275,7 +280,7 @@
   #adminOpen b{color:var(--text)}
 
   @media(max-width:460px){
-    .ovrow{grid-template-columns:1fr 84px 30px}
+    .ovrow{grid-template-columns:1fr 70px 26px 40px}
     .role .rl{width:64px}
   }
 
@@ -932,6 +937,19 @@ const DutyApp = (function(){
       el.innerHTML='<span class="dl-ic">✓</span><span>Eintragefrist vorbei — Austragen gesperrt. Bei Verhinderung bitte <b>tauschen (Wechseln)</b>. '+(open?'<b>'+open+'</b> offene Slots: Restverteilung über den Admin-Bereich.':'Alle Dienste besetzt.')+'</span>';
     }
   }
+  // Kader-Vorname -> Spiele laut offizieller Statistik (jeder Eintrag im Boxscore zählt)
+  const NAME_ALIAS={fabi:"fabian",alex:"alexander",matze:"matthias",dom:"dominik"};
+  function gamesPlayed(n){
+    if(typeof STATS==="undefined"||!STATS) return null;
+    const key=n.trim().toLowerCase(), first=NAME_ALIAS[key]||key;
+    let gp=0;
+    Object.values(STATS).forEach(g=>{
+      const hit=(g.p||[]).find(r=>{const full=String(r[1]).toLowerCase();return full===key||full.split(/\s+/)[0]===first;});
+      if(hit) gp++;                       // im Spielberichtsbogen = Spiel gezählt, auch mit 0 Minuten
+    });
+    return gp;
+  }
+  const gpCell=n=>{const gp=gamesPlayed(n);return gp===null?'<span class="ovgp"></span>':'<span class="ovgp'+(gp?'':' zero')+'">'+gp+' Sp.</span>';};
   function renderOverview(st,c){
     const host=document.getElementById("overview");
     const act=active(st);
@@ -939,15 +957,15 @@ const DutyApp = (function(){
     document.getElementById("fairMeta").textContent=assigned+" / "+SLOTS+" Slots vergeben"+(act.length?" · Ziel ≈ "+(SLOTS/act.length).toFixed(1)+" pro Person":"");
     if(!st.roster.length){host.innerHTML='<div class="emptyroster">Noch keine Namen im Kader — unten unter „Kader verwalten" anlegen.</div>';return;}
     const max=Math.max(1,...act.map(n=>c[n]||0)), target=SLOTS/Math.max(act.length,1);
-    let html=[...act].sort((a,b)=>(c[b]||0)-(c[a]||0)||a.localeCompare(b)).map(n=>{
+    let html='<div class="ovrow ovhead"><span>Name</span><span></span><span>Dienste</span><span>Gespielt</span></div>'+[...act].sort((a,b)=>(c[b]||0)-(c[a]||0)||a.localeCompare(b)).map(n=>{
       const v=c[n]||0, over=v>Math.ceil(target);
       return '<div class="ovrow'+(over?' over':'')+'"><span class="nm'+(v===0?' zero':'')+'">'+esc(n)+'</span>'+
         '<span class="ovbar"><i style="width:'+(v/max*100)+'%"></i></span>'+
-        '<span class="ovcount'+(v===0?' zero':'')+'">'+v+'</span></div>';
+        '<span class="ovcount'+(v===0?' zero':'')+'">'+v+'</span>'+gpCell(n)+'</div>';
     }).join("");
     const ex=st.roster.filter(n=>isEx(st,n));
     if(ex.length) html+=ex.sort((a,b)=>a.localeCompare(b)).map(n=>
-      '<div class="ovrow exempt"><span class="nm">'+esc(n)+'</span><span class="extag">kein Dienst</span></div>').join("");
+      '<div class="ovrow exempt"><span class="nm">'+esc(n)+'</span><span class="extag">kein Dienst</span>'+gpCell(n)+'</div>').join("");
     host.innerHTML=html;
   }
   function renderGames(st,c){
@@ -1098,13 +1116,15 @@ const DutyApp = (function(){
     else{render();}
     startPoll();
   }
-  return {start,stopPoll};
+  return {start,stopPoll,render};
 })();
 
-// ---- STATS (offiziell aus DBB.Scores, manuell aus Screenshots übernommen) ----
+// ---- STATS (offiziell aus DBB.Scores) ----
+// Quelle: Google Sheet (Tabs "Stats_Spiele" + "Stats_Spieler") über Apps Script ?action=stats.
+// Die Daten hier unten sind nur der Notfall-Stand, falls der Server nicht erreichbar ist.
 // Pro Spiel: q = unsere Viertel, oq = Gegner-Viertel, opp = Gegner-Teamwerte
 // p: [Nr, Name, Min, Pkt, FW-Treffer, FW-Versuche, 2er, 3er, Fouls, +/-, Starter(1/0)]
-const STATS = {
+let STATS = {
   "2026-10-10": { match:2894558, q:[15,10,15,10], oq:[28,13,16,14], opp:{ftm:10,p2:14,p3:11,pf:16},
     p:[
       [4, "Matthias Schöning",     "16:29", 7, 0,0, 2,1, 0,  -6, 0],
@@ -1176,7 +1196,7 @@ const Stats = (function(){
     const agg={};
     list.forEach(g=>STATS[g.date].p.map(P).forEach(x=>{
       const a=agg[x.name]||(agg[x.name]={name:x.name,no:x.no,gp:0,sec:0,pts:0,ftm:0,fta:0,p2:0,p3:0,pf:0,pm:0});
-      if(x.sec>0) a.gp++;
+      a.gp++;
       ["sec","pts","ftm","fta","p2","p3","pf","pm"].forEach(k=>a[k]+=x[k]); a.no=x.no;
     }));
     const val={name:a=>a.name,gp:a=>a.gp,min:a=>a.gp?a.sec/a.gp:0,pts:a=>a.pts,ppg:a=>a.gp?a.pts/a.gp:0,ft:a=>a.ftm,p3:a=>a.p3,pf:a=>a.pf,pm:a=>a.pm};
@@ -1221,7 +1241,21 @@ const Stats = (function(){
     season(played());
   });
   render();
-  return {render};
+  // Stats aus dem Sheet laden; bei Fehler bleibt der eingebaute Stand
+  async function load(){
+    for(let a=0;a<3;a++){
+      try{
+        const r=await fetch(API_URL+"?action=stats&t="+Date.now(),{cache:"no-store"});
+        if(r.ok){const j=JSON.parse(await r.text());
+          if(j&&j.stats&&typeof j.stats==="object"&&Object.keys(j.stats).length){STATS=j.stats;render();try{DutyApp.render();}catch(e){}return true;}
+          return false;}
+      }catch(e){console.warn("stats try "+(a+1),e);}
+      await new Promise(res=>setTimeout(res,800*(a+1)));
+    }
+    return false;
+  }
+  load();
+  return {render,load};
 })();
 
 // ---- TABS ----
