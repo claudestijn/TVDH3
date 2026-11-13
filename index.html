@@ -375,6 +375,51 @@
   [data-theme="c1"].scrolled .tab{color:var(--muted)}
   [data-theme="c1"].scrolled .tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--home)}
   @media (prefers-reduced-motion: reduce){[data-theme="c1"] .title,[data-theme="c1"] .head-inner .eyebrow,[data-theme="c1"] .head-inner .sub{transition:none}}
+
+  /* ---- 5 Tabs: Breite nach Inhalt, auf dem Handy enger ---- */
+  .tab{flex:1 1 auto}
+  @media(max-width:520px){.tabs{gap:0}.tab{font-size:13px;letter-spacing:.03em;padding:12px 2px 13px}}
+
+  /* ---- Video-Button im Spielplan ---- */
+  .vid{display:inline-flex;align-items:center;gap:5px;font-family:var(--body);font-weight:600;font-size:12px;color:var(--text);background:var(--surface-2);border:1px solid var(--line-strong);border-radius:999px;padding:5px 11px;text-decoration:none;white-space:nowrap}
+  .vid:hover{border-color:var(--home)}
+  .vid:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+  .game.past:has(.vid){opacity:.85}
+
+  /* ---- Taktik ---- */
+  .pb-plays{display:flex;gap:2px;margin:16px 0 2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line)}
+  .pb-plays button{flex:0 0 auto;appearance:none;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font-family:var(--disp);font-weight:700;font-size:20px;line-height:1;padding:10px 12px 9px;min-height:44px;cursor:pointer;text-align:left}
+  .pb-plays button[aria-selected=true]{color:var(--text);border-bottom-color:var(--home)}
+  .pb-plays small{display:block;font-family:var(--body);font-weight:500;font-size:11px;color:var(--muted-2);margin-top:3px}
+  .pb-groups{display:flex;gap:6px;margin:4px 0 10px;flex-wrap:wrap}
+  .pb-groups:empty{display:none}
+  .pb-gb{flex:1 1 0;min-height:44px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-family:var(--disp);font-weight:600;font-size:18px;border-radius:4px;cursor:pointer;padding:0 8px}
+  .pb-gb[aria-pressed=true]{background:var(--home);color:#fff;border-color:var(--home)}
+  .pb-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .pb-ch{min-height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--line-strong);background:transparent;color:var(--text);font-family:var(--body);font-weight:500;font-size:14px;cursor:pointer}
+  .pb-ch[aria-pressed=true]{background:#fff;color:#121212;border-color:#fff}
+  .pb-court{background:var(--surface);border-radius:4px;padding:8px}
+  .pb-ctl{display:flex;align-items:center;gap:8px;margin-top:10px}
+  .pb-bt{min-width:44px;height:44px;border-radius:4px;border:1px solid var(--line);background:var(--surface-2);color:#fff;font-family:var(--body);font-weight:600;font-size:15px;cursor:pointer;display:grid;place-items:center;padding:0 12px}
+  .pb-bt.pri{background:var(--home);border-color:var(--home);min-width:92px}
+  .pb-bt svg{width:18px;height:18px;fill:currentColor}
+  .pb-ctl input[type=range]{flex:1;min-width:0;accent-color:var(--home);height:44px}
+  .pb-bt:focus-visible,.pb-ch:focus-visible,.pb-gb:focus-visible,.pb-plays button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+  .pb-ttl{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin:16px 0 6px}
+  .pb-ttl h2{font-family:var(--disp);font-weight:700;font-size:24px;line-height:1.1}
+  .pb-ttl span{color:var(--muted);font-family:var(--disp);font-weight:600;font-size:16px;white-space:nowrap}
+  .pb-lab{display:block;color:var(--home);font-size:16px;line-height:1;margin-bottom:3px}
+  .pb-txt{font-size:15px;line-height:1.5;max-width:68ch}
+  .pb-leg{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:12.5px;margin:12px 0 0;list-style:none}
+  .pb-leg li{display:flex;align-items:center;gap:8px}
+  .pb-leg svg{width:34px;height:14px}
+  .pb-src{color:var(--muted-2);font-size:12px;margin-top:12px;line-height:1.5}
+  .lk{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--home);border-radius:4px;color:var(--text);text-decoration:none;margin-bottom:8px}
+  .lk span{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+  .lk b{color:var(--muted);font-weight:600}
+  .lk:hover{background:var(--surface-2)}
+  .lk:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+  @media(max-width:420px){.pb-gb{font-size:16px}.pb-bt.pri{min-width:78px}.pb-plays button{font-size:18px;padding:10px 9px 9px}}
 </style>
 </head>
 <body>
@@ -388,6 +433,7 @@
       <button class="tab" role="tab" aria-selected="false" data-tab="map">Karte</button>
       <button class="tab" role="tab" aria-selected="false" data-tab="duty">Tischdienst</button>
       <button class="tab" role="tab" aria-selected="false" data-tab="stats">Stats</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="taktik">Taktik</button>
     </div>
   </div>
 </header>
@@ -529,6 +575,45 @@
     </div>
   </section>
 
+  <!-- TAKTIK -->
+  <section class="panel" id="taktik" role="tabpanel">
+    <div class="pb-plays" id="pbPlays" role="tablist" aria-label="Spielzug"></div>
+    <p class="maphead" id="pbSub"></p>
+    <div class="pb-groups" id="pbGroups" role="group" aria-label="Gruppe"></div>
+    <div class="pb-chips" id="pbChips" role="group" aria-label="Variante"></div>
+    <div class="pb-court">
+      <svg viewBox="-0.4 -1.1 15.8 15.5" role="img" aria-label="Animiertes Spielfeld">
+        <g id="pbLines" fill="none" stroke="rgba(255,255,255,.5)" stroke-width=".06"></g>
+        <g id="pbGhost"></g><g id="pbTrail"></g><g id="pbScr2"></g><g id="pbPls"></g><g id="pbBallg"></g>
+      </svg>
+    </div>
+    <div class="pb-ctl">
+      <button class="pb-bt" id="pbPrev" aria-label="Vorherige Variante"><svg viewBox="0 0 24 24"><path d="M15.4 5.4 14 4l-8 8 8 8 1.4-1.4L8.8 12z"/></svg></button>
+      <button class="pb-bt pri" id="pbPlay">Abspielen</button>
+      <input type="range" id="pbScr" min="0" max="1000" value="0" aria-label="Zeitleiste">
+      <button class="pb-bt" id="pbSpd" aria-label="Tempo">1×</button>
+      <button class="pb-bt" id="pbNext" aria-label="Nächste Variante"><svg viewBox="0 0 24 24"><path d="M8.6 5.4 10 4l8 8-8 8-1.4-1.4 6.6-6.6z"/></svg></button>
+    </div>
+    <div class="pb-ttl"><h2 id="pbName"></h2><span id="pbCnt"></span></div>
+    <p class="pb-txt" id="pbTxt"></p>
+    <ul class="pb-leg">
+      <li><svg viewBox="0 0 34 14"><path d="M2 7h30" stroke="#fff" stroke-width="2"/></svg>Laufweg</li>
+      <li><svg viewBox="0 0 34 14"><path d="M2 7l3-4 4 8 4-8 4 8 4-8 4 8 4-8 3 4" fill="none" stroke="#fff" stroke-width="1.6"/></svg>Dribbling</li>
+      <li><svg viewBox="0 0 34 14"><path d="M2 7h26M28 1v12" stroke="#fff" stroke-width="2" fill="none"/></svg>Block</li>
+      <li><svg viewBox="0 0 34 14"><path d="M2 7h30" stroke="#F28C28" stroke-width="2" stroke-dasharray="4 3"/></svg>Pass / Wurf</li>
+      <li><svg viewBox="0 0 34 14"><circle cx="17" cy="7" r="6" fill="#E0353B"/></svg><span id="pbHll">Abschluss</span></li>
+    </ul>
+    <p class="pb-src" id="pbSrc"></p>
+
+    <div class="month">Links</div>
+    <a class="lk" href="https://drive.google.com/drive/folders/1StmrrwQmCZYN0zxwvllg0hxwy7YnOnWn" target="_blank" rel="noopener">
+      <div>Spielaufnahmen<span>Google Drive · alle Videos. Einzelne Spiele: „▶ Video“ im Spielplan</span></div><b aria-hidden="true">↗</b>
+    </a>
+    <a class="lk" href="https://www.basketball-bund.net/static/#/liga/55489/spielplan" target="_blank" rel="noopener">
+      <div>Liga beim Verband<span>basketball-bund.net · Spielplan, Ergebnisse, Tabelle</span></div><b aria-hidden="true">↗</b>
+    </a>
+  </section>
+
   <footer>
     Datenquelle: basketball-bund.net (TeamSL), Liga&nbsp;55489 · Fahrstrecken gerundet (ca.), Luftlinien geokodiert.<br>
     Anwurfzeiten mit <b>„Zeit offen"</b> sind im Verband noch nicht angesetzt.
@@ -570,6 +655,11 @@ const isPast = g => gameStart(g).getTime()+GAME_LEN_MS <= Date.now();
 // ---- ERGEBNISSE (aus Apps Script, Quelle basketball-bund.net) ----
 const API_URL = "https://script.google.com/macros/s/AKfycbz6wi1cBqOI4Pa7vONWNMX8hZhjNwPNLz3EcGdKYqUiRNvJZm5wfsooQdRhtcNUWJXEtw/exec";   // Apps Script Web-App (einzige Stelle für die URL)
 let RESULTS = {}, RES_UPDATED = "";
+// Spielvideos: Sheet-Tab "Videos" (Datum + Drive-Link), kommt mit ?action=results.
+// VIDEOS_LOCAL nur als Notfall, falls der Server nichts liefert: {"2026-10-10":"https://drive.google.com/…"}
+let VIDEOS = {};
+const VIDEOS_LOCAL = {};
+function videoUrl(g){const u=VIDEOS[g.date]||VIDEOS_LOCAL[g.date]||"";return /^https:\/\//.test(u)?u.replace(/"/g,"%22"):"";}
 function scoreHtml(r){return '<span class="res '+(r.win?'w':'l')+'">'+(r.win?'S':'N')+'</span>'+r.our+':'+r.opp;}
 async function loadResults(refresh){
   for(let a=0;a<3;a++){                               // bis zu 3 Versuche (Apps Script Kaltstart)
@@ -578,7 +668,7 @@ async function loadResults(refresh){
       if(r.ok){
         const j = JSON.parse(await r.text());
         if(j && j.results && typeof j.results==="object"){
-          RESULTS = j.results; RES_UPDATED = j.updated || "";
+          RESULTS = j.results; RES_UPDATED = j.updated || ""; if(j.videos && typeof j.videos==="object") VIDEOS = j.videos;
           renderSchedule(); renderNext(); renderResInfo();
           return true;
         }
@@ -652,7 +742,8 @@ function renderSchedule(){
       '<div class="date"><div class="dow">'+DOW[dt.getDay()]+'</div><div class="dm">'+dt.getDate()+'.'+(dt.getMonth()+1)+'.</div></div>'+
       '<div class="match"><div class="opp">'+(g.home?'vs ':'@ ')+g.opp+'</div>'+
       '<div class="venue">'+venue+'</div>'+hallLine+'</div>'+
-      '<div class="side"><span class="chip '+(g.home?'h':'a')+'">'+(g.home?'Heim':'Ausw.')+'</span>'+timeHtml+'</div>';
+      '<div class="side"><span class="chip '+(g.home?'h':'a')+'">'+(g.home?'Heim':'Ausw.')+'</span>'+timeHtml+
+      (videoUrl(g)?'<a class="vid" href="'+videoUrl(g)+'" target="_blank" rel="noopener">▶ Video</a>':'')+'</div>';
     host.appendChild(row);
   });
 }
@@ -1258,7 +1349,358 @@ const Stats = (function(){
   return {render,load};
 })();
 
+// ---- TAKTIK (animierte Spielzüge + Links) ----
+const Playbook=(function(){
+const CM_LATE='Spät heißt: erst losgehen, wenn der Drive schon läuft.';
+const CM=[
+ {play:'circle',hl:'5',id:'baseline-45',g:'Baseline',name:'Drive vom 45',
+  txt:'Baseline-Drive vom 45: Der Innenspieler auf der Weakside schneidet spät ins „Fenster“ – oben am No-Charge-Halbkreis, dem Dunker’s Spot. '+CM_LATE,
+  pl:{2:[1.2,6.4],5:[10.1,1.0]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[2.6,4.6],[4.6,2.7],[6.0,1.9]]},
+      {p:'5',k:'c',t:[.9,2],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
+      {k:'p',from:'2',to:'5',t:[2.1,2.45]}]},
+ {play:'circle',hl:'5',id:'baseline-ecke',g:'Baseline',name:'Drive aus der Ecke',
+  txt:'Gleiches Verhalten beim Baseline-Drive aus der Ecke: Der Weakside-Post füllt spät den Dunker’s Spot und bestraft, dass sein Gegenspieler am Ball aushilft.',
+  pl:{2:[0.6,1.1],5:[10.1,1.0]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[2.5,1.0],[4.5,1.2],[6.0,1.6]]},
+      {p:'5',k:'c',t:[.9,2],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
+      {k:'p',from:'2',to:'5',t:[2.1,2.45]}]},
+ {play:'circle',hl:'5',id:'baseline-slot',g:'Baseline',name:'Drive vom Slot',
+  txt:'Auch beim Baseline-Drive vom Slot: spät ins Fenster am Dunker’s Spot. Hilft der Verteidiger von 5 gegen den Drive, ist 5 frei.',
+  pl:{2:[4.9,9.5],5:[10.1,1.0]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.8],pts:[[4.8,7.0],[5.4,4.2],[6.4,2.4]]},
+      {p:'5',k:'c',t:[1,2.1],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
+      {k:'p',from:'2',to:'5',t:[2.2,2.55]}]},
+ {play:'circle',hl:'5',id:'baseline-bsp1',g:'Baseline',name:'Beispiel 1 · Spacing',
+  txt:'Baseline-Drive vom 45 mit allen Fünf: Die Spieler ohne Ball halten Abstand und bieten Passoptionen. 3 sinkt in die Ecke, 1 füllt den 45, 4 bleibt als Safety hinter dem Drive.',
+  pl:{2:[1.2,6.3],5:[10.1,1.0],1:[9.8,9.2],3:[13.9,6.1],4:[5.0,9.2]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[2.7,4.4],[4.7,2.4],[6.1,1.5]]},
+      {p:'3',k:'c',t:[.3,1.5],pts:[[14.4,3.5],[14.4,0.8]]},
+      {p:'1',k:'c',t:[.6,1.8],pts:[[12.0,8.4],[13.3,6.4]]},
+      {p:'4',k:'c',t:[.5,1.6],pts:[[3.8,8.6],[2.8,7.8]]},
+      {p:'5',k:'c',t:[.9,2],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
+      {k:'p',from:'2',to:'5',t:[2.1,2.45]}]},
+ {play:'circle',hl:'5',id:'baseline-bsp2',g:'Baseline',name:'Beispiel 2 · Spacing',
+  txt:'Baseline-Drive vom Slot: 4 und 3 bleiben in den Ecken, 1 geht auf den 45 und ist bereit als Safety. 5 schneidet spät zum Dunker’s Spot.',
+  pl:{2:[4.9,9.1],5:[10.1,1.0],1:[9.6,9.1],3:[14.4,0.6],4:[0.6,0.6]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.8],pts:[[4.8,6.5],[5.5,3.8],[6.6,1.6]]},
+      {p:'1',k:'c',t:[.4,1.6],pts:[[11.6,8.3],[13.0,6.8]]},
+      {p:'5',k:'c',t:[1,2.1],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
+      {k:'p',from:'2',to:'5',t:[2.2,2.55]}]},
+ {play:'circle',hl:'5',id:'middle-45',g:'Middle',name:'Drive vom 45',
+  txt:'Middle-Drive vom 45: Der Weakside-Innenspieler cuttet spät unter dem Brett durch zur Brettecke auf der anderen Seite.',
+  pl:{2:[1.0,6.4],5:[9.6,1.1]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[3.5,6.6],[6.2,5.4],[7.8,3.8]]},
+      {p:'5',k:'c',t:[.9,2.1],pts:[[8.8,0.5],[7.5,0.45],[6.2,0.6],[5.6,1.5]]},
+      {k:'p',from:'2',to:'5',t:[2.2,2.55]}]},
+ {play:'circle',hl:'5',id:'middle-bsp',g:'Middle',name:'Beispiel · Spacing',
+  txt:'Middle-Drive vom Slot: 5 cuttet unter dem Brett durch. Die übrigen füllen auf – 4 aus der Ecke auf den 45 (ist die Ecke schon besetzt, cuttet der Spieler dort backdoor), 1 auf den 45, 3 in die Ecke.',
+  pl:{2:[4.7,9.4],5:[9.6,1.1],4:[0.4,1.1],1:[9.5,9.0],3:[13.7,6.3]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[5.4,7.2],[6.2,5.4],[6.9,3.8]]},
+      {p:'4',k:'c',t:[.3,1.5],pts:[[0.6,3.8],[1.2,6.4]]},
+      {p:'3',k:'c',t:[.3,1.5],pts:[[14.4,3.8],[14.4,1.0]]},
+      {p:'1',k:'c',t:[.6,1.8],pts:[[11.6,8.3],[13.3,6.6]]},
+      {p:'5',k:'c',t:[.9,2.1],pts:[[8.8,0.5],[7.5,0.45],[6.2,0.6],[5.6,1.5]]},
+      {k:'p',from:'2',to:'5',t:[2.2,2.55]}]},
+ {play:'circle',hl:'5',id:'lowpost-baseline',g:'Lowpost',name:'1-gegen-1 Baseline',
+  txt:'Ball im Lowpost, 4 geht 1-gegen-1 zur Baseline: Der Weakside-Post reagiert im Sinne des Circle Movement und cuttet spät ins Fenster zum Dunker’s Spot.',
+  pl:{4:[4.5,3.1],5:[9.8,1.1]},ball:'4',
+  mv:[{p:'4',k:'d',t:[0,1.2],pts:[[5.0,2.0],[5.8,1.3]]},
+      {p:'5',k:'c',t:[.6,1.7],pts:[[10.1,2.5],[9.1,3.2],[8.2,3.0]]},
+      {k:'p',from:'4',to:'5',t:[1.8,2.1]}]},
+ {play:'circle',hl:'5',id:'lowpost-mitte',g:'Lowpost',name:'1-gegen-1 Mitte',
+  txt:'Ball im Lowpost, 4 geht 1-gegen-1 zur Mitte: Der Weakside-Post cuttet spät unter dem Brett durch zur Brettecke.',
+  pl:{4:[4.5,3.1],5:[9.8,1.1]},ball:'4',
+  mv:[{p:'4',k:'d',t:[0,1.2],pts:[[5.6,3.0],[6.7,2.4]]},
+      {p:'5',k:'c',t:[.6,1.8],pts:[[8.9,0.5],[7.5,0.45],[6.2,0.6],[5.6,1.3]]},
+      {k:'p',from:'4',to:'5',t:[1.9,2.2]}]},
+ {play:'circle',hl:'5',id:'ballseite-baseline',g:'Ballseite',name:'Baseline → Elbow',
+  txt:'Baseline-Drive vom 45, Innenspieler auf der Ballseite: 5 schiebt parallel zur Zonenlinie Richtung Elbow. Das macht Platz für den Drive – und 5 ist anspielbar, wenn sein Gegenspieler aushilft.',
+  pl:{2:[1.0,6.4],5:[5.0,2.6]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.6],pts:[[2.0,4.3],[3.2,3.0],[4.0,2.4]]},
+      {p:'5',k:'c',t:[.3,1.4],pts:[[5.1,4.2],[5.1,5.6]]},
+      {k:'p',from:'2',to:'5',t:[1.8,2.15]}]},
+ {play:'circle',hl:'5',id:'ballseite-middle',g:'Ballseite',name:'Middle → Short Corner',
+  txt:'Middle-Drive vom 45, Innenspieler auf der Ballseite: 5 schiebt Richtung Short Corner. Platz für den Drive, und anspielbar, falls sein Gegenspieler beim Dribbler aushilft.',
+  pl:{2:[1.1,6.4],5:[4.6,3.0]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[3.4,6.0],[5.4,4.2],[6.6,2.6]]},
+      {p:'5',k:'c',t:[.3,1.4],pts:[[3.6,2.2],[2.9,1.2]]},
+      {k:'p',from:'2',to:'5',t:[1.9,2.25]}]}
+];
+const RIM={x:7.5,y:1.575};
+const PLAYS=[
+ {id:'horns',name:'Horns',kind:'System',sub:'Einstieg: Doppelblock von 4 und 5 für 1, 3 geht in die Ecke',hll:'Abschluss',groups:['Direkt','Swing'],
+  src:'Nach Gerhards Play „TVD Horns“ (Hoops Geek). Phase 1–7 dort = die sieben Varianten hier.'},
+ {id:'box',name:'Box',kind:'Einwurf',sub:'Einwurf von der Grundlinie – 1 wirft ein, Lesereihenfolge 4 → 5 → 3',hll:'Anspielstation',groups:['Optionen'],
+  src:'Nach Gerhards Play „TVD Box“ (Hoops Geek).'},
+ {id:'circle',name:'Circle Movement',kind:'Prinzip',sub:'Dribble Drive – was der Innenspieler macht',hll:'Innenspieler (5)',groups:['Baseline','Middle','Lowpost','Ballseite'],
+  src:'Nach den BBW-Unterlagen „Circle Movement – Dribble Drive (Innenspieler)“. Die Passoption am Ende ist ergänzt, um zu zeigen, wofür der Laufweg da ist.'}
+];
+const st=(d,...a)=>({d,a});
+const P=(f,t)=>({k:'p',from:f,to:t}), SH=p=>({k:'sh',p});
+
+/* ---------- Horns ---------- */
+const H_PL={1:[7.5,10.2],2:[0.9,6.2],3:[14.3,6.6],4:[5.5,7.7],5:[9.4,7.6]};
+const H_ENTRY=[{p:'4',k:'s'},{p:'5',k:'s'},{p:'3',k:'c',pts:[[14.4,3.5],[14.4,1.2]]},{p:'1',k:'d',pts:[[8.6,9.7],[10.0,8.4],[11.5,7.2]]}];
+const H_SWING=[
+  st(1.5,...H_ENTRY),
+  st(1.5,{p:'5',k:'c',pts:[[8.5,5.3],[7.9,3.1],[6.9,1.7],[6.0,1.4]]},{p:'4',k:'c',pts:[[6.0,6.5],[6.9,6.5],[7.3,7.9]]}),
+  st(1.2,P('1','4'),{p:'2',k:'c',pts:[[2.4,4.9],[2.9,5.3],[2.8,6.3]]}),
+  st(.5,P('4','2'))];
+const H_SCREEN5={p:'5',k:'s',pts:[[5.4,2.6],[4.2,4.7],[3.7,5.5]]};
+const HORNS=[
+ {id:'horns-drive',g:'Direkt',lab:'Abschluss 1',name:'Drive',hl:'1',
+  txt:'4 und 5 stellen den Doppelblock, 3 geht in die Ecke. 1 nutzt den Block von 5 und zieht direkt zum Korb.',
+  steps:[st(2.2,{p:'4',k:'s'},{p:'5',k:'s'},{p:'3',k:'c',pts:[[14.4,3.5],[14.4,1.2]]},{p:'1',k:'d',pts:[[8.6,9.8],[10.4,8.6],[10.6,7.0],[9.9,5.0],[9.0,3.2],[8.0,2.0]]})]},
+ {id:'horns-roll',g:'Direkt',lab:'Abschluss 2',name:'Roll',hl:'5',
+  txt:'1 dribbelt über den Block von 5 nach rechts. 5 rollt zum Korb und bekommt den Pass von 1.',
+  steps:[st(1.5,...H_ENTRY),st(1.2,{p:'5',k:'c',pts:[[8.6,5.0],[7.7,2.4]]}),st(.5,P('1','5'))]},
+ {id:'horns-highlow',g:'Direkt',lab:'Abschluss 3',name:'High-Low',hl:'5',
+  txt:'5 rollt zum Korb, 4 täuscht Richtung Freiwurflinie an und kommt zurück an die Spitze. 1 passt auf 4, 4 spielt high-low auf 5.',
+  steps:[st(1.5,...H_ENTRY),st(1.4,{p:'5',k:'c',pts:[[8.6,5.0],[7.7,2.4]]},{p:'4',k:'c',pts:[[6.6,6.1],[7.4,5.3],[7.8,6.4],[7.6,7.9]]}),st(.5,P('1','4')),st(.5,P('4','5'))]},
+ {id:'horns-post',g:'Swing',lab:'Abschluss 5',name:'Post 5',hl:'5',
+  txt:'Swing: 5 rollt auf die linke Seite unter den Korb, 4 kommt an die Spitze. 1 auf 4, 2 macht einen V-Cut, 4 auf 2. Dann 2 auf 5 – Wurf 5.',
+  steps:[...H_SWING,st(.5,P('2','5')),st(.6,SH('5'))]},
+ {id:'horns-2zieht',g:'Swing',name:'2 zieht',hl:'2',
+  txt:'Nach dem Swing auf 2 kommt 5 aus der Zone und stellt den Block für 2. 2 zieht über den Block zum Korb.',
+  steps:[...H_SWING,st(1.1,H_SCREEN5),st(1.6,{p:'2',k:'d',pts:[[4.4,6.0],[5.4,4.5],[6.4,3.0],[7.2,1.9]]})]},
+ {id:'horns-pnr',g:'Swing',name:'Pick & Roll',hl:'5',
+  txt:'Nach dem Swing stellt 5 den Block für 2 und rollt ab. 2 dribbelt an und passt auf den rollenden 5.',
+  steps:[...H_SWING,st(1.1,H_SCREEN5),st(1.3,{p:'2',k:'d',pts:[[4.0,6.0],[5.0,5.7]]},{p:'5',k:'c',pts:[[5.2,3.8],[6.7,2.3]]}),st(.5,P('2','5'))]},
+ {id:'horns-stagger',g:'Swing',name:'Stagger 3',hl:'3',
+  txt:'Nach dem Swing stellen 1 und 4 nacheinander Blöcke für 3. 3 kommt aus der Ecke über die Spitze, bekommt den Pass von 2 und wirft.',
+  steps:[...H_SWING,st(1.0,{p:'1',k:'s',pts:[[12.6,5.0],[12.8,3.4]]}),st(1.0,{p:'4',k:'s',pts:[[8.6,7.4],[9.3,6.4]]}),
+         st(2.0,{p:'3',k:'c',pts:[[13.7,3.0],[12.3,4.9],[10.6,6.4],[8.8,7.2],[6.6,7.6],[4.6,7.6]]}),st(.5,P('2','3')),st(.6,SH('3'))]}
+].map(s=>({...s,play:'horns',pl:H_PL,ball:'1'}));
+
+/* ---------- Box (Einwurf Grundlinie) ---------- */
+const B_PL={1:[4.9,-0.45],2:[5.2,5.8],3:[9.9,6.1],4:[5.4,1.8],5:[9.8,2.2]};
+const B_BASE=[
+  st(.9,{p:'4',k:'s',pts:[[7.0,1.9],[8.6,1.9]]}),
+  st(1.1,{p:'5',k:'c',pts:[[9.2,2.9],[7.6,3.0],[6.3,2.7]]},{p:'2',k:'s',pts:[[7.0,5.85],[8.6,5.9]]}),
+  st(1.6,{p:'3',k:'c',pts:[[10.1,6.9],[9.2,7.5],[6.0,7.0],[3.5,6.2],[1.9,5.5]]})];
+const BOX=[
+ {id:'box-4',g:'Optionen',lab:'Option 1',name:'4 nach dem Block',hl:'4',
+  txt:'Box-Aufstellung, 1 wirft ein. 4 blockt quer für 5. Erste Option: 4 direkt nach seinem Block anspielen.',
+  steps:[B_BASE[0],st(.6,{p:'5',k:'c',pts:[[9.2,2.9],[7.6,3.0],[6.3,2.7]]}),st(.5,P('1','4'))]},
+ {id:'box-5',g:'Optionen',lab:'Option 2',name:'5 über den Block',hl:'5',
+  txt:'5 kommt über den Querblock von 4 vor den Korb – zweite Option für den Einwurf.',
+  steps:[B_BASE[0],st(1.1,{p:'5',k:'c',pts:[[9.2,2.9],[7.6,3.0],[6.3,2.7]]}),st(.5,P('1','5'))]},
+ {id:'box-3',g:'Optionen',lab:'Option 3',name:'3 auf den Flügel',hl:'3',
+  txt:'2 blockt für 3, 3 läuft unter dem Block durch auf den linken Flügel und bekommt den Einwurf. Danach kommt 1 ins Feld auf den rechten Flügel, 2 geht als Sicherung an die Spitze.',
+  steps:[...B_BASE,st(.5,P('1','3')),st(1.6,{p:'1',k:'c',pts:[[7.5,0.4],[11.4,1.6],[13.2,5.3]]},{p:'2',k:'c',pts:[[7.9,7.2],[7.3,8.4]]})]}
+].map(s=>({...s,play:'box',pl:B_PL,ball:'1'}));
+
+const SC=[...HORNS,...BOX,...CM];
+const $=id=>document.getElementById('pb'+id[0].toUpperCase()+id.slice(1));
+
+$('lines').innerHTML=`
+ <rect x="0" y="0" width="15" height="14"/>
+ <rect x="5.05" y="0" width="4.9" height="5.8" fill="rgba(224,53,59,.10)"/>
+ <circle cx="7.5" cy="5.8" r="1.8"/>
+ <path d="M0.9 0V2.99A6.75 6.75 0 0 0 14.1 2.99V0"/>
+ <path d="M6.25 1.2V1.575A1.25 1.25 0 0 0 8.75 1.575V1.2"/>
+ <path d="M5.7 14A1.8 1.8 0 0 1 9.3 14"/>
+ <path d="M6.6 1.2H8.4" stroke="#fff" stroke-width=".1"/>
+ <circle cx="7.5" cy="1.575" r=".225" stroke="#F28C28" stroke-width=".07"/>`;
+
+function prep(pts){
+  const Q=[],n=pts.length;
+  for(let i=0;i<n-1;i++){
+    const a=pts[Math.max(i-1,0)],b=pts[i],c=pts[i+1],d=pts[Math.min(i+2,n-1)];
+    for(let k=0;k<20;k++){
+      const t=k/20,t2=t*t,t3=t2*t;
+      const f=(A,B,C,D)=>0.5*(2*B+(-A+C)*t+(2*A-5*B+4*C-D)*t2+(-A+3*B-3*C+D)*t3);
+      Q.push([f(a[0],b[0],c[0],d[0]),f(a[1],b[1],c[1],d[1])]);
+    }
+  }
+  Q.push(pts[n-1]);
+  const L=[0];
+  for(let i=1;i<Q.length;i++)L.push(L[i-1]+Math.hypot(Q[i][0]-Q[i-1][0],Q[i][1]-Q[i-1][1]));
+  return {P:Q,L,len:L[L.length-1]};
+}
+function at(pa,s){
+  s=Math.max(0,Math.min(pa.len,s));
+  let i=1;while(i<pa.L.length-1&&pa.L[i]<s)i++;
+  const a=pa.P[i-1],b=pa.P[i],seg=(pa.L[i]-pa.L[i-1])||1e-6,u=(s-pa.L[i-1])/seg;
+  return {x:a[0]+(b[0]-a[0])*u,y:a[1]+(b[1]-a[1])*u,ang:Math.atan2(b[1]-a[1],b[0]-a[0])};
+}
+const isBall=m=>m.k==='p'||m.k==='sh';
+
+/* Schritte → Zeitfenster; Laufwege verketten (Start = Ende des letzten Wegs) */
+SC.forEach(s=>{
+  if(s.steps){
+    let t=0;s.mv=[];
+    JSON.parse(JSON.stringify(s.steps)).forEach(stp=>{
+      let end=t;
+      stp.a.forEach(a=>{const d=isBall(a)?.5:stp.d;s.mv.push({...a,t:[t,t+d]});end=Math.max(end,t+d);});
+      t=end+.15;
+    });
+  }
+  s.mv.sort((a,b)=>a.t[0]-b.t[0]);
+  const cur={};Object.keys(s.pl).forEach(p=>cur[p]=s.pl[p]);
+  s.mv.forEach(m=>{
+    if(m.pts){m.pa=prep([cur[m.p],...m.pts]);cur[m.p]=m.pts[m.pts.length-1];}
+    else if(m.k==='s')m.spot=cur[m.p];
+  });
+  s.dur=Math.max(...s.mv.map(m=>m.t[1]))+0.9;
+});
+
+const ease=x=>x<.5?2*x*x:1-((-2*x+2)**2)/2;
+const prog=(m,t)=>Math.max(0,Math.min(1,(t-m.t[0])/(m.t[1]-m.t[0])));
+const f2=v=>v.toFixed(3);
+const OFF={x:.4,y:-.4};
+
+function pos(s,p,t){
+  let q={x:s.pl[p][0],y:s.pl[p][1]};
+  for(const m of s.mv){
+    if(m.p!==p||!m.pa)continue;
+    if(t<m.t[0])break;
+    if(t<m.t[1])return at(m.pa,ease(prog(m,t))*m.pa.len);
+    const e=m.pa.P[m.pa.P.length-1];q={x:e[0],y:e[1]};
+  }
+  return q;
+}
+const off=q=>({x:q.x+OFF.x,y:q.y+OFF.y});
+function ballAt(s,t){
+  let h=s.ball;
+  for(const m of s.mv){
+    if(!isBall(m))continue;
+    if(t<m.t[0])break;
+    const fp=m.k==='p'?m.from:m.p;
+    if(t<m.t[1]){
+      const a=off(pos(s,fp,m.t[0])),b=m.k==='p'?off(pos(s,m.to,t)):RIM,u=prog(m,t);
+      return {x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u};
+    }
+    h=m.k==='p'?m.to:null;
+  }
+  return h?off(pos(s,h,t)):{x:RIM.x,y:RIM.y};
+}
+function dCut(pa,sEnd){
+  let d=`M${f2(pa.P[0][0])} ${f2(pa.P[0][1])}`;
+  for(let i=1;i<pa.P.length&&pa.L[i]<sEnd;i++)d+=`L${f2(pa.P[i][0])} ${f2(pa.P[i][1])}`;
+  const e=at(pa,sEnd);return d+`L${f2(e.x)} ${f2(e.y)}`;
+}
+function dDrib(pa,sEnd){
+  const A=.14,W=.42;let d='';
+  for(let u=0;;u+=.035){
+    if(u>sEnd)u=sEnd;
+    const q=at(pa,u),tap=Math.min(1,u/.3,(pa.len-u)/.3),o=A*Math.sin(2*Math.PI*u/W)*Math.max(0,tap);
+    d+=(d?'L':'M')+f2(q.x-Math.sin(q.ang)*o)+' '+f2(q.y+Math.cos(q.ang)*o);
+    if(u>=sEnd)break;
+  }
+  return d;
+}
+const dPath=m=>m.k==='d'?dDrib(m.pa,m.pa.len):dCut(m.pa,m.pa.len);
+
+let cur=0,t=0,playing=false,last=0,speed=1;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let shown=false,inited=false;
+const isPlayHash=()=>SC.some(x=>x.id===location.hash.slice(1));
+const playOf=s=>PLAYS.find(p=>p.id===s.play);
+const inPlay=pid=>SC.filter(x=>x.play===pid);
+
+function drawGhost(s){
+  $('ghost').innerHTML=s.mv.filter(m=>m.pa).map(m=>
+    `<path d="${dPath(m)}" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width=".07" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+}
+function screens(s){
+  let o='';
+  for(const m of s.mv){
+    if(m.k!=='s')continue;
+    const from=m.pa?m.t[1]:m.t[0];
+    if(t<from)continue;
+    const nx=s.mv.find(n=>n!==m&&n.p===m.p&&n.pa&&n.t[0]>=from-1e-6);
+    if(nx&&t>=nx.t[0])continue;
+    let x,y,ang;
+    if(m.pa){const e=at(m.pa,m.pa.len);x=e.x;y=e.y;ang=e.ang;}else{x=m.spot[0];y=m.spot[1];ang=Math.PI/2;}
+    const cx=x+Math.cos(ang)*.66,cy=y+Math.sin(ang)*.66,px=-Math.sin(ang)*.42,py=Math.cos(ang)*.42;
+    o+=`<path d="M${f2(cx-px)} ${f2(cy-py)}L${f2(cx+px)} ${f2(cy+py)}" stroke="#fff" stroke-width=".12" stroke-linecap="round"/>`;
+  }
+  return o;
+}
+function render(){
+  const s=SC[cur];let tr='';
+  for(const m of s.mv){
+    if(!m.pa||t<=m.t[0])continue;
+    const sE=ease(prog(m,t))*m.pa.len;
+    tr+=`<path d="${m.k==='d'?dDrib(m.pa,sE):dCut(m.pa,sE)}" fill="none" stroke="${m.p===s.hl?'#FF6B70':'#fff'}" stroke-width=".09" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  const b=ballAt(s,t);
+  for(const m of s.mv){
+    if(!isBall(m)||t<=m.t[0])continue;
+    const a=off(pos(s,m.k==='p'?m.from:m.p,m.t[0]));
+    const e=t>=m.t[1]?(m.k==='p'?off(pos(s,m.to,m.t[1])):RIM):b;
+    tr+=`<path d="M${f2(a.x)} ${f2(a.y)}L${f2(e.x)} ${f2(e.y)}" stroke="#F28C28" stroke-width=".08" stroke-dasharray=".25 .17" fill="none"/>`;
+  }
+  $('trail').innerHTML=tr;
+  $('scr2').innerHTML=screens(s);
+  $('pls').innerHTML=Object.keys(s.pl).map(p=>{
+    const q=pos(s,p,t),r=p===s.hl;
+    return `<g transform="translate(${f2(q.x)} ${f2(q.y)})"><circle r=".52" fill="rgba(0,0,0,.35)" cy=".07"/><circle r=".5" fill="${r?'#E0353B':'#fff'}" stroke="${r?'#FF9C9C':'#121212'}" stroke-width=".05"/><text y=".02" text-anchor="middle" dominant-baseline="central" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="700" font-size=".68" fill="${r?'#fff':'#121212'}">${p}</text></g>`;
+  }).join('');
+  $('ballg').innerHTML=`<circle cx="${f2(b.x)}" cy="${f2(b.y)}" r=".22" fill="#F28C28" stroke="#121212" stroke-width=".04"/>`;
+  $('scr').value=Math.round(t/s.dur*1000);
+}
+
+function tick(ts){
+  if(!playing)return;
+  const dt=last?(ts-last)/1000:0;last=ts;
+  t+=dt*speed;
+  const s=SC[cur];
+  if(t>=s.dur){t=s.dur;playing=false;setBtn();render();return;}
+  render();requestAnimationFrame(tick);
+}
+function setBtn(){$('play').textContent=playing?'Pause':(t>=SC[cur].dur?'Nochmal':'Abspielen');}
+function play(){if(t>=SC[cur].dur)t=0;playing=true;last=0;setBtn();requestAnimationFrame(tick);}
+function pause(){playing=false;setBtn();}
+
+function select(i,auto){
+  cur=(i+SC.length)%SC.length;const s=SC[cur],pl=playOf(s),list=inPlay(s.play);
+  t=0;playing=false;
+  if(shown&&!/sync=/.test(location.hash)&&location.hash.slice(1)!==s.id)history.replaceState(null,'',location.pathname+location.search+'#'+s.id);
+  $('plays').innerHTML=PLAYS.map(p=>`<button role="tab" aria-selected="${p.id===s.play}" data-p="${p.id}">${p.name}<small>${p.kind}</small></button>`).join('');
+  $('sub').textContent=pl.sub;
+  $('groups').innerHTML=pl.groups.length>1?pl.groups.map(g=>`<button class="pb-gb" aria-pressed="${g===s.g}" data-g="${g}">${g}</button>`).join(''):'';
+  $('chips').innerHTML=SC.map((x,j)=>x.play===s.play&&x.g===s.g?`<button class="pb-ch" aria-pressed="${j===cur}" data-i="${j}">${x.name}</button>`:'').join('');
+  $('name').innerHTML=(s.lab?`<span class="pb-lab">${s.lab}</span>`:'')+(s.lab?s.name:s.g+' · '+s.name);
+  $('cnt').textContent=(list.indexOf(s)+1)+' / '+list.length;
+  $('txt').textContent=s.txt;$('hll').textContent=pl.hll;$('src').textContent=pl.src;
+  drawGhost(s);
+  if(reduce){t=s.dur;render();setBtn();return;}
+  render();setBtn();
+  if(auto&&shown)setTimeout(()=>{if(shown&&SC[cur]===s&&!playing&&t===0)play();},350);
+}
+function step(d){
+  const list=inPlay(SC[cur].play),k=(list.indexOf(SC[cur])+d+list.length)%list.length;
+  select(SC.indexOf(list[k]),true);
+}
+
+$('plays').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b)select(SC.findIndex(x=>x.play===b.dataset.p),true);});
+$('groups').addEventListener('click',e=>{const g=e.target.closest('[data-g]');if(g)select(SC.findIndex(x=>x.play===SC[cur].play&&x.g===g.dataset.g),true);});
+$('chips').addEventListener('click',e=>{const c=e.target.closest('[data-i]');if(c)select(+c.dataset.i,true);});
+$('prev').addEventListener('click',()=>step(-1));
+$('next').addEventListener('click',()=>step(1));
+$('play').addEventListener('click',()=>playing?pause():play());
+$('scr').addEventListener('input',e=>{pause();t=e.target.value/1000*SC[cur].dur;render();setBtn();});
+$('spd').addEventListener('click',()=>{speed=speed===1?.5:speed===.5?1.5:1;$('spd').textContent=String(speed).replace('.',',')+'×';});
+function show(id){
+  shown=true;
+  const i=SC.findIndex(x=>x.id===(id||location.hash.slice(1)));
+  if(i>=0)select(i,true);
+  else if(!inited)select(0,true);
+  else select(cur,false);
+  inited=true;
+}
+function hide(){
+  shown=false;pause();
+  if(isPlayHash())history.replaceState(null,'',location.pathname+location.search);
+}
+return {show,hide,isPlayHash};
+})();
+
 // ---- TABS ----
+function openTab(name){const b=document.querySelector('.tab[data-tab="'+name+'"]');if(b)b.click();}
 document.querySelectorAll(".tab").forEach(t=>{
   t.addEventListener("click",()=>{
     document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", x===t));
@@ -1266,8 +1708,13 @@ document.querySelectorAll(".tab").forEach(t=>{
     document.getElementById(t.dataset.tab).classList.add("active");
     window.scrollTo({top:0, behavior:"smooth"});
     if(t.dataset.tab==="duty") DutyApp.start(); else DutyApp.stopPoll();
+    if(t.dataset.tab==="taktik") Playbook.show(); else Playbook.hide();
   });
 });
+
+// Direktlink auf einen Spielzug (z.B. …/#horns-roll) öffnet den Taktik-Tab
+if(Playbook.isPlayHash()) openTab("taktik");
+window.addEventListener("hashchange",()=>{if(Playbook.isPlayHash()){if(!document.getElementById("taktik").classList.contains("active"))openTab("taktik");else Playbook.show();}});
 
 // ---- KOPFZEILE: beim Scrollen kompakt ----
 (function(){
