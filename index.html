@@ -104,6 +104,11 @@
   .panel{display:none;animation:fade .25s ease both}
   .panel.active{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* Tab-Wechsel per Wischen: neuer Tab gleitet aus der Wischrichtung herein */
+  .panel.from-right{animation:slideL .22s ease both}
+  .panel.from-left{animation:slideR .22s ease both}
+  @keyframes slideL{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}
+  @keyframes slideR{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}
 
   /* ---- Month + games ---- */
   .month{font-family:var(--disp);font-weight:600;letter-spacing:.12em;text-transform:uppercase;
@@ -1529,17 +1534,54 @@ return {show,hide,isPlayHash};
 })();
 
 // ---- TABS ----
-function openTab(name){const b=document.querySelector('.tab[data-tab="'+name+'"]');if(b)b.click();}
+let swipeDir="";   // gesetzt beim Wischen -> Richtung der Einblend-Animation
+function openTab(name,dir){const b=document.querySelector('.tab[data-tab="'+name+'"]');if(b){swipeDir=dir||"";b.click();}}
 document.querySelectorAll(".tab").forEach(t=>{
   t.addEventListener("click",()=>{
     document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected", x===t));
-    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-    document.getElementById(t.dataset.tab).classList.add("active");
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active","from-left","from-right"));
+    const panel=document.getElementById(t.dataset.tab);
+    if(swipeDir) panel.classList.add(swipeDir);
+    swipeDir="";
+    panel.classList.add("active");
     window.scrollTo({top:0, behavior:"smooth"});
     if(t.dataset.tab==="duty") DutyApp.start(); else DutyApp.stopPoll();
     if(t.dataset.tab==="taktik") Playbook.show(); else Playbook.hide();
   });
 });
+
+// ---- WISCHEN: nach links = nächster Tab, nach rechts = vorheriger (wie in einer App) ----
+// Nicht ausgelöst am Bildschirmrand (System-Geste „Zurück"), auf dem Taktik-Feld/Zeitleiste,
+// in Eingabefeldern und in waagrecht scrollbaren Tabellen (Stats).
+(function(){
+  const order=[...document.querySelectorAll(".tab")].map(t=>t.dataset.tab);
+  let sx=0, sy=0, st=0, track=false;
+  const blocked=el=>{
+    for(let n=el; n && n!==document.body && n!==document.documentElement; n=n.parentElement){
+      if(n.matches && n.matches("input,textarea,select,button.pk,.pb-court,.pb-ctl,.picker")) return true;
+      if(n.scrollWidth>n.clientWidth+2){ const ox=getComputedStyle(n).overflowX; if(ox==="auto"||ox==="scroll") return true; }
+    }
+    return false;
+  };
+  document.addEventListener("touchstart",e=>{
+    track=false;
+    if(e.touches.length!==1) return;
+    const p=e.touches[0];
+    if(p.clientX<24 || p.clientX>window.innerWidth-24) return;
+    if(blocked(e.target)) return;
+    sx=p.clientX; sy=p.clientY; st=Date.now(); track=true;
+  },{passive:true});
+  document.addEventListener("touchend",e=>{
+    if(!track) return; track=false;
+    const p=e.changedTouches[0], dx=p.clientX-sx, dy=p.clientY-sy;
+    if(Date.now()-st>700 || Math.abs(dx)<60 || Math.abs(dx)<Math.abs(dy)*1.8) return;   // zu langsam, zu kurz oder eher vertikal
+    const cur=document.querySelector('.tab[aria-selected="true"]');
+    const i=order.indexOf(cur?cur.dataset.tab:"plan")+(dx<0?1:-1);
+    if(i<0 || i>=order.length) return;
+    openTab(order[i], dx<0?"from-right":"from-left");
+  },{passive:true});
+  document.addEventListener("touchcancel",()=>{ track=false; },{passive:true});
+})();
 
 // Direktlink auf einen Spielzug (z.B. …/#horns-roll) öffnet den Taktik-Tab
 if(Playbook.isPlayHash()) openTab("taktik");
