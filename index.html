@@ -901,9 +901,7 @@ const DutyApp = (function(){
       el.className="deadline open";
       el.innerHTML='<span class="dl-ic">‼</span><span>Selbst eintragen bis <b>So 31.10.2026</b> · noch <b>'+days+' Tag'+(days===1?'':'e')+'</b>. Danach verteilt der Admin die offenen Dienste fair.</span>';
     }else{
-      const open=openSlots(state).length;
-      el.className="deadline closed";
-      el.innerHTML='<span class="dl-ic">✓</span><span>Eintragefrist vorbei — Austragen gesperrt. Bei Verhinderung bitte <b>tauschen (Wechseln)</b>. '+(open?'<b>'+open+'</b> offene Slots: Restverteilung über den Admin-Bereich.':'Alle Dienste besetzt.')+'</span>';
+      el.style.display="none";   // nach der Frist kein Hinweis mehr (Austragen ist trotzdem gesperrt)
     }
   }
   // Kader-Vorname -> Spiele laut offizieller Statistik (jeder Eintrag im Boxscore zählt)
