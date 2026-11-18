@@ -526,7 +526,7 @@
 
   <!-- STATS -->
   <section class="panel" id="stats" role="tabpanel">
-    <p class="maphead">Offizielle Statistik aus DBB.Scores (Punkte, Würfe, Fouls, +/-) und unsere eigene Statistik vom Tablet-Tracker (Rebounds &amp; Co.).</p>
+    <p class="maphead">Offizielle Statistik vom Verband (basketball-bund.net, kommt nach jedem Spiel automatisch), Minuten und +/- aus DBB.Scores, sobald nachgetragen – dazu unsere eigene Statistik vom Tablet-Tracker (Rebounds &amp; Co.).</p>
     <div class="strip" id="stSummary"></div>
     <div class="dcard">
       <div class="dcard-h"><h3>Viertel im Schnitt</h3><span class="fairmeta">TVD : Gegner</span></div>
@@ -763,6 +763,7 @@ document.getElementById("resRefresh").addEventListener("click", async e=>{
   const b=e.currentTarget, info=document.getElementById("resInfo");
   b.disabled=true; b.textContent="Lade von basketball-bund.net…";
   const ok=await loadResults(true);
+  if(ok) Stats.load();   // Server holt beim Aktualisieren auch neue Boxscores vom Verband
   b.disabled=false; b.textContent="Ergebnisse aktualisieren";
   if(!ok) info.textContent="Abruf fehlgeschlagen – Apps Script neu bereitgestellt?";
 });
@@ -1078,7 +1079,9 @@ let STATS = cacheGet("stats") || {};
 
 const Stats = (function(){
   let sortKey="pts", sortDir=-1;
-  const P = r=>({no:r[0],name:r[1],sec:secs(r[2]),pts:r[3],ftm:r[4],fta:r[5],p2:r[6],p3:r[7],pf:r[8],pm:r[9],st:r[10]});
+  // Min/+/- leer = unbekannt (Spiel nur vom Verband, ohne DBB.Scores-Bericht) -> null
+  const blankV=v=>v===null||v===undefined||v==="";
+  const P = r=>({no:r[0],name:r[1],sec:blankV(r[2])?null:secs(r[2]),pts:r[3],ftm:r[4],fta:r[5],p2:r[6],p3:r[7],pf:r[8],pm:blankV(r[9])?null:r[9],st:r[10]});
   function secs(s){const [m,x]=String(s).split(":").map(Number);return m*60+(x||0);}
   const mmss=s=>Math.floor(s/60)+":"+String(Math.round(s%60)).padStart(2,"0");
   const pct=(a,b)=>b?Math.round(a/b*100)+"%":"–";
@@ -1114,18 +1117,21 @@ const Stats = (function(){
   function season(list){
     const agg={};
     list.forEach(g=>STATS[g.date].p.map(P).forEach(x=>{
-      const a=agg[x.name]||(agg[x.name]={name:x.name,no:x.no,gp:0,sec:0,pts:0,ftm:0,fta:0,p2:0,p3:0,pf:0,pm:0});
+      const key=x.name.toLowerCase();   // Schreibweise vom Verband kann abweichen (van/Van)
+      const a=agg[key]||(agg[key]={name:x.name,no:x.no,gp:0,sec:0,gpm:0,pts:0,ftm:0,fta:0,p2:0,p3:0,pf:0,pm:0,gpp:0});
       a.gp++;
-      ["sec","pts","ftm","fta","p2","p3","pf","pm"].forEach(k=>a[k]+=x[k]); a.no=x.no;
+      ["pts","ftm","fta","p2","p3","pf"].forEach(k=>a[k]+=x[k]); if(x.no) a.no=x.no;
+      if(x.sec!==null){a.sec+=x.sec;a.gpm++;}   // Minuten-Schnitt nur über Spiele mit Minuten
+      if(x.pm!==null){a.pm+=x.pm;a.gpp++;}
     }));
-    const val={name:a=>a.name,gp:a=>a.gp,min:a=>a.gp?a.sec/a.gp:0,pts:a=>a.pts,ppg:a=>a.gp?a.pts/a.gp:0,ft:a=>a.ftm,p3:a=>a.p3,pf:a=>a.pf,pm:a=>a.pm};
+    const val={name:a=>a.name,gp:a=>a.gp,min:a=>a.gpm?a.sec/a.gpm:-1,pts:a=>a.pts,ppg:a=>a.gp?a.pts/a.gp:0,ft:a=>a.ftm,p3:a=>a.p3,pf:a=>a.pf,pm:a=>a.gpp?a.pm:-999};
     const rows=Object.values(agg).sort((a,b)=>{const x=val[sortKey](a),y=val[sortKey](b);
       return (typeof x==="string"?x.localeCompare(y):(x-y))*sortDir || b.pts-a.pts;});
     const cols=[["name","Spieler"],["gp","Sp"],["min","Min Ø"],["pts","Pkt"],["ppg","Ø"],["ft","FW"],["p3","3er"],["pf","F"],["pm","+/-"]];
     let h='<table class="stbl"><thead><tr>'+cols.map(([k,l])=>'<th data-sort="'+k+'"'+(k===sortKey?' class="on"':'')+'>'+l+(k===sortKey?(sortDir<0?' ▾':' ▴'):'')+'</th>').join("")+'</tr></thead><tbody>';
-    h+=rows.map(a=>'<tr><td class="nm" title="'+esc(a.name)+'">'+esc(a.name)+'</td><td>'+a.gp+'</td><td>'+(a.gp?mmss(a.sec/a.gp):"–")+'</td>'+
+    h+=rows.map(a=>'<tr><td class="nm" title="'+esc(a.name)+'">'+esc(a.name)+'</td><td>'+a.gp+'</td><td>'+(a.gpm?mmss(a.sec/a.gpm):"–")+'</td>'+
       '<td class="hi">'+a.pts+'</td><td>'+(a.gp?r1(a.pts/a.gp):"–")+'</td><td'+(a.fta?'':' class="dim"')+'>'+a.ftm+'/'+a.fta+'</td>'+
-      '<td'+(a.p3?'':' class="dim"')+'>'+a.p3+'</td><td>'+a.pf+'</td><td'+(a.pm>0?' class="pos"':'')+'>'+sgn(a.pm)+'</td></tr>').join("");
+      '<td'+(a.p3?'':' class="dim"')+'>'+a.p3+'</td><td>'+a.pf+'</td><td'+(a.gpp&&a.pm>0?' class="pos"':(a.gpp?'':' class="dim"'))+'>'+(a.gpp?sgn(a.pm):"–")+'</td></tr>').join("");
     document.getElementById("stPlayers").innerHTML=list.length?h+'</tbody></table>':'<p class="hint" style="margin:0">Noch keine Spiele erfasst.</p>';
   }
 
@@ -1139,13 +1145,13 @@ const Stats = (function(){
       '<tr><td class="nm">TVD 3</td><td>'+T("ftm")+'/'+T("fta")+'</td><td>'+T("p2")+'</td><td>'+T("p3")+'</td><td>'+T("pf")+'</td></tr>'+
       '<tr class="opp"><td class="nm">'+esc(g.opp)+'</td><td>'+s.opp.ftm+'</td><td>'+s.opp.p2+'</td><td>'+s.opp.p3+'</td><td>'+s.opp.pf+'</td></tr></tbody></table>';
     const box='<table class="stbl"><thead><tr><th>Spieler</th><th>Min</th><th>Pkt</th><th>FW</th><th>2er</th><th>3er</th><th>F</th><th>+/-</th></tr></thead><tbody>'+
-      [...ps].sort((a,b)=>b.pts-a.pts||b.sec-a.sec).map(x=>'<tr><td class="nm" title="'+esc(x.name)+'"><i>'+x.no+'</i>'+esc(x.name)+(x.st?'<span class="st" title="Starter"></span>':'')+'</td>'+
-        '<td>'+mmss(x.sec)+'</td><td class="hi">'+x.pts+'</td><td'+(x.fta?'':' class="dim"')+'>'+x.ftm+'/'+x.fta+'</td><td>'+x.p2+'</td><td>'+x.p3+'</td><td>'+x.pf+'</td><td'+(x.pm>0?' class="pos"':'')+'>'+sgn(x.pm)+'</td></tr>').join("")+
+      [...ps].sort((a,b)=>b.pts-a.pts||(b.sec||0)-(a.sec||0)).map(x=>'<tr><td class="nm" title="'+esc(x.name)+'"><i>'+(x.no||'')+'</i>'+esc(x.name)+(x.st?'<span class="st" title="Starter"></span>':'')+'</td>'+
+        '<td'+(x.sec===null?' class="dim"':'')+'>'+(x.sec===null?'–':mmss(x.sec))+'</td><td class="hi">'+x.pts+'</td><td'+(x.fta?'':' class="dim"')+'>'+x.ftm+'/'+x.fta+'</td><td>'+x.p2+'</td><td>'+x.p3+'</td><td>'+x.pf+'</td><td'+(x.pm===null?' class="dim"':(x.pm>0?' class="pos"':''))+'>'+(x.pm===null?'–':sgn(x.pm))+'</td></tr>').join("")+
       '<tr class="tot"><td>Gesamt</td><td></td><td>'+us+'</td><td>'+T("ftm")+'/'+T("fta")+'</td><td>'+T("p2")+'</td><td>'+T("p3")+'</td><td>'+T("pf")+'</td><td></td></tr></tbody></table>';
     return '<details class="sgame '+(g.home?'home':'away')+'"><summary><span class="sg-d">'+dm(g.date)+'</span>'+
       '<span class="sg-o">'+(g.home?'vs ':'@ ')+esc(g.opp)+'</span><span class="score">'+scoreHtml({our:us,opp:them,win})+'</span></summary>'+
       '<div class="sg-body">'+(videoUrl(g)?'<div class="sg-video"><a class="vid" href="'+videoUrl(g)+'" target="_blank" rel="noopener">▶ Video ansehen</a></div>':'')+'<h4>Viertel</h4><div class="stbl-wrap">'+qt+'</div><h4>Teamvergleich</h4><div class="stbl-wrap">'+cmp+'</div>'+
-      '<h4>Boxscore TVD 3</h4><div class="stbl-wrap">'+box+'</div><p class="stnote">● = Starter · Quelle: DBB.Scores'+(s.match?' (Spiel-ID '+s.match+')':'')+'</p></div></details>';
+      '<h4>Boxscore TVD 3</h4><div class="stbl-wrap">'+box+'</div><p class="stnote">'+(ps.some(x=>x.sec!==null)?'● = Starter · Quelle: DBB.Scores':'Quelle: basketball-bund.net · Minuten, +/- und Starter folgen, sobald der DBB.Scores-Bericht nachgetragen ist')+(s.match?' (Spiel-ID '+s.match+')':'')+'</p></div></details>';
   }
 
   function render(){
