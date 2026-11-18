@@ -402,6 +402,10 @@
   .scout .stat{background:var(--ink)}
   .scout h4{font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.06em;color:var(--muted);margin:14px 0 6px}
   .scout .teamline{margin-top:4px}
+  .scout .sgame{background:var(--ink)}
+  .scout .sgame .stbl th:first-child,.scout .sgame .stbl td:first-child{background:var(--ink)}
+  .scout .sgame summary{font-family:var(--body);font-weight:400;letter-spacing:0;text-transform:none;font-size:inherit;color:var(--text)}
+  .scout .sgame summary::after{margin-left:4px}
 
   /* ---- Taktik ---- */
   .pb-plays{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:16px 0 10px}
@@ -696,10 +700,15 @@ function renderTable(){
   const esc=x=>String(x).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
   const sg=v=>v===null||v===undefined?"":(v>0?"+":"")+v;
   const sum='<summary><h3>Tabelle</h3>'+(me?'<span class="lt-me">Platz '+me.rank+'<small>von '+rows.length+(full?' · '+me.wins+'–'+me.losses:'')+'</small></span>':'')+'</summary>';
-  const head=full?'<tr><th>Pl.</th><th>Team</th><th>Sp</th><th>S</th><th>N</th><th>Diff</th></tr>':'<tr><th>Pl.</th><th>Team</th></tr>';
-  const body=rows.map(r=>'<tr'+(r.us?' class="us"':'')+'><td>'+r.rank+'</td><td class="tm">'+esc(r.team)+'</td>'+
-    (full?'<td>'+r.games+'</td><td>'+r.wins+'</td><td>'+r.losses+'</td><td'+(r.diff>0?' class="pos"':'')+'>'+sg(r.diff)+'</td>':'')+'</tr>').join("");
-  el.innerHTML=sum+'<table class="stbl"><thead>'+head+'</thead><tbody>'+body+'</tbody></table>'+
+  // Ø Punkte / Ø kassiert pro Spiel aus dem Korbverhältnis ("pf:pa")
+  const avg=r=>{const m=String(r.korb||"").match(/^(\d+):(\d+)$/);return m&&r.games?[Number(m[1])/r.games,Number(m[2])/r.games]:null;};
+  const r1=v=>(Math.round(v*10)/10).toFixed(1).replace(".",",");
+  const hasAvg=full&&rows.some(avg);
+  const head=full?'<tr><th>Pl.</th><th>Team</th><th>Sp</th><th>S</th><th>N</th><th>Diff</th>'+(hasAvg?'<th>Ø Pkt</th><th>Ø Geg.</th>':'')+'</tr>':'<tr><th>Pl.</th><th>Team</th></tr>';
+  const body=rows.map(r=>{const a=hasAvg?avg(r):null;return '<tr'+(r.us?' class="us"':'')+'><td>'+r.rank+'</td><td class="tm">'+esc(r.team)+'</td>'+
+    (full?'<td>'+r.games+'</td><td>'+r.wins+'</td><td>'+r.losses+'</td><td'+(r.diff>0?' class="pos"':'')+'>'+sg(r.diff)+'</td>'+
+      (hasAvg?(a?'<td>'+r1(a[0])+'</td><td>'+r1(a[1])+'</td>':'<td class="dim">–</td><td class="dim">–</td>'):''):'')+'</tr>';}).join("");
+  el.innerHTML=sum+'<div class="stbl-wrap"><table class="stbl"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+
     '<p class="lt-note">'+(TABLE.source==="berechnet"?'Berechnet aus allen Liga-Ergebnissen (basketball-bund.net) – bei Gleichstand ohne direkten Vergleich':'Quelle: basketball-bund.net')+(TABLE.updated?' · Stand '+esc(TABLE.updated):'')+'</p>';
   el.open=wasOpen; el.style.display="block";
 }
@@ -1226,10 +1235,30 @@ const Scout = (function(){
         '<td'+(p[3]?'':' class="dim"')+'>'+r1(p[3]/p[1])+'</td><td'+(p[4]?'':' class="dim"')+'>'+r1(p[4]/p[1])+'</td>'+
         '<td'+(p[6]?'':' class="dim"')+'>'+p[5]+'/'+p[6]+'</td><td>'+r1(p[7]/p[1])+'</td></tr>').join("")+'</tbody></table>';
   }
+  // Spiele des Gegners: Endstand, Viertel (beide Teams) + Teamwerte FW/2er/3er/Fouls des gescouteten Teams
+  // gl[] = {d, h (Heimspiel?), o (Gegner), s:[Pkt, Gegenpunkte], q/oq: Viertel oder null, st:[FW T, FW V, 2er, 3er, Fouls] oder null}
+  function gameList(t,openG){
+    if(!Array.isArray(t.gl)||!t.gl.length) return "";
+    const dm=s=>{const p=String(s).slice(0,10).split("-");return p.length===3?Number(p[2])+"."+Number(p[1])+".":esc(s);};
+    const short=s=>esc(String(s).replace(/^(SV 03|SV|TB|TuS|VfL|SpVgg|TSV|TSG|TV|BG|SG)\s+/,""));
+    return '<h4>Spiele</h4>'+[...t.gl].reverse().map(x=>{
+      const win=x.s[0]>x.s[1], st=x.st;
+      const qt=x.q&&x.oq?'<div class="stbl-wrap"><table class="stbl" style="min-width:0"><thead><tr><th>Team</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Ges.</th></tr></thead><tbody>'+
+        '<tr><td class="nm">'+short(t.team)+'</td>'+x.q.map(v=>'<td>'+v+'</td>').join("")+'<td class="hi">'+x.s[0]+'</td></tr>'+
+        '<tr class="opp"><td class="nm">'+short(x.o)+'</td>'+x.oq.map(v=>'<td>'+v+'</td>').join("")+'<td>'+x.s[1]+'</td></tr></tbody></table></div>'
+        :'<p class="stnote" style="margin-top:0">Keine Viertel beim Verband.</p>';
+      const line=st?'<div class="teamline"><span>FW <b>'+st[0]+'/'+st[1]+'</b>'+(st[1]?' ('+Math.round(st[0]/st[1]*100)+'%)':'')+'</span><span>2er <b>'+st[2]+'</b></span><span>3er <b>'+st[3]+'</b></span><span>Fouls <b>'+st[4]+'</b></span></div>'
+        :'<p class="stnote">Keine Wurf-/Foulstatistik für dieses Spiel.</p>';
+      return '<details class="sgame '+(x.h?'home':'away')+'" data-d="'+esc(x.d)+'"'+(openG.includes(String(x.d))?' open':'')+'><summary><span class="sg-d">'+dm(x.d)+'</span>'+
+        '<span class="sg-o">'+(x.h?'vs ':'@ ')+short(x.o)+'</span><span class="score">'+scoreHtml({our:x.s[0],opp:x.s[1],win})+'</span></summary>'+
+        '<div class="sg-body">'+qt+line+'</div></details>';
+    }).join("");
+  }
   function render(){
     const host=document.getElementById("scout"); if(!host) return;
     const g=nextIdx>=0?games[nextIdx]:null, t=g?teamData(g.opp):null;
     if(!g||!t||!t.games){host.hidden=true;return;}
+    const openG=[...host.querySelectorAll(".sgame[open]")].map(x=>x.dataset.d);   // aufgeklappte Spiele bleiben offen
     const rk=rankOf(g.opp), n=t.games, bx=t.bx||0, per=v=>bx?r1(v/bx):"–";
     const tiles=[
       [rk?rk.rank+".":"–","Platz"+(rk&&TABLE.ok!==false?" · "+rk.wins+"–"+rk.losses:"")],
@@ -1244,6 +1273,7 @@ const Scout = (function(){
       '<div class="strip">'+tiles.map(([v,l])=>'<div class="stat"><div class="n">'+v+'</div><div class="l">'+l+'</div></div>').join("")+'</div>'+
       '<div class="teamline"><span>Fouls pro Spiel <b>'+per(t.fouls)+'</b></span>'+(bx?'<span>Freiwürfe <b>'+per(t.ftm)+'/'+per(t.fta)+'</b> pro Spiel</span>':'')+h2h+'</div>'+
       (bx&&t.players&&t.players.length?'<h4>Spieler · Ø pro Spiel (FW gesamt)</h4><div class="stbl-wrap">'+players(t)+'</div>':'<p class="stnote">Noch keine Boxscores für dieses Team.</p>')+
+      gameList(t,openG)+
       '<p class="stnote">Basis: '+bx+' von '+n+' Spielen mit Statistik · Quelle: basketball-bund.net'+(SCOUT.updated?' · Stand '+esc(SCOUT.updated):'')+'</p>';
     host.hidden=false;
   }
