@@ -435,6 +435,11 @@
   .pb-txt{font-size:15px;line-height:1.5;max-width:68ch}
   .pb-leg{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:12.5px;margin:12px 0 0;list-style:none}
   .pb-leg li{display:flex;align-items:center;gap:8px}
+  .pb-leg li[hidden]{display:none}
+  .pb-row.role{padding-bottom:10px}
+  .pb-rl{min-height:38px;padding:0 18px;border-radius:4px;border:1px solid var(--line-strong);background:transparent;color:var(--text);font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+  .pb-rl[aria-pressed=true]{background:var(--home);border-color:var(--home);color:#fff}
+  .pb-rl:focus-visible{outline:2px solid #fff;outline-offset:2px}
   .pb-leg svg{width:34px;height:14px}
   .pb-src{color:var(--muted-2);font-size:12px;margin-top:12px;line-height:1.5}
   .lk{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;padding:10px 14px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--home);border-radius:4px;color:var(--text);text-decoration:none;margin-bottom:8px}
@@ -582,6 +587,7 @@
       <li><svg viewBox="0 0 34 14"><path d="M2 7h26M28 1v12" stroke="#fff" stroke-width="2" fill="none"/></svg>Block</li>
       <li><svg viewBox="0 0 34 14"><path d="M2 7h30" stroke="#F28C28" stroke-width="2" stroke-dasharray="4 3"/></svg>Pass / Wurf</li>
       <li><svg viewBox="0 0 34 14"><circle cx="17" cy="7" r="6" fill="#E0353B"/></svg><span id="pbHll">Abschluss</span></li>
+      <li id="pbDefLeg" hidden><svg viewBox="0 0 34 14"><path d="M17 7L31 7" stroke="#A6A6A6" stroke-width="1.6"/><circle cx="17" cy="7" r="5.5" fill="#3A3A3A" stroke="#A6A6A6" stroke-width="1.2"/></svg>Verteidiger (Strich = Blick zum Ball)</li>
     </ul>
     <p class="pb-src" id="pbSrc"></p>
 
@@ -1298,25 +1304,25 @@ const Scout = (function(){
 const Playbook=(function(){
 const CM_LATE='Spät heißt: erst losgehen, wenn der Drive schon läuft.';
 const CM=[
- {play:'circle',hl:'5',id:'baseline-45',g:'Baseline',name:'Drive vom 45',
+ {play:'circle',r:'innen',hl:'5',id:'baseline-45',g:'Baseline',name:'Drive vom 45',
   txt:'Baseline-Drive vom 45: Der Innenspieler auf der Weakside schneidet spät ins „Fenster“ – oben am No-Charge-Halbkreis, dem Dunker’s Spot. '+CM_LATE,
   pl:{2:[1.2,6.4],5:[10.1,1.0]},ball:'2',
   mv:[{p:'2',k:'d',t:[0,1.7],pts:[[2.6,4.6],[4.6,2.7],[6.0,1.9]]},
       {p:'5',k:'c',t:[.9,2],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
       {k:'p',from:'2',to:'5',t:[2.1,2.45]}]},
- {play:'circle',hl:'5',id:'baseline-ecke',g:'Baseline',name:'Drive aus der Ecke',
+ {play:'circle',r:'innen',hl:'5',id:'baseline-ecke',g:'Baseline',name:'Drive aus der Ecke',
   txt:'Gleiches Verhalten beim Baseline-Drive aus der Ecke: Der Weakside-Post füllt spät den Dunker’s Spot und bestraft, dass sein Gegenspieler am Ball aushilft.',
   pl:{2:[0.6,1.1],5:[10.1,1.0]},ball:'2',
   mv:[{p:'2',k:'d',t:[0,1.7],pts:[[2.5,1.0],[4.5,1.2],[6.0,1.6]]},
       {p:'5',k:'c',t:[.9,2],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
       {k:'p',from:'2',to:'5',t:[2.1,2.45]}]},
- {play:'circle',hl:'5',id:'baseline-slot',g:'Baseline',name:'Drive vom Slot',
+ {play:'circle',r:'innen',hl:'5',id:'baseline-slot',g:'Baseline',name:'Drive vom Slot',
   txt:'Auch beim Baseline-Drive vom Slot: spät ins Fenster am Dunker’s Spot. Hilft der Verteidiger von 5 gegen den Drive, ist 5 frei.',
   pl:{2:[4.9,9.5],5:[10.1,1.0]},ball:'2',
   mv:[{p:'2',k:'d',t:[0,1.8],pts:[[4.8,7.0],[5.4,4.2],[6.4,2.4]]},
       {p:'5',k:'c',t:[1,2.1],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
       {k:'p',from:'2',to:'5',t:[2.2,2.55]}]},
- {play:'circle',hl:'5',id:'baseline-bsp1',g:'Baseline',name:'Beispiel 1 · Spacing',
+ {play:'circle',r:'innen',hl:'5',id:'baseline-bsp1',g:'Baseline',name:'Beispiel 1 · Spacing',
   txt:'Baseline-Drive vom 45 mit allen Fünf: Die Spieler ohne Ball halten Abstand und bieten Passoptionen. 3 sinkt in die Ecke, 1 füllt den 45, 4 bleibt als Safety hinter dem Drive.',
   pl:{2:[1.2,6.3],5:[10.1,1.0],1:[9.8,9.2],3:[13.9,6.1],4:[5.0,9.2]},ball:'2',
   mv:[{p:'2',k:'d',t:[0,1.7],pts:[[2.7,4.4],[4.7,2.4],[6.1,1.5]]},
@@ -1325,20 +1331,20 @@ const CM=[
       {p:'4',k:'c',t:[.5,1.6],pts:[[3.8,8.6],[2.8,7.8]]},
       {p:'5',k:'c',t:[.9,2],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
       {k:'p',from:'2',to:'5',t:[2.1,2.45]}]},
- {play:'circle',hl:'5',id:'baseline-bsp2',g:'Baseline',name:'Beispiel 2 · Spacing',
+ {play:'circle',r:'innen',hl:'5',id:'baseline-bsp2',g:'Baseline',name:'Beispiel 2 · Spacing',
   txt:'Baseline-Drive vom Slot: 4 und 3 bleiben in den Ecken, 1 geht auf den 45 und ist bereit als Safety. 5 schneidet spät zum Dunker’s Spot.',
   pl:{2:[4.9,9.1],5:[10.1,1.0],1:[9.6,9.1],3:[14.4,0.6],4:[0.6,0.6]},ball:'2',
   mv:[{p:'2',k:'d',t:[0,1.8],pts:[[4.8,6.5],[5.5,3.8],[6.6,1.6]]},
       {p:'1',k:'c',t:[.4,1.6],pts:[[11.6,8.3],[13.0,6.8]]},
       {p:'5',k:'c',t:[1,2.1],pts:[[10.3,2.3],[9.4,3.1],[8.3,3.0]]},
       {k:'p',from:'2',to:'5',t:[2.2,2.55]}]},
- {play:'circle',hl:'5',id:'middle-45',g:'Middle',name:'Drive vom 45',
+ {play:'circle',r:'innen',hl:'5',id:'middle-45',g:'Middle',name:'Drive vom 45',
   txt:'Middle-Drive vom 45: Der Weakside-Innenspieler cuttet spät unter dem Brett durch zur Brettecke auf der anderen Seite.',
   pl:{2:[1.0,6.4],5:[9.6,1.1]},ball:'2',
   mv:[{p:'2',k:'d',t:[0,1.7],pts:[[3.5,6.6],[6.2,5.4],[7.8,3.8]]},
       {p:'5',k:'c',t:[.9,2.1],pts:[[8.8,0.5],[7.5,0.45],[6.2,0.6],[5.6,1.5]]},
       {k:'p',from:'2',to:'5',t:[2.2,2.55]}]},
- {play:'circle',hl:'5',id:'middle-bsp',g:'Middle',name:'Beispiel · Spacing',
+ {play:'circle',r:'innen',hl:'5',id:'middle-bsp',g:'Middle',name:'Beispiel · Spacing',
   txt:'Middle-Drive vom Slot: 5 cuttet unter dem Brett durch. Die übrigen füllen auf – 4 aus der Ecke auf den 45 (ist die Ecke schon besetzt, cuttet der Spieler dort backdoor), 1 auf den 45, 3 in die Ecke.',
   pl:{2:[4.7,9.4],5:[9.6,1.1],4:[0.4,1.1],1:[9.5,9.0],3:[13.7,6.3]},ball:'2',
   mv:[{p:'2',k:'d',t:[0,1.7],pts:[[5.4,7.2],[6.2,5.4],[6.9,3.8]]},
@@ -1347,39 +1353,109 @@ const CM=[
       {p:'1',k:'c',t:[.6,1.8],pts:[[11.6,8.3],[13.3,6.6]]},
       {p:'5',k:'c',t:[.9,2.1],pts:[[8.8,0.5],[7.5,0.45],[6.2,0.6],[5.6,1.5]]},
       {k:'p',from:'2',to:'5',t:[2.2,2.55]}]},
- {play:'circle',hl:'5',id:'lowpost-baseline',g:'Lowpost',name:'1-gegen-1 Baseline',
+ {play:'circle',r:'innen',hl:'5',id:'lowpost-baseline',g:'Lowpost',name:'1-gegen-1 Baseline',
   txt:'Ball im Lowpost, 4 geht 1-gegen-1 zur Baseline: Der Weakside-Post reagiert im Sinne des Circle Movement und cuttet spät ins Fenster zum Dunker’s Spot.',
   pl:{4:[4.5,3.1],5:[9.8,1.1]},ball:'4',
   mv:[{p:'4',k:'d',t:[0,1.2],pts:[[5.0,2.0],[5.8,1.3]]},
       {p:'5',k:'c',t:[.6,1.7],pts:[[10.1,2.5],[9.1,3.2],[8.2,3.0]]},
       {k:'p',from:'4',to:'5',t:[1.8,2.1]}]},
- {play:'circle',hl:'5',id:'lowpost-mitte',g:'Lowpost',name:'1-gegen-1 Mitte',
+ {play:'circle',r:'innen',hl:'5',id:'lowpost-mitte',g:'Lowpost',name:'1-gegen-1 Mitte',
   txt:'Ball im Lowpost, 4 geht 1-gegen-1 zur Mitte: Der Weakside-Post cuttet spät unter dem Brett durch zur Brettecke.',
   pl:{4:[4.5,3.1],5:[9.8,1.1]},ball:'4',
   mv:[{p:'4',k:'d',t:[0,1.2],pts:[[5.6,3.0],[6.7,2.4]]},
       {p:'5',k:'c',t:[.6,1.8],pts:[[8.9,0.5],[7.5,0.45],[6.2,0.6],[5.6,1.3]]},
       {k:'p',from:'4',to:'5',t:[1.9,2.2]}]},
- {play:'circle',hl:'5',id:'ballseite-baseline',g:'Ballseite',name:'Baseline → Elbow',
+ {play:'circle',r:'innen',hl:'5',id:'ballseite-baseline',g:'Ballseite',name:'Baseline → Elbow',
   txt:'Baseline-Drive vom 45, Innenspieler auf der Ballseite: 5 schiebt parallel zur Zonenlinie Richtung Elbow. Das macht Platz für den Drive – und 5 ist anspielbar, wenn sein Gegenspieler aushilft.',
   pl:{2:[1.0,6.4],5:[5.0,2.6]},ball:'2',
   mv:[{p:'2',k:'d',t:[0,1.6],pts:[[2.0,4.3],[3.2,3.0],[4.0,2.4]]},
       {p:'5',k:'c',t:[.3,1.4],pts:[[5.1,4.2],[5.1,5.6]]},
       {k:'p',from:'2',to:'5',t:[1.8,2.15]}]},
- {play:'circle',hl:'5',id:'ballseite-middle',g:'Ballseite',name:'Middle → Short Corner',
+ {play:'circle',r:'innen',hl:'5',id:'ballseite-middle',g:'Ballseite',name:'Middle → Short Corner',
   txt:'Middle-Drive vom 45, Innenspieler auf der Ballseite: 5 schiebt Richtung Short Corner. Platz für den Drive, und anspielbar, falls sein Gegenspieler beim Dribbler aushilft.',
   pl:{2:[1.1,6.4],5:[4.6,3.0]},ball:'2',
   mv:[{p:'2',k:'d',t:[0,1.7],pts:[[3.4,6.0],[5.4,4.2],[6.6,2.6]]},
       {p:'5',k:'c',t:[.3,1.4],pts:[[3.6,2.2],[2.9,1.2]]},
       {k:'p',from:'2',to:'5',t:[1.9,2.25]}]}
 ];
+/* ---------- Circle Movement · Außenspieler (BBW-Blatt „Dribble Drive (Außenspieler)“) ---------- */
+const CA_DRIFT={p:'3',k:'c',pts:[[14.2,4.0],[14.4,1.0]]};
+const CA=[
+ {id:'aussen-45',g:'Auffüllen',name:'Baseline vom 45',ch:'vom 45',hl:'3',
+  txt:'Baseline-Drive vom 45: Wir füllen die Weakside-Ecke (Drift) und den Weakside-45. 3 driftet in die Ecke, 1 rückt auf den 45 nach – beide bieten den Kick-out-Pass an.',
+  pl:{2:[1.2,6.4],1:[9.8,9.2],3:[13.3,6.4]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[2.7,4.4],[4.7,2.4],[6.1,1.6]]},
+      {...CA_DRIFT,t:[.3,1.5]},
+      {p:'1',k:'c',t:[.6,1.8],pts:[[11.8,8.6],[13.2,6.6]]},
+      {k:'p',from:'2',to:'3',t:[2.0,2.4]}]},
+ {id:'aussen-slot',g:'Auffüllen',name:'Baseline vom Slot',ch:'vom Slot',hl:'3',
+  txt:'Gleiches Verhalten beim Baseline-Drive vom Slot (und beim Drive aus der Ecke): Weakside-Ecke per Drift füllen, Weakside-45 nachrücken.',
+  pl:{2:[4.6,9.4],1:[10.2,9.4],3:[13.3,6.4]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.8],pts:[[4.8,7.0],[5.4,4.2],[6.4,2.4]]},
+      {...CA_DRIFT,t:[.3,1.5]},
+      {p:'1',k:'c',t:[.6,1.8],pts:[[12.0,8.6],[13.2,6.6]]},
+      {k:'p',from:'2',to:'3',t:[2.1,2.5]}]},
+ {id:'aussen-45cut',g:'Auffüllen',name:'45-Cut',ch:'45-Cut',hl:'1',
+  txt:'Baseline-Drive, Weakside-45 und Slot sind schon besetzt: Der Spieler auf dem Weakside-45 cuttet zum Korb (wie bei den Post-Feed-Prinzipien). Für die Weakside-Ecke gilt: „Der Ball muss dich sehen können.“',
+  pl:{2:[1.2,6.4],3:[14.4,0.8],1:[13.2,6.6]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[2.7,4.4],[4.7,2.4],[5.9,1.7]]},
+      {p:'1',k:'c',t:[.8,2.0],pts:[[11.6,5.0],[9.6,3.4],[8.4,2.6]]},
+      {k:'p',from:'2',to:'1',t:[2.1,2.45]}]},
+ {id:'aussen-bleibt',g:'Ecke liest',name:'Bleibt in der Ecke',ch:'Bleibt',hl:'3',
+  txt:'Baseline-Drive vom Slot oder 45: Der Spieler in der Ballseiten-Ecke liest seinen Verteidiger. Hilft dieser spät und der Ball kann ihn in der Ecke sehen, bleibt er dort – Kick-out und Wurf.',
+  pl:{2:[4.9,9.4],3:[0.6,0.8],x3:[1.6,1.7]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.8],pts:[[5.0,7.0],[5.6,4.4],[6.4,2.6]]},
+      {p:'x3',k:'c',t:[1.1,1.8],pts:[[3.2,2.2],[4.6,2.5]]},
+      {k:'p',from:'2',to:'3',t:[1.95,2.35]},
+      {k:'sh',p:'3',t:[2.5,3.0]}]},
+ {id:'aussen-backdoor',g:'Ecke liest',name:'Backdoor',ch:'Backdoor',hl:'3',
+  txt:'Schaut der Verteidiger der Ballseiten-Ecke zum Ball (3 sieht also seinen Hinterkopf), cuttet 3 backdoor an der Grundlinie entlang zum Korb.',
+  pl:{2:[4.9,9.4],3:[0.6,0.8],x3:[1.6,1.8]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.6],pts:[[5.0,7.2],[5.5,5.0],[6.0,3.6]]},
+      {p:'x3',k:'c',t:[.6,1.4],pts:[[2.4,2.6],[3.1,3.0]]},
+      {p:'3',k:'c',t:[1.0,2.0],pts:[[2.6,0.55],[4.8,0.6],[6.4,1.1]]},
+      {k:'p',from:'2',to:'3',t:[2.0,2.35]}]},
+ {id:'aussen-flip',g:'Ecke liest',name:'Flip',ch:'Flip',hl:'3',
+  txt:'Steht der Verteidiger der Ballseiten-Ecke offen und stark zum Ball orientiert, hilft er früh oder täuscht Hilfe an – und der Ball kann 3 nicht sehen: 3 macht einen Flip, kreuzt also hinter dem Ballführer und bekommt den Ball zurück.',
+  pl:{2:[2.2,7.6],3:[0.6,0.8],x3:[1.7,2.0]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.6],pts:[[3.2,6.0],[4.4,4.4],[5.6,3.0]]},
+      {p:'x3',k:'c',t:[.4,1.3],pts:[[2.8,2.8],[3.8,3.4]]},
+      {p:'3',k:'c',t:[.8,2.1],pts:[[0.9,3.2],[2.0,5.2],[3.4,6.2],[4.6,6.2]]},
+      {k:'p',from:'2',to:'3',t:[2.15,2.45]}]},
+ {id:'aussen-mitte',g:'Middle',name:'Auffüllen',ch:'Auffüllen',hl:'3',
+  txt:'Drive zur Mitte vom Slot oder 45: Wir füllen die Weakside-Ecke und den Weakside-45 – 3 driftet in die Ecke, 1 rückt auf den 45.',
+  pl:{2:[4.4,8.8],1:[9.8,9.2],3:[13.2,6.6]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[5.6,6.8],[6.8,4.6],[7.3,3.1]]},
+      {...CA_DRIFT,t:[.3,1.5]},
+      {p:'1',k:'c',t:[.6,1.8],pts:[[11.8,8.6],[13.1,6.8]]},
+      {k:'p',from:'2',to:'3',t:[2.0,2.4]}]},
+ {id:'aussen-mitte-flip',g:'Middle',name:'Flip',ch:'Flip',hl:'1',
+  txt:'Drive zur Mitte, beide Slots besetzt: Steht der Verteidiger von 1 offen bzw. stark zum Ball orientiert, macht 1 einen Flip – er kreuzt hinter dem Ballführer und bekommt den Ball zurück.',
+  pl:{2:[4.4,8.8],1:[9.6,9.4],x1:[8.9,8.3],3:[13.2,6.6]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[5.6,6.8],[6.6,4.8],[7.2,3.2]]},
+      {p:'x1',k:'c',t:[.4,1.2],pts:[[8.2,7.0],[7.8,6.0]]},
+      {...CA_DRIFT,t:[.3,1.5]},
+      {p:'1',k:'c',t:[.8,2.0],pts:[[8.2,9.9],[6.2,9.6],[4.8,8.0]]},
+      {k:'p',from:'2',to:'1',t:[2.1,2.45]}]},
+ {id:'aussen-mitte-backdoor',g:'Middle',name:'Backdoor',ch:'Backdoor',hl:'3',
+  txt:'Drive zur Mitte, die Weakside-Ecke ist schon besetzt: Der Spieler dort cuttet backdoor zum Korb. Der andere Weakside-Spieler bewegt sich mit dem Ball und füllt Ecke bzw. 45 auf.',
+  pl:{2:[4.4,8.8],3:[14.4,0.8],1:[12.4,7.4]},ball:'2',
+  mv:[{p:'2',k:'d',t:[0,1.7],pts:[[5.6,6.8],[6.6,4.8],[7.0,3.5]]},
+      {p:'3',k:'c',t:[.9,2.0],pts:[[12.8,0.55],[10.4,0.6],[8.7,1.1]]},
+      {p:'1',k:'c',t:[1.0,2.1],pts:[[13.6,5.0],[14.4,1.4]]},
+      {k:'p',from:'2',to:'3',t:[2.1,2.45]}]}
+].map(s=>({...s,play:'circle',r:'aussen'}));
 const RIM={x:7.5,y:1.575};
 const PLAYS=[
  {id:'horns',name:'Horns',kind:'System',sub:'Einstieg: Doppelblock von 4 und 5 für 1, 3 geht in die Ecke',hll:'Abschluss',groups:['Direkt','Swing'],
   src:'Nach Gerhards Play „TVD Horns“ (Hoops Geek). Phase 1–7 dort = die sieben Varianten hier.'},
  {id:'box',name:'Box',kind:'Einwurf',sub:'Einwurf von der Grundlinie – 1 wirft ein, Lesereihenfolge 4 → 5 → 3',hll:'Anspielstation',groups:['Optionen'],
   src:'Nach Gerhards Play „TVD Box“ (Hoops Geek).'},
- {id:'circle',name:'Circle Movement',kind:'Prinzip',sub:'Dribble Drive – was der Innenspieler macht',hll:'Innenspieler (5)',groups:['Baseline','Middle','Lowpost','Ballseite'],
-  src:'Nach den BBW-Unterlagen „Circle Movement – Dribble Drive (Innenspieler)“. Die Passoption am Ende ist ergänzt, um zu zeigen, wofür der Laufweg da ist.'}
+ {id:'circle',name:'Circle Movement',kind:'Prinzip',roles:{
+  innen:{label:'Innen',sub:'Dribble Drive – was der Innenspieler macht',hll:'Innenspieler (5)',groups:['Baseline','Middle','Lowpost','Ballseite'],
+   src:'Nach den BBW-Unterlagen „Circle Movement – Dribble Drive (Innenspieler)“. Die Passoption am Ende ist ergänzt, um zu zeigen, wofür der Laufweg da ist.'},
+  aussen:{label:'Außen',sub:'Dribble Drive – was die Außenspieler machen',hll:'Reagierender Außenspieler',groups:['Auffüllen','Ecke liest','Middle'],
+   src:'Nach den BBW-Unterlagen „Circle Movement – Dribble Drive (Außenspieler)“. Der Pass am Ende ist ergänzt, um zu zeigen, wofür der Laufweg da ist.'}}}
 ];
 const st=(d,...a)=>({d,a});
 const P=(f,t)=>({k:'p',from:f,to:t}), SH=p=>({k:'sh',p});
@@ -1440,7 +1516,7 @@ const CH={'baseline-45':'vom 45','baseline-ecke':'aus der Ecke','baseline-slot':
   'middle-45':'vom 45','middle-bsp':'Spacing','lowpost-baseline':'zur Baseline','lowpost-mitte':'zur Mitte',
   'ballseite-baseline':'Baseline → Elbow','ballseite-middle':'Middle → Short Corner'};
 CM.forEach(x=>{if(CH[x.id])x.ch=CH[x.id];});
-const SC=[...HORNS,...BOX,...CM];
+const SC=[...HORNS,...BOX,...CM,...CA];
 const $=id=>document.getElementById('pb'+id[0].toUpperCase()+id.slice(1));
 
 $('lines').innerHTML=`
@@ -1547,7 +1623,9 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let shown=false,inited=false;
 const isPlayHash=()=>SC.some(x=>x.id===location.hash.slice(1));
 const playOf=s=>PLAYS.find(p=>p.id===s.play);
-const inPlay=pid=>SC.filter(x=>x.play===pid);
+const inSet=s=>SC.filter(x=>x.play===s.play&&(x.r||'')===(s.r||''));   // Varianten derselben Gruppe (bei Circle: Innen bzw. Außen)
+const viewOf=s=>{const p=playOf(s);return p.roles?p.roles[s.r]:p;};
+const isDef=k=>k[0]==='x';
 
 function drawGhost(s){
   $('ghost').innerHTML=s.mv.filter(m=>m.pa).map(m=>
@@ -1573,7 +1651,7 @@ function render(){
   for(const m of s.mv){
     if(!m.pa||t<=m.t[0])continue;
     const sE=ease(prog(m,t))*m.pa.len;
-    tr+=`<path d="${m.k==='d'?dDrib(m.pa,sE):dCut(m.pa,sE)}" fill="none" stroke="${m.p===s.hl?'#FF6B70':'#fff'}" stroke-width=".09" stroke-linecap="round" stroke-linejoin="round"/>`;
+    tr+=`<path d="${m.k==='d'?dDrib(m.pa,sE):dCut(m.pa,sE)}" fill="none" stroke="${m.p===s.hl?'#FF6B70':isDef(m.p)?'#8A8A8A':'#fff'}" stroke-width=".09" stroke-linecap="round" stroke-linejoin="round"/>`;
   }
   const b=ballAt(s,t);
   for(const m of s.mv){
@@ -1584,7 +1662,12 @@ function render(){
   }
   $('trail').innerHTML=tr;
   $('scr2').innerHTML=screens(s);
-  $('pls').innerHTML=Object.keys(s.pl).map(p=>{
+  // Verteidiger (x1, x3 …): grau, Strich zeigt die Blickrichtung zum Ball
+  const defs=Object.keys(s.pl).filter(isDef).map(p=>{
+    const q=pos(s,p,t),a=Math.atan2(b.y-q.y,b.x-q.x);
+    return `<g transform="translate(${f2(q.x)} ${f2(q.y)})"><path d="M0 0L${f2(Math.cos(a)*.78)} ${f2(Math.sin(a)*.78)}" stroke="#A6A6A6" stroke-width=".09" stroke-linecap="round"/><circle r=".4" fill="#3A3A3A" stroke="#A6A6A6" stroke-width=".05"/><text y=".02" text-anchor="middle" dominant-baseline="central" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="700" font-size=".44" fill="#E6E6E6">${p}</text></g>`;
+  }).join('');
+  $('pls').innerHTML=defs+Object.keys(s.pl).filter(p=>!isDef(p)).map(p=>{
     const q=pos(s,p,t),r=p===s.hl;
     return `<g transform="translate(${f2(q.x)} ${f2(q.y)})"><circle r=".52" fill="rgba(0,0,0,.35)" cy=".07"/><circle r=".5" fill="${r?'#E0353B':'#fff'}" stroke="${r?'#FF9C9C':'#121212'}" stroke-width=".05"/><text y=".02" text-anchor="middle" dominant-baseline="central" font-family="Barlow Condensed,Arial Narrow,sans-serif" font-weight="700" font-size=".68" fill="${r?'#fff':'#121212'}">${p}</text></g>`;
   }).join('');
@@ -1605,29 +1688,34 @@ function play(){if(t>=SC[cur].dur)t=0;playing=true;last=0;setBtn();requestAnimat
 function pause(){playing=false;setBtn();}
 
 function select(i,auto){
-  cur=(i+SC.length)%SC.length;const s=SC[cur],pl=playOf(s),list=inPlay(s.play);
+  cur=(i+SC.length)%SC.length;const s=SC[cur],P0=playOf(s),pl=viewOf(s),list=inSet(s);
   t=0;playing=false;
   if(shown&&location.hash.slice(1)!==s.id)history.replaceState(null,'',location.pathname+location.search+'#'+s.id);
   $('plays').innerHTML=PLAYS.map(p=>`<button role="tab" aria-selected="${p.id===s.play}" data-p="${p.id}">${p.name}<small>${p.kind}</small></button>`).join('');
   $('sub').textContent=pl.sub;
   const solo=pl.groups.length<2;
-  $('chips').innerHTML=pl.groups.map(g=>`<div class="pb-row${solo?' solo':''}">${solo?'':`<span class="pb-gl">${g}</span>`}<div class="pb-cs">`+
-    SC.map((x,j)=>x.play===s.play&&x.g===g?`<button class="pb-ch" aria-pressed="${j===cur}" data-i="${j}">${x.ch||x.name}</button>`:'').join('')+`</div></div>`).join('');
+  const roleRow=P0.roles?`<div class="pb-row role"><span class="pb-gl">Rolle</span><div class="pb-cs">`+
+    Object.keys(P0.roles).map(r=>`<button class="pb-rl" aria-pressed="${r===s.r}" data-r="${r}">${P0.roles[r].label}</button>`).join('')+`</div></div>`:'';
+  $('chips').innerHTML=roleRow+pl.groups.map(g=>`<div class="pb-row${solo?' solo':''}">${solo?'':`<span class="pb-gl">${g}</span>`}<div class="pb-cs">`+
+    SC.map((x,j)=>x.play===s.play&&(x.r||'')===(s.r||'')&&x.g===g?`<button class="pb-ch" aria-pressed="${j===cur}" data-i="${j}">${x.ch||x.name}</button>`:'').join('')+`</div></div>`).join('');
   $('name').innerHTML=(s.lab?`<span class="pb-lab">${s.lab}</span>`:'')+(s.lab?s.name:s.g+' · '+s.name);
   $('cnt').textContent=(list.indexOf(s)+1)+' / '+list.length;
   $('txt').textContent=s.txt;$('hll').textContent=pl.hll;$('src').textContent=pl.src;
+  $('defLeg').hidden=!Object.keys(s.pl).some(isDef);
   drawGhost(s);
   if(reduce){t=s.dur;render();setBtn();return;}
   render();setBtn();
   if(auto&&shown)setTimeout(()=>{if(shown&&SC[cur]===s&&!playing&&t===0)play();},350);
 }
 function step(d){
-  const list=inPlay(SC[cur].play),k=(list.indexOf(SC[cur])+d+list.length)%list.length;
+  const list=inSet(SC[cur]),k=(list.indexOf(SC[cur])+d+list.length)%list.length;
   select(SC.indexOf(list[k]),true);
 }
 
 $('plays').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(b)select(SC.findIndex(x=>x.play===b.dataset.p),true);});
-$('chips').addEventListener('click',e=>{const c=e.target.closest('[data-i]');if(c)select(+c.dataset.i,true);});
+$('chips').addEventListener('click',e=>{
+  const r=e.target.closest('[data-r]');if(r){if(r.dataset.r!==SC[cur].r)select(SC.findIndex(x=>x.play===SC[cur].play&&x.r===r.dataset.r),true);return;}
+  const c=e.target.closest('[data-i]');if(c)select(+c.dataset.i,true);});
 $('prev').addEventListener('click',()=>step(-1));
 $('next').addEventListener('click',()=>step(1));
 $('play').addEventListener('click',()=>playing?pause():play());
