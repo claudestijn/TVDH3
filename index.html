@@ -1122,9 +1122,9 @@ const Stats = (function(){
     }
     document.getElementById("stQuarters").innerHTML=qh;
     const all=list.flatMap(g=>STATS[g.date].p.map(P));
-    const ftm=sum(all.map(x=>x.ftm)), fta=sum(all.map(x=>x.fta)), p3=sum(all.map(x=>x.p3)), pf=sum(all.map(x=>x.pf));
+    const ftm=sum(all.map(x=>x.ftm)), fta=sum(all.map(x=>x.fta)), p2=sum(all.map(x=>x.p2)), p3=sum(all.map(x=>x.p3)), pf=sum(all.map(x=>x.pf));
     document.getElementById("stTeamline").innerHTML=n?
-      '<span>Freiwürfe <b>'+ftm+'/'+fta+'</b> ('+pct(ftm,fta)+')</span><span>3er pro Spiel <b>'+r1(p3/n)+'</b></span><span>Fouls pro Spiel <b>'+r1(pf/n)+'</b></span>':'';
+      '<span>Freiwürfe <b>'+ftm+'/'+fta+'</b> ('+pct(ftm,fta)+')</span><span>2er pro Spiel <b>'+r1(p2/n)+'</b></span><span>3er pro Spiel <b>'+r1(p3/n)+'</b></span><span>Fouls pro Spiel <b>'+r1(pf/n)+'</b></span>':'';
   }
 
   function season(list){
@@ -1137,14 +1137,14 @@ const Stats = (function(){
       if(x.sec!==null){a.sec+=x.sec;a.gpm++;}   // Minuten-Schnitt nur über Spiele mit Minuten
       if(x.pm!==null){a.pm+=x.pm;a.gpp++;}
     }));
-    const val={name:a=>a.name,gp:a=>a.gp,min:a=>a.gpm?a.sec/a.gpm:-1,pts:a=>a.pts,ppg:a=>a.gp?a.pts/a.gp:0,ft:a=>a.ftm,p3:a=>a.p3,pf:a=>a.pf,pm:a=>a.gpp?a.pm:-999};
+    const val={name:a=>a.name,gp:a=>a.gp,min:a=>a.gpm?a.sec/a.gpm:-1,pts:a=>a.pts,ppg:a=>a.gp?a.pts/a.gp:0,ft:a=>a.ftm,p2:a=>a.p2,p3:a=>a.p3,pf:a=>a.pf,pm:a=>a.gpp?a.pm:-999};
     const rows=Object.values(agg).sort((a,b)=>{const x=val[sortKey](a),y=val[sortKey](b);
       return (typeof x==="string"?x.localeCompare(y):(x-y))*sortDir || b.pts-a.pts;});
-    const cols=[["name","Spieler"],["gp","Sp"],["min","Min Ø"],["pts","Pkt"],["ppg","Ø"],["ft","FW"],["p3","3er"],["pf","F"],["pm","+/-"]];
+    const cols=[["name","Spieler"],["gp","Sp"],["min","Min Ø"],["pts","Pkt"],["ppg","Ø"],["ft","FW"],["p2","2er"],["p3","3er"],["pf","F"],["pm","+/-"]];
     let h='<table class="stbl"><thead><tr>'+cols.map(([k,l])=>'<th data-sort="'+k+'"'+(k===sortKey?' class="on"':'')+'>'+l+(k===sortKey?(sortDir<0?' ▾':' ▴'):'')+'</th>').join("")+'</tr></thead><tbody>';
     h+=rows.map(a=>'<tr><td class="nm" title="'+esc(a.name)+'">'+esc(a.name)+'</td><td>'+a.gp+'</td><td>'+(a.gpm?mmss(a.sec/a.gpm):"–")+'</td>'+
       '<td class="hi">'+a.pts+'</td><td>'+(a.gp?r1(a.pts/a.gp):"–")+'</td><td'+(a.fta?'':' class="dim"')+'>'+a.ftm+'/'+a.fta+'</td>'+
-      '<td'+(a.p3?'':' class="dim"')+'>'+a.p3+'</td><td>'+a.pf+'</td><td'+(a.gpp&&a.pm>0?' class="pos"':(a.gpp?'':' class="dim"'))+'>'+(a.gpp?sgn(a.pm):"–")+'</td></tr>').join("");
+      '<td'+(a.p2?'':' class="dim"')+'>'+a.p2+'</td><td'+(a.p3?'':' class="dim"')+'>'+a.p3+'</td><td>'+a.pf+'</td><td'+(a.gpp&&a.pm>0?' class="pos"':(a.gpp?'':' class="dim"'))+'>'+(a.gpp?sgn(a.pm):"–")+'</td></tr>').join("");
     document.getElementById("stPlayers").innerHTML=list.length?h+'</tbody></table>':'<p class="hint" style="margin:0">Noch keine Spiele erfasst.</p>';
   }
 
