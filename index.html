@@ -224,6 +224,20 @@
   .dg-tag{display:inline-block;font-family:var(--disp);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px dashed var(--muted-2);color:var(--muted);margin-left:6px;vertical-align:1px}
   .dutygame.tentative{border-style:dashed}
   .dg-note{color:var(--muted-2);font-size:12px;margin:-4px 0 10px}
+  /* Vergangene Dienste: eingeklappt, per Tippen aufklappbar */
+  details.dutygame>summary{list-style:none;cursor:pointer}
+  details.dutygame>summary::-webkit-details-marker{display:none}
+  details.dutygame:not([open])>summary .dg-h{margin-bottom:0}
+  .dutygame.past{opacity:.7}
+  .dutygame.past[open]{opacity:1}
+  .dg-badge.done{background:color-mix(in srgb,var(--text) 8%,transparent);color:var(--muted)}
+  .dg-tog{color:var(--muted-2);font-size:15px;line-height:1;margin-left:2px}
+  .dg-tog::after{content:"＋"}
+  details.dutygame[open] .dg-tog::after{content:"－"}
+  .dg-names{color:var(--muted);font-size:12px;margin-top:1px}
+  .role.extra{border-style:dashed}
+  .role.extra .who{font-weight:500}
+  .role .xtag{font-size:11px;color:var(--muted-2);margin-left:auto}
 
   .roles{display:grid;gap:7px}
   .role{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
@@ -807,9 +821,15 @@ const DutyApp = (function(){
     "2027-02-28":{time:"14:00",team:"Herren 2",opp:"TuS Metzingen",ok:false},
     "2027-03-14":{time:"16:00",team:"Herren 2",opp:"SV Böblingen Panthers",ok:false}
   };
+  // Einmalige Zusatzhilfe am Spieltag (nicht eintragbar, nur dieser Tag) — zählt in der Übersicht als Dienst
+  const EXTRA_HELP = {
+    "2026-11-15":[{label:"Verkauf",names:["Daniel","Sadik","Til"],note:"Verkaufsstand · einmalig"}]
+  };
+  const EXTRA_N = Object.values(EXTRA_HELP).flat().reduce((a,x)=>a+x.names.length,0);
   const dutyGames = games.filter(g=>g.home);               // 7 Heimtermine
   const SLOTS = dutyGames.length * ROLES.length;           // 21
   const SIGNUP_DEADLINE = new Date(2026,9,31,23,59,59);     // Ende Oktober 2026
+  const openPast = new Set();                               // aufgeklappte vergangene Dienste (bleibt beim Neuzeichnen offen)
   let state=null, pollTimer=null, openPicker=null, started=false, adminUnlocked=false, resetArm=false, dirty=false, serverDown=false;
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
@@ -905,7 +925,11 @@ const DutyApp = (function(){
     return flush();
   }
 
-  function counts(st){const c={};st.roster.forEach(n=>c[n]=0);Object.values(st.duties).forEach(sl=>Object.values(sl).forEach(n=>{if(n)c[n]=(c[n]||0)+1;}));return c;}
+  function counts(st){const c={};st.roster.forEach(n=>c[n]=0);Object.values(st.duties).forEach(sl=>Object.values(sl).forEach(n=>{if(n)c[n]=(c[n]||0)+1;}));
+    Object.values(EXTRA_HELP).flat().forEach(x=>x.names.forEach(n=>{const r=st.roster.find(y=>y.toLowerCase()===n.toLowerCase())||n;c[r]=(c[r]||0)+1;}));
+    return c;}
+  // Dienst gilt als vorbei: Anwurf des betreuten Spiels + 2 Std. (ohne Uhrzeit: Tagesende)
+  function dutyPast(g){const inf=DUTY_INFO[g.date]||{};const dt=d(g.date);const [h,m]=(inf.time||"23:59").split(":").map(Number);dt.setHours(h,m,0,0);return dt.getTime()+GAME_LEN_MS<=Date.now();}
   function fmtDate(s){const dt=d(s);return DOW[dt.getDay()]+" "+dt.getDate()+"."+(dt.getMonth()+1)+".";}
 
   function render(){
@@ -943,10 +967,10 @@ const DutyApp = (function(){
   function renderOverview(st,c){
     const host=document.getElementById("overview");
     const act=active(st);
-    const assigned=Object.values(c).reduce((a,b)=>a+b,0);
-    document.getElementById("fairMeta").textContent=assigned+" / "+SLOTS+" Slots vergeben"+(act.length?" · Ziel ≈ "+(SLOTS/act.length).toFixed(1)+" pro Person":"");
+    const assigned=Object.values(c).reduce((a,b)=>a+b,0)-EXTRA_N, total=SLOTS+EXTRA_N;
+    document.getElementById("fairMeta").textContent=assigned+" / "+SLOTS+" Slots vergeben"+(EXTRA_N?" · +"+EXTRA_N+" Verkauf":"")+(act.length?" · Ziel ≈ "+(total/act.length).toFixed(1)+" pro Person":"");
     if(!st.roster.length){host.innerHTML='<div class="emptyroster">Noch keine Namen im Kader — unten unter „Kader verwalten" anlegen.</div>';return;}
-    const max=Math.max(1,...act.map(n=>c[n]||0)), target=SLOTS/Math.max(act.length,1);
+    const max=Math.max(1,...act.map(n=>c[n]||0)), target=(SLOTS+EXTRA_N)/Math.max(act.length,1);
     let html='<div class="ovrow ovhead"><span>Name</span><span></span><span>Dienste</span><span>Gespielt</span></div>'+[...act].sort((a,b)=>(c[b]||0)-(c[a]||0)||a.localeCompare(b)).map(n=>{
       const v=c[n]||0, over=v>Math.ceil(target);
       return '<div class="ovrow'+(over?' over':'')+'"><span class="nm'+(v===0?' zero':'')+'">'+esc(n)+'</span>'+
@@ -971,15 +995,23 @@ const DutyApp = (function(){
         return '<div class="role empty"><span class="rl">'+label+'</span><span class="who">frei</span>'+
           '<button class="act add" data-add="'+g.date+'|'+k+'">Eintragen</button></div>'+(isOpen?picker(st,c,g.date,k):"");
       }).join("");
+      const extra=(EXTRA_HELP[g.date]||[]).map(x=>'<div class="role extra"><span class="rl">'+esc(x.label)+'</span><span class="who">'+x.names.map(esc).join(", ")+'</span>'+
+        (x.note?'<span class="xtag">'+esc(x.note)+'</span>':'')+'</div>').join("");
       const inf=DUTY_INFO[g.date]||{time:"",team:"Herren 2",opp:"",ok:false};
-      const tent=!inf.ok;
-      return '<div class="dutygame'+(full?' full':'')+(tent?' tentative':'')+'"><div class="dg-h">'+
+      const tent=!inf.ok, past=dutyPast(g);
+      const who=[...ROLES.map(([k])=>slot[k]).filter(Boolean),...(EXTRA_HELP[g.date]||[]).flatMap(x=>x.names)];
+      const badge=past?'<span class="dg-badge done">erledigt</span><span class="dg-tog" aria-hidden="true"></span>'
+        :'<span class="dg-badge '+(full?'full':'open')+'">'+(full?'komplett':(ROLES.length-filled)+' frei')+'</span>';
+      const head='<div class="dg-h">'+
         '<div class="dg-main"><div><span class="dg-date">'+fmtDate(g.date)+'</span>'+(inf.time?'<span class="dg-time">'+inf.time+' Uhr</span>':'')+
-        (tent?'<span class="dg-tag">vorläufig</span>':'')+'</div>'+
-        '<span class="dg-sub">'+esc(inf.team)+(inf.opp?' vs '+esc(inf.opp):'')+'</span></div>'+
-        '<span class="dg-badge '+(full?'full':'open')+'">'+(full?'komplett':(ROLES.length-filled)+' frei')+'</span></div>'+
-        (tent?'<div class="dg-note">Noch nicht offiziell zugeteilt – Termin/Uhrzeit können sich ändern.</div>':'')+
-        '<div class="roles">'+roles+'</div></div>';
+        (tent&&!past?'<span class="dg-tag">vorläufig</span>':'')+'</div>'+
+        '<span class="dg-sub">'+esc(inf.team)+(inf.opp?' vs '+esc(inf.opp):'')+'</span>'+
+        (past&&who.length?'<span class="dg-names">'+[...new Set(who)].map(esc).join(" · ")+'</span>':'')+'</div>'+badge+'</div>';
+      const body=(tent&&!past?'<div class="dg-note">Noch nicht offiziell zugeteilt – Termin/Uhrzeit können sich ändern.</div>':'')+
+        '<div class="roles">'+roles+extra+'</div>';
+      const cls='dutygame'+(full?' full':'')+(tent&&!past?' tentative':'')+(past?' past':'');
+      if(past) return '<details class="'+cls+'" data-date="'+g.date+'"'+(openPast.has(g.date)?' open':'')+'><summary>'+head+'</summary>'+body+'</details>';
+      return '<div class="'+cls+'">'+head+body+'</div>';
     }).join("");
   }
   function picker(st,c,date,role){
@@ -1064,6 +1096,10 @@ const DutyApp = (function(){
         else{resetArm=false;t.textContent="Alle Zuteilungen leeren";await mutate(st=>{dutyGames.forEach(g=>st.duties[g.date]={anschreiber:"",zeitnehmer:"",sekunden:""});});}
       }
     });
+    document.getElementById("dutyList").addEventListener("toggle",e=>{
+      const el=e.target; if(!el.matches||!el.matches("details.dutygame")) return;
+      if(el.open) openPast.add(el.dataset.date); else openPast.delete(el.dataset.date);
+    },true);
     document.getElementById("newPlayer").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addPlayers();}});
   }
   function startPoll(){stopPoll();pollTimer=setInterval(async()=>{
