@@ -823,7 +823,7 @@ const DutyApp = (function(){
   };
   // Einmalige Zusatzhilfe am Spieltag (nicht eintragbar, nur dieser Tag) — zählt in der Übersicht als Dienst
   const EXTRA_HELP = {
-    "2026-11-15":[{label:"Verkauf",names:["Daniel","Sadik","Til"],note:"Verkaufsstand · einmalig"}]
+    "2026-11-15":[{label:"Verkauf",names:["Sadik","Til"],note:"Verkaufsstand · einmalig"}]
   };
   const EXTRA_N = Object.values(EXTRA_HELP).flat().reduce((a,x)=>a+x.names.length,0);
   const dutyGames = games.filter(g=>g.home);               // 7 Heimtermine
@@ -1100,6 +1100,11 @@ const DutyApp = (function(){
       const el=e.target; if(!el.matches||!el.matches("details.dutygame")) return;
       if(el.open) openPast.add(el.dataset.date); else openPast.delete(el.dataset.date);
     },true);
+    // Schon beim Tippen merken (falls genau dann neu gezeichnet wird, kommt "toggle" am alten Element an)
+    document.getElementById("dutyList").addEventListener("click",e=>{
+      const sm=e.target.closest("details.dutygame>summary"); if(!sm) return;
+      const el=sm.parentElement; if(el.open) openPast.delete(el.dataset.date); else openPast.add(el.dataset.date);
+    });
     document.getElementById("newPlayer").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addPlayers();}});
   }
   function startPoll(){stopPoll();pollTimer=setInterval(async()=>{
